@@ -3,6 +3,7 @@ import DashboardPage from './pages/DashboardPage';
 import SalesPage from './pages/SalesPage';
 import NewOrderPage from './pages/NewOrderPage';
 import OrdersPage from './pages/OrdersPage';
+import MenuPage from './pages/MenuPage';
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 type PageId = 
@@ -46,6 +47,8 @@ function App() {
         return <NewOrderPage />;
         case 'orders':
         return <OrdersPage onNavigateToNewOrder={() => setCurrentPage('new-order')} />;
+        case 'menu':
+        return <MenuPage />;
       default:
         return (
           <div className="p-8 text-center text-slate-400">
