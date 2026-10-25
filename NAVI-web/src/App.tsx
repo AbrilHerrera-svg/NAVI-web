@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import DashboardPage from './pages/DashboardPage';
 import SalesPage from './pages/SalesPage';
+import NewOrderPage from './pages/NewOrderPage';
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 type PageId = 
@@ -40,6 +41,8 @@ function App() {
         return <DashboardPage />;
       case 'sales':
         return <SalesPage />;
+      case 'new-order':
+        return <NewOrderPage />;
       default:
         return (
           <div className="p-8 text-center text-slate-400">
