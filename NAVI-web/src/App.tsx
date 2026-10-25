@@ -5,6 +5,7 @@ import NewOrderPage from "./pages/NewOrderPage";
 import OrdersPage from "./pages/OrdersPage";
 import MenuPage from "./pages/MenuPage";
 import Sidebar, {type PageId} from "./components/layout/Sidebar";
+import Topbar from "./components/layout/Topbar";
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 function App() {
@@ -39,10 +40,13 @@ function App() {
     }
   };
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-800">
-      <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-      <main className="flex-1 overflow-y-auto">{renderCurrentPage()}</main>
-    </div>
+   <div className="flex min-h-screen bg-slate-50 font-sans text-slate-800">
+  <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+  <div className="flex flex-col flex-1">
+    <Topbar currentPage={currentPage} />
+    <main className="flex-1 overflow-y-auto">{renderCurrentPage()}</main>
+  </div>
+</div>
   );
 }
 
