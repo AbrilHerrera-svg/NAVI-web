@@ -7,9 +7,7 @@ export type PageId =
   | "new-order"
   | "menu"
   | "cash-register"
-  | "finances"
   | "inventory"
-  | "reservations"
   | "tasks"
   | "users";
 
