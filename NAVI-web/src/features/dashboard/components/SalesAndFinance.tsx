@@ -1,3 +1,4 @@
+import ProgressBar from "../../../components/ui/ProgressBar";
 export const SalesAndFinance = () => {
   // Datos simulados para las barras de ventas por hora
   const hourlySales = [
@@ -43,9 +44,7 @@ export const SalesAndFinance = () => {
                 <span>Efectivo</span>
                 <span className="font-bold text-slate-800">$1,860 · 43%</span>
               </div>
-              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div className="bg-[#5960A1] h-full rounded-full" style={{ width: '43%' }} />
-              </div>
+            <ProgressBar value={43} />
             </div>
 
             {/* Terminal */}
@@ -54,9 +53,7 @@ export const SalesAndFinance = () => {
                 <span>Terminal de tarjeta</span>
                 <span className="font-bold text-slate-800">$1,620 · 38%</span>
               </div>
-              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div className="bg-[#5960A1]/60 h-full rounded-full" style={{ width: '38%' }} />
-              </div>
+              <ProgressBar value={38} tone="medium" />
             </div>
 
             {/* Transferencia */}
@@ -65,9 +62,7 @@ export const SalesAndFinance = () => {
                 <span>Transferencia</span>
                 <span className="font-bold text-slate-800">$800 · 19%</span>
               </div>
-              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div className="bg-[#5960A1]/30 h-full rounded-full" style={{ width: '19%' }} />
-              </div>
+              <ProgressBar value={19} tone="light" />
             </div>
           </div>
         </div>
