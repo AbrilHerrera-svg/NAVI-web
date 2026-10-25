@@ -1,4 +1,5 @@
-import * as Icons from 'lucide-react';
+import * as Icons from "lucide-react";
+import naviLogo from "../../assets/navi-cohete.svg";
 export type PageId =
   | "dashboard"
   | "sales"
@@ -12,16 +13,16 @@ export type PageId =
   | "tasks"
   | "users";
 
-const menuItems: { id: PageId; label: string; icon: Icons.LucideIcon}[] = [
-  { id: "dashboard", label: "Inicio", icon: Icons.House},
+const menuItems: { id: PageId; label: string; icon: Icons.LucideIcon }[] = [
+  { id: "dashboard", label: "Inicio", icon: Icons.House },
   { id: "sales", label: "Ventas", icon: Icons.ChartColumnIncreasing },
-  { id: "orders", label: "Pedidos", icon:Icons.ClipboardList},
+  { id: "orders", label: "Pedidos", icon: Icons.ClipboardList },
   { id: "new-order", label: "Nuevo pedido", icon: Icons.ClipboardPlus },
-  { id: "menu", label: "Menú", icon: Icons.UtensilsCrossed  },
+  { id: "menu", label: "Menú", icon: Icons.UtensilsCrossed },
   { id: "cash-register", label: "Caja", icon: Icons.CreditCardReader },
   { id: "inventory", label: "Inventario", icon: Icons.ShelvingUnit },
   { id: "tasks", label: "Tareas", icon: Icons.SquareCheckBig },
-  { id: "users", label: "Usuarios", icon: Icons.Users},
+  { id: "users", label: "Usuarios", icon: Icons.Users },
 ];
 interface SidebarProps {
   currentPage: PageId;
@@ -34,10 +35,8 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
       <div>
         {/* Logo */}
         <div className="flex items-center gap-2 px-3 py-4 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-[#5960A1] flex items-center justify-center text-white font-bold text-sm shadow-xs">
-            🚀
-          </div>
-          <span className="font-extrabold text-lg tracking-wider text-slate-800">
+          <img src={naviLogo} alt="Navi" className="w-8 h-8" />
+          <span className="font-extrabold text-lg tracking-wider text-[#5960A1]">
             NAVI
           </span>
         </div>
@@ -56,7 +55,7 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                     : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                <item.icon size= {18}/>
+                <item.icon size={18} />
                 {item.label}
               </button>
             );
