@@ -4,7 +4,6 @@ export const UrgentAlerts = () => {
     { tag: 'Por vencer', color: 'bg-yellow-100 text-yellow-700', count: 2, title: 'Ingredientes bajos / agotados', desc: 'Leche entera 4,200 ml · Jarabe de chocolate agotado', link: 'Ver Inventario →' },
     { tag: 'Pendiente', color: 'bg-yellow-100 text-yellow-700', count: 1, title: 'Limpieza de cierre pendiente', desc: 'Lista de cierre incompleta', link: 'Ver Tareas →' },
     { tag: 'Pendiente', color: 'bg-yellow-100 text-yellow-700', count: 2, title: 'Tareas de apertura / cierre pendientes', desc: '2 tareas sin completar', link: 'Ver Tareas →' },
-    { tag: 'Reservación', color: 'bg-navi-light text-navi', count: 7, title: 'Próxima reservación', desc: '6:00 p. m. · 4 personas · 7 reservaciones hoy', link: 'Ver Reservaciones →' },
     { tag: 'Revisar', color: 'bg-yellow-100 text-yellow-700', count: 1, title: 'Caja abierta con diferencia', desc: 'Cierre pendiente · diferencia detectada', link: 'Ver Caja →' },
   ];
 
