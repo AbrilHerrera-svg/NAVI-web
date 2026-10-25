@@ -1,12 +1,21 @@
 import Card from "../../../components/ui/Card";
 export const QuickMetrics = () => {
   const metrics = [
-    { label: 'Ventas de hoy', value: '$4,280', sub: '+12% vs. el sábado pasado' },
-    { label: 'Pedidos', value: '96', sub: '62 app · 34 mostrador' },
-    { label: 'Ticket promedio', value: '$44.58', sub: '+4% vs. el mismo día' },
-    { label: 'Tiempo de prep.', value: '9 min', sub: 'dentro de lo estimado' },
-    { label: 'Utilidad estimada', value: '$1,240', sub: 'margen 29%' },
-    { label: 'Productos agotados', value: '3', sub: '+1 vs. el mismo día', isAlert: true },
+    {
+      label: "Ventas de hoy",
+      value: "$4,280",
+      sub: "+12% vs. el sábado pasado",
+    },
+    { label: "Pedidos", value: "96", sub: "62 app · 34 mostrador" },
+    { label: "Ticket promedio", value: "$44.58", sub: "+4% vs. el mismo día" },
+    { label: "Tiempo de prep.", value: "9 min", sub: "dentro de lo estimado" },
+    { label: "Utilidad estimada", value: "$1,240", sub: "margen 29%" },
+    {
+      label: "Productos agotados",
+      value: "3",
+      sub: "+1 vs. el mismo día",
+      isAlert: true,
+    },
   ];
 
   return (
@@ -15,7 +24,9 @@ export const QuickMetrics = () => {
         <Card key={idx}>
           <p className="text-xs text-gray-400 font-medium">{m.label}</p>
           <p className="text-2xl font-bold text-gray-800 mt-1">{m.value}</p>
-          <p className={`text-[11px] mt-1 ${m.isAlert ? 'text-red-500' : 'text-gray-400'}`}>
+          <p
+            className={`text-[11px] mt-1 ${m.isAlert ? "text-red-500" : "text-gray-400"}`}
+          >
             {m.sub}
           </p>
         </Card>

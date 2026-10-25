@@ -1,4 +1,5 @@
-import type { OrderItemRecord } from '../types';
+import Badge from "../../../components/ui/Badge";
+import type { OrderItemRecord } from "../types";
 
 interface Props {
   orders: OrderItemRecord[];
@@ -24,38 +25,44 @@ export const OrdersTableView = ({ orders }: Props) => {
           <tbody className="divide-y divide-slate-100 font-medium">
             {orders.map((item) => (
               <tr key={item.id} className="hover:bg-slate-50/70 transition">
-                <td className="py-3.5 px-4 font-bold text-slate-900">{item.orderNumber}</td>
-                <td className="py-3.5 px-4">
-                  <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-semibold">
-                    {item.origin}
-                  </span>
+                <td className="py-3.5 px-4 font-bold text-slate-900">
+                  {item.orderNumber}
                 </td>
-                <td className="py-3.5 px-4 text-slate-500">{item.receivedTime}</td>
+                <td className="py-3.5 px-4">
+                  <Badge>{item.origin}</Badge>
+                </td>
+                <td className="py-3.5 px-4 text-slate-500">
+                  {item.receivedTime}
+                </td>
                 <td className="py-3.5 px-4">
                   <span
                     className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
-                      item.dueStatusColor === 'urgent'
-                        ? 'bg-rose-100 text-rose-600'
-                        : item.dueStatusColor === 'warning'
-                        ? 'bg-amber-100 text-amber-700'
-                        : 'bg-emerald-50 text-emerald-700'
+                      item.dueStatusColor === "urgent"
+                        ? "bg-rose-100 text-rose-600"
+                        : item.dueStatusColor === "warning"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-emerald-50 text-emerald-700"
                     }`}
                   >
                     {item.dueTime}
                   </span>
                 </td>
-                <td className="py-3.5 px-4 text-slate-800">{item.productsSummary}</td>
-                <td className="py-3.5 px-4 font-bold text-slate-900">${item.total}</td>
+                <td className="py-3.5 px-4 text-slate-800">
+                  {item.productsSummary}
+                </td>
+                <td className="py-3.5 px-4 font-bold text-slate-900">
+                  ${item.total}
+                </td>
                 <td className="py-3.5 px-4">
                   <span
                     className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
-                      item.status === 'En preparación'
-                        ? 'bg-amber-100 text-amber-800'
-                        : item.status === 'Nuevo'
-                        ? 'bg-indigo-50 text-indigo-700'
-                        : item.status === 'Listo'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-slate-100 text-slate-600'
+                      item.status === "En preparación"
+                        ? "bg-amber-100 text-amber-800"
+                        : item.status === "Nuevo"
+                          ? "bg-indigo-50 text-indigo-700"
+                          : item.status === "Listo"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-slate-100 text-slate-600"
                     }`}
                   >
                     {item.status}
@@ -71,7 +78,9 @@ export const OrdersTableView = ({ orders }: Props) => {
                       Ver
                     </button>
                   )}
-                  <button className="text-slate-400 hover:text-slate-600 text-xs font-medium">Más ▾</button>
+                  <button className="text-slate-400 hover:text-slate-600 text-xs font-medium">
+                    Más ▾
+                  </button>
                 </td>
               </tr>
             ))}
