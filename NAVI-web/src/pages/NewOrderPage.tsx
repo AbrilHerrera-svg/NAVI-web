@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ProductItem, CartItem, SelectedItemExtra } from '../features/orders/types';
+import type { ProductItem, CartItem, SelectedItemExtra } from '../features/orders/types';
 import { OrderCatalog } from '../features/orders/components/OrderCatalog';
 import { OrderExtrasView } from '../features/orders/components/OrderExtrasView';
 import { OrderSummarySidebar } from '../features/orders/components/OrderSummarySidebar';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ProductItem } from '../types';
+import type { ProductItem } from '../types';
 
 interface Props {
   onAddProduct: (product: ProductItem) => void;

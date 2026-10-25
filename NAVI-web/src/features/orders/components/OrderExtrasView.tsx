@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ProductItem, SelectedItemExtra } from '../types';
+import type { ProductItem, SelectedItemExtra } from '../types';
 
 interface Props {
   product: ProductItem;

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import DashboardPage from './pages/DashboardPage';
 import SalesPage from './pages/SalesPage';
 import NewOrderPage from './pages/NewOrderPage';
+import OrdersPage from './pages/OrdersPage';
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 type PageId = 
@@ -43,6 +44,8 @@ function App() {
         return <SalesPage />;
       case 'new-order':
         return <NewOrderPage />;
+        case 'orders':
+        return <OrdersPage onNavigateToNewOrder={() => setCurrentPage('new-order')} />;
       default:
         return (
           <div className="p-8 text-center text-slate-400">
