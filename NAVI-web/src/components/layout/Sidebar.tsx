@@ -36,8 +36,17 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
         {/* Logo */}
         <div className="flex items-center gap-2 px-3 py-4 mb-4">
           <img src={naviLogo} alt="Navi" className="w-8 h-8" />
-          <span className="font-extrabold text-lg tracking-wider text-[#5960A1]">
-            NAVI
+          <span
+            style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 900,
+              fontSize: "22px",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            <span style={{ color: "#5960A1" }}>N</span>
+            <span style={{ color: "#AC8572" }}>A</span>
+            <span style={{ color: "#5960A1" }}>VI</span>
           </span>
         </div>
 
