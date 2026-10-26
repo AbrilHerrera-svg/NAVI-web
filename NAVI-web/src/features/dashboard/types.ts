@@ -3,7 +3,8 @@ import type { AlertTagColor } from "../../components/ui/AlertCard";
 export interface MetricCardItem {
   label: string;
   value: string;
-  subtext?: string;
+  sub: string;
+  isAlert?: boolean;
 }
 
 export interface AlertCardItem {
