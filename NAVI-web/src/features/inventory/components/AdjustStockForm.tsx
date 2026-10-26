@@ -20,6 +20,8 @@ interface Props {
 const inputClass =
   'w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#5960A1]';
 
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
 export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<InventoryIngredient | null>(null);
@@ -27,7 +29,7 @@ export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
   const [adjustmentType, setAdjustmentType] = useState<AdjustmentType | ''>('');
   const [countedBoxes, setCountedBoxes] = useState('');
   const [responsible, setResponsible] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(todayISO());
   const [reason, setReason] = useState('');
   const [reference, setReference] = useState('');
 
@@ -41,7 +43,8 @@ export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
     hasCounted &&
     difference !== 0 &&
     responsible.trim().length > 0 &&
-    reason.trim().length > 0;
+    reason.trim().length > 0 &&
+    date.trim().length > 0;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -144,10 +147,10 @@ export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1">Fecha</label>
             <input
-              type="text"
+              type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              placeholder="Hoy o una fecha"
+              max={todayISO()}
               className={inputClass}
             />
           </div>

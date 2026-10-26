@@ -21,19 +21,26 @@ const isUsedInRecipe = (ingredientId: string) => {
   return inProducts || inExtras;
 };
 
-// Etiqueta de fecha para movimientos nuevos: la fecha capturada (o "Hoy") + hora actual
-const buildDateLabel = (date: string) => {
+// Fecha ISO (yyyy-mm-dd) del momento real en que se registra el movimiento.
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+const monthAbbrev = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+// "2026-10-17" → "17 Oct 2026"
+const formatIsoDate = (iso: string) => {
+  const [year, month, day] = iso.split('-').map(Number);
+  return `${String(day).padStart(2, '0')} ${monthAbbrev[month - 1]} ${year}`;
+};
+
+// Etiqueta de fecha para movimientos nuevos: la fecha (capturada o de hoy) + hora actual.
+const buildDateLabel = (isoDate: string) => {
   const time = new Date().toLocaleTimeString('es-MX', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
   });
-  return `${date.trim() || 'Hoy'} · ${time}`;
+  return `${formatIsoDate(isoDate || todayISO())} · ${time}`;
 };
-
-// Fecha ISO (yyyy-mm-dd) del momento real en que se registra el movimiento, para el
-// filtro por rango de fechas — independiente de la fecha en texto libre que capture el usuario.
-const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const [ingredients, setIngredients] = useState<InventoryIngredient[]>(mockIngredients);
@@ -52,7 +59,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     setMovements((prev) => [
       {
         id: `mov-${Date.now()}`,
-        date: todayISO(),
+        date: input.date || todayISO(),
         dateLabel: buildDateLabel(input.date),
         type: input.type,
         ingredientName: ingredient.name,
@@ -76,7 +83,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     setMovements((prev) => [
       {
         id: `mov-${Date.now()}`,
-        date: todayISO(),
+        date: input.date || todayISO(),
         dateLabel: buildDateLabel(input.date),
         type: 'Compra',
         ingredientName: ingredient.name,

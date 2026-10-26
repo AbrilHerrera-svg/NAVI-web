@@ -54,7 +54,7 @@ export interface StockAdjustmentInput {
   countedBoxes: number;
   notes: string;
   responsible: string;
-  date: string;
+  date: string; // ISO yyyy-mm-dd (viene de un <input type="date">)
   reason: string;
   reference: string;
 }
@@ -65,7 +65,7 @@ export interface PurchaseInput {
   totalCost: number;
   notes: string;
   supplier: string;
-  date: string;
+  date: string; // ISO yyyy-mm-dd (viene de un <input type="date">)
   paymentMethod: PaymentMethod;
 }
 

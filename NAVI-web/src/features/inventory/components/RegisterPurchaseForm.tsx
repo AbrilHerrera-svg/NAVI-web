@@ -14,6 +14,7 @@ const inputClass =
   'w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#5960A1]';
 
 const parseCost = (value: string) => parseFloat(value.replace(/[^0-9.]/g, '')) || 0;
+const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export const RegisterPurchaseForm = ({ ingredients, onCancel, onSubmit }: Props) => {
   const [query, setQuery] = useState('');
@@ -22,7 +23,7 @@ export const RegisterPurchaseForm = ({ ingredients, onCancel, onSubmit }: Props)
   const [receivedBoxes, setReceivedBoxes] = useState('');
   const [totalCost, setTotalCost] = useState('');
   const [supplier, setSupplier] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(todayISO());
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | ''>('');
 
   const received = parseFloat(receivedBoxes) || 0;
@@ -34,7 +35,8 @@ export const RegisterPurchaseForm = ({ ingredients, onCancel, onSubmit }: Props)
     received > 0 &&
     total > 0 &&
     supplier.trim().length > 0 &&
-    paymentMethod !== '';
+    paymentMethod !== '' &&
+    date.trim().length > 0;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -133,10 +135,10 @@ export const RegisterPurchaseForm = ({ ingredients, onCancel, onSubmit }: Props)
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1">Fecha de compra</label>
             <input
-              type="text"
+              type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              placeholder="17 oct 2026"
+              max={todayISO()}
               className={inputClass}
             />
           </div>
