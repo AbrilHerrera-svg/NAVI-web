@@ -1,15 +1,6 @@
 import ProgressBar from "../../../components/ui/ProgressBar";
+import { mockHourlySales } from "../data/dashboardMock";
 export const SalesAndFinance = () => {
-  // Datos simulados para las barras de ventas por hora
-  const hourlySales = [
-    { hour: "8h", height: "h-8" },
-    { hour: "9h", height: "h-12" },
-    { hour: "10h", height: "h-32", peak: true },
-    { hour: "11h", height: "h-18" },
-    { hour: "12h", height: "h-10" },
-    { hour: "1h", height: "h-22" },
-    { hour: "2h", height: "h-14" },
-  ];
 
   return (
     <section className="space-y-4">
@@ -25,7 +16,7 @@ export const SalesAndFinance = () => {
             Ventas por hora
           </h3>
           <div className="flex items-end justify-between h-36 px-4 pb-2 border-b border-slate-100 gap-2">
-            {hourlySales.map((item, idx) => (
+            {mockHourlySales.map((item, idx) => (
               <div
                 key={idx}
                 className="flex flex-col items-center gap-2 flex-1"

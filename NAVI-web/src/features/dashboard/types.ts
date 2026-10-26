@@ -32,3 +32,9 @@ export interface LowStockItem {
   time: string;
   isUrgent: boolean;
 }
+
+export interface HourlySalesItem {
+  hour: string;
+  height: string;
+  peak?: boolean;
+}

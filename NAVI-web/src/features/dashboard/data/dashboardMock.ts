@@ -1,4 +1,4 @@
-import type { AlertCardItem, MetricCardItem, TopProductItem, OutOfStockItem, LowStockItem } from "../types";
+import type { AlertCardItem, MetricCardItem, TopProductItem, OutOfStockItem, LowStockItem, HourlySalesItem } from "../types";
 
 export const mockUrgentAlerts: AlertCardItem[] = [
   { tag: 'Atrasado', tagColor: 'danger', count: 2, title: 'Pedidos atrasados / por vencer', desc: '#88 Chilaquiles rojos · atrasado +8 min', link: 'Ver Pedidos →' },
@@ -37,4 +37,14 @@ export const mockLowStock: LowStockItem[] = [
   { name: 'Leche entera', detail: '4,200 de 6,000 ml', time: '~2 días', isUrgent: false },
   { name: 'Jarabe de chocolate', detail: '0 ml', time: 'agotado', isUrgent: true },
   { name: 'Base de té', detail: '900 de 500 g', time: '~4 días', isUrgent: false },
+];
+
+export const mockHourlySales: HourlySalesItem[] = [
+  { hour: '8h', height: 'h-8' },
+  { hour: '9h', height: 'h-12' },
+  { hour: '10h', height: 'h-32', peak: true },
+  { hour: '11h', height: 'h-20' },
+  { hour: '12h', height: 'h-10' },
+  { hour: '1h', height: 'h-24' },
+  { hour: '2h', height: 'h-14' },
 ];
