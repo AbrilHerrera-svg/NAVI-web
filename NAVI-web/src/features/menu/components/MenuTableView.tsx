@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Search } from 'lucide-react';
 import type { MenuItem } from '../types';
 import Badge from '../../../components/ui/Badge';
 
@@ -35,7 +36,7 @@ export const MenuTableView = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200">
         <div className="flex items-center gap-2 flex-1 max-w-md">
           <div className="relative w-full">
-            <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 text-xs">🔍</span>
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={searchQuery}

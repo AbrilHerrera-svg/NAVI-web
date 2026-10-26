@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Search } from 'lucide-react';
 import type { PromotionItem } from '../types';
 import Badge from '../../../components/ui/Badge';
 
@@ -29,7 +30,7 @@ export const PromotionsTableView = ({
       {/* Buscador superior */}
       <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200">
         <div className="relative w-72">
-          <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 text-xs">🔍</span>
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={searchQuery}

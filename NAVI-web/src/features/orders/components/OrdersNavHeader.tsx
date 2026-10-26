@@ -1,3 +1,4 @@
+import { Search } from "lucide-react";
 import Button from "../../../components/ui/Button";
 
 interface Props {
@@ -93,7 +94,7 @@ export const OrdersNavHeader = ({
         </select>
 
         <div className="relative flex-1 min-w-[200px]">
-          <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 text-xs">🔍</span>
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
