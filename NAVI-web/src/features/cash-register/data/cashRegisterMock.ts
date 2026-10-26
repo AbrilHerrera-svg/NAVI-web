@@ -5,6 +5,7 @@ import type {
   DailyExpenseItem,
   RefundItem,
   ClosingSummary,
+  ClosingInputs,
 } from "../types";
 
 export const mockCashOpening: CashOpeningInfo = {
@@ -44,6 +45,12 @@ export const mockClosingSummary: ClosingSummary = {
   expectedFunds: 4580,
   countedFunds: 4570,
   difference: -10,
+};
+
+export const mockClosingInputs: ClosingInputs = {
+  cashCounted: 2150,
+  terminalCounted: 1620,
+  transferCounted: 800,
 };
 
 export const mockClosingReason =

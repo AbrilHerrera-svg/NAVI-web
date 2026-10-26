@@ -6,3 +6,4 @@ export * from './components/ExpectedCashCard';
 export * from './components/SalesByMethodCard';
 export * from './components/DailyExpensesCard';
 export * from './components/RefundsCard';
+export * from './components/ClosingCard';

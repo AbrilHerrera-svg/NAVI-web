@@ -34,3 +34,9 @@ export interface ClosingSummary {
   countedFunds: number;
   difference: number;
 }
+
+export interface ClosingInputs {
+  cashCounted: number;
+  terminalCounted: number;
+  transferCounted: number;
+}

@@ -5,11 +5,15 @@ import {
   SalesByMethodCard,
   DailyExpensesCard,
   RefundsCard,
+  ClosingCard,
   mockCashOpening,
   mockExpectedCash,
   mockSalesByMethod,
   mockDailyExpenses,
   mockRefunds,
+  mockClosingSummary,
+  mockClosingInputs,
+  mockClosingReason,
 } from '../features/cash-register';
 
 export default function CashRegisterPage() {
@@ -25,6 +29,14 @@ export default function CashRegisterPage() {
       </div>
 
       <RefundsCard items={mockRefunds} />
+
+      <ClosingCard
+        summary={mockClosingSummary}
+        inputs={mockClosingInputs}
+        initialReason={mockClosingReason}
+        dateLabel="Sábado, 17 de octubre"
+        onCloseDay={() => alert('¡Día cerrado!')}
+      />
     </div>
   );
 }
