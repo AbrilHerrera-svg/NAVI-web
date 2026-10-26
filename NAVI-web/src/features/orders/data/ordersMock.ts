@@ -127,19 +127,6 @@ export const mockOrderExceptions: OrderExceptionItem[] = [
     secondaryAction: 'Quitar del pedido',
   },
   {
-    id: 'e-2',
-    type: 'Pago rechazado',
-    tag: 'No cobrado',
-    tagColor: 'danger',
-    orderRef: '#91 · Biscoff Smoothie MED · App',
-    description:
-      'El banco rechazó el cargo. No se registró pago ni reembolso. Mantén el pedido mientras eliges otro método.',
-    metaLabel: 'Pago pendiente',
-    metaValue: '$75',
-    primaryAction: 'Reintentar',
-    secondaryAction: 'Cambiar método',
-  },
-  {
     id: 'e-3',
     type: 'No recogido',
     tag: 'Listo',
