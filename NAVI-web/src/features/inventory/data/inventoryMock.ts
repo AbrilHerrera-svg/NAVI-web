@@ -1,0 +1,62 @@
+import type { InventoryIngredient, InventoryMovement, TodayMovement } from '../types';
+
+export const mockIngredients: InventoryIngredient[] = [
+  { id: 'ing-1', name: 'Leche entera', stock: 2, minStock: 3, costPerBox: 336, dependentProducts: 5 },
+  { id: 'ing-2', name: 'Jarabe de chocolate', stock: 0, minStock: 1, costPerBox: 420, dependentProducts: 3 },
+  { id: 'ing-3', name: 'Base de té', stock: 1, minStock: 2, costPerBox: 480, dependentProducts: 8 },
+  { id: 'ing-4', name: 'Oreo', stock: 3, minStock: 2, costPerBox: 96, dependentProducts: 2 },
+  { id: 'ing-5', name: 'Leche de coco', stock: 2, minStock: 1, costPerBox: 162, dependentProducts: 1 },
+  { id: 'ing-6', name: 'Perlas de tapioca', stock: 4, minStock: 2, costPerBox: 30, dependentProducts: 6 },
+];
+
+export const mockMovements: InventoryMovement[] = [
+  {
+    id: 'mov-5',
+    dateLabel: '17 Oct 2026 · 13:58',
+    type: 'Venta',
+    ingredientName: 'Leche entera',
+    quantity: -0.025,
+    reference: 'Pedido #98 · Chai Milk Tea GDE',
+  },
+  {
+    id: 'mov-4',
+    dateLabel: '17 Oct 2026 · 13:45',
+    type: 'Cancelación',
+    ingredientName: 'Leche entera',
+    quantity: 0.025,
+    reference: 'Pedido #87 · existencias restauradas',
+  },
+  {
+    id: 'mov-3',
+    dateLabel: '17 Oct 2026 · 10:30',
+    type: 'Merma',
+    ingredientName: 'Jarabe de chocolate',
+    quantity: -0.5,
+    reference: 'Lote caducado · Ana García',
+  },
+  {
+    id: 'mov-2',
+    dateLabel: '17 Oct 2026 · 09:10',
+    type: 'Ajuste',
+    ingredientName: 'Base de té',
+    quantity: -0.02,
+    reference: 'Diferencia de conteo · Sofía Torres',
+  },
+  {
+    id: 'mov-1',
+    dateLabel: '17 Oct 2026 · 08:30',
+    type: 'Compra',
+    ingredientName: 'Leche entera',
+    quantity: 0.5,
+    reference: 'PUR-104 · Lácteos del Mayab · $168',
+  },
+];
+
+export const mockTodayMovements: TodayMovement[] = [
+  { id: 't-1', time: '09:00', label: 'Compra de leche', type: 'Compra', quantity: 2 },
+  { id: 't-2', time: '10:05', label: 'Venta Chai Milk Tea GDE', type: 'Venta', quantity: -0.025 },
+  { id: 't-3', time: '12:40', label: 'Merma', type: 'Merma', quantity: -0.04 },
+];
+
+// Siguiente folio de compra (la última registrada en el mock es PUR-104)
+export const mockNextPurchaseFolio = 105;
