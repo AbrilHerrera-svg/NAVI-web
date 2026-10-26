@@ -1,8 +1,8 @@
 import Card from '../../../components/ui/Card';
-import { formatSignedBoxes, type MovementType, type TodayMovement } from '../types';
+import { formatSignedBoxes, getLatestMovementDate, type InventoryMovement, type MovementType } from '../types';
 
 interface Props {
-  items: TodayMovement[];
+  movements: InventoryMovement[];
 }
 
 const quantityColor: Partial<Record<MovementType, string>> = {
@@ -10,7 +10,15 @@ const quantityColor: Partial<Record<MovementType, string>> = {
   Merma: 'text-rose-600',
 };
 
-export const TodayMovementsCard = ({ items }: Props) => {
+// "17 Oct 2026 · 13:58" → "13:58"
+const timeFromLabel = (dateLabel: string) => dateLabel.split('·').pop()?.trim() ?? dateLabel;
+
+export const TodayMovementsCard = ({ movements }: Props) => {
+  const latestDate = getLatestMovementDate(movements);
+  const today = movements
+    .filter((m) => m.date === latestDate)
+    .sort((a, b) => b.dateLabel.localeCompare(a.dateLabel));
+
   return (
     <section className="space-y-3">
       <h2 className="text-base font-bold text-slate-800">Movimientos de hoy</h2>
@@ -20,10 +28,11 @@ export const TodayMovementsCard = ({ items }: Props) => {
           <h3 className="font-semibold text-sm text-slate-800 mb-3">Entradas y salidas</h3>
 
           <div className="space-y-2 text-xs">
-            {items.map((item) => (
+            {today.length === 0 && <p className="text-slate-400">Sin movimientos todavía hoy.</p>}
+            {today.map((item) => (
               <div key={item.id} className="flex justify-between text-slate-500">
                 <span>
-                  {item.time} · {item.label}
+                  {timeFromLabel(item.dateLabel)} · {item.type} · {item.ingredientName}
                 </span>
                 <span className={`font-bold ${quantityColor[item.type] ?? 'text-slate-900'}`}>
                   {formatSignedBoxes(item.quantity)}

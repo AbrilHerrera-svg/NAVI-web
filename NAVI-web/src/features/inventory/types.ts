@@ -40,13 +40,11 @@ export interface InventoryMovement {
   notes?: string;
 }
 
-export interface TodayMovement {
-  id: string;
-  time: string; // ej. "09:00"
-  label: string;
-  type: MovementType;
-  quantity: number;
-}
+// "Hoy" se define como la fecha del movimiento más reciente, no el reloj del navegador:
+// así funciona igual con datos de ejemplo (fecha fija en el pasado) y con movimientos
+// reales creados en la sesión. Compartido por MovementsView y TodayMovementsCard.
+export const getLatestMovementDate = (movements: InventoryMovement[]) =>
+  movements.reduce((max, m) => (m.date > max ? m.date : max), movements[0]?.date ?? '');
 
 export interface StockAdjustmentInput {
   ingredientId: string;

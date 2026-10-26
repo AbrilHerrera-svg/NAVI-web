@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import Card from '../../../components/ui/Card';
 import Badge, { type BadgeColor } from '../../../components/ui/Badge';
-import { formatSignedBoxes, type InventoryIngredient, type InventoryMovement, type MovementType } from '../types';
+import {
+  formatSignedBoxes,
+  getLatestMovementDate,
+  type InventoryIngredient,
+  type InventoryMovement,
+  type MovementType,
+} from '../types';
 
 interface Props {
   movements: InventoryMovement[];
@@ -40,10 +46,7 @@ export const MovementsView = ({ movements, ingredients }: Props) => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  // "Hoy" se calcula contra el movimiento más reciente, no contra el reloj del
-  // navegador: así los presets funcionan igual con datos de ejemplo (fecha fija en el
-  // pasado) y con movimientos reales creados en la sesión.
-  const latestDate = movements.reduce((max, m) => (m.date > max ? m.date : max), movements[0]?.date ?? '');
+  const latestDate = getLatestMovementDate(movements);
 
   const handlePresetChange = (preset: RangePreset) => {
     setRangePreset(preset);

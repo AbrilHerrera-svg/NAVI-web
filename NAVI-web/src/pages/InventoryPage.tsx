@@ -10,7 +10,6 @@ import {
   RegisterPurchaseForm,
   IngredientFormModal,
   DeleteIngredientModal,
-  mockTodayMovements,
   useInventory,
   type InventoryIngredient,
   type InventoryTab,
@@ -100,7 +99,7 @@ export default function InventoryPage() {
           {currentTab === 'movimientos' && (
             <>
               <MovementsView movements={movements} ingredients={ingredients} />
-              <TodayMovementsCard items={mockTodayMovements} />
+              <TodayMovementsCard movements={movements} />
             </>
           )}
         </>
