@@ -12,6 +12,7 @@ import SettingsPage from "./pages/SettingsPage";
 import MainLayout from "./components/layout/MainLayout";
 import { type PageId } from "./components/layout/Sidebar";
 import { InventoryProvider } from "./features/inventory";
+import { OrdersProvider } from "./features/orders";
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 function App() {
@@ -61,13 +62,15 @@ function App() {
 
   return (
     <InventoryProvider>
-      <MainLayout
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-        onLogout={() => setIsAuthenticated(false)}
-      >
-        {renderCurrentPage()}
-      </MainLayout>
+      <OrdersProvider>
+        <MainLayout
+          currentPage={currentPage}
+          onNavigate={setCurrentPage}
+          onLogout={() => setIsAuthenticated(false)}
+        >
+          {renderCurrentPage()}
+        </MainLayout>
+      </OrdersProvider>
     </InventoryProvider>
   );
 }

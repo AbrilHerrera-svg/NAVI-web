@@ -5,10 +5,12 @@ import { OrderExtrasView } from '../features/orders/components/OrderExtrasView';
 import { OrderSummarySidebar } from '../features/orders/components/OrderSummarySidebar';
 import { OrderConfirmModal } from '../features/orders/components/OrderConfirmModal';
 import { buildStockLines } from '../features/orders/utils/buildStockLines';
+import { useOrders } from '../features/orders';
 import { useInventory } from '../features/inventory';
 
 export default function NewOrderPage() {
   const { ingredients, registerSale } = useInventory();
+  const { addOrder } = useOrders();
 
   // Estado inicial simulado con los 2 productos de la captura
   const [cart, setCart] = useState<CartItem[]>([
@@ -59,6 +61,7 @@ export default function NewOrderPage() {
   };
 
   // Confirmar: descuenta inventario según receta y, solo si alcanza, limpia el carrito
+  // y manda el pedido a la cola compartida de Pedidos (ya cobrado).
   const handleFinalizeOrder = () => {
     setIsConfirmOpen(false);
 
@@ -73,6 +76,14 @@ export default function NewOrderPage() {
       );
       return;
     }
+
+    const productsTotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    const extrasTotal = cart.reduce((acc, item) => {
+      const itemExtras = item.extras.reduce((eAcc, e) => eAcc + e.price * e.quantity, 0);
+      return acc + itemExtras * item.quantity;
+    }, 0);
+
+    addOrder({ origin: 'Mostrador', cart, total: productsTotal + extrasTotal, alreadyCharged: true });
 
     alert('¡Pedido confirmado y enviado a preparación!');
     setCart([]);
