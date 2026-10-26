@@ -1,4 +1,6 @@
 import type { MenuItem } from '../types';
+import Card from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
 
 interface Props {
   product: MenuItem;
@@ -18,7 +20,7 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
       </div>
 
       {/* Tarjeta de Resumen con Costos */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-2xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <Card className="rounded-2xl shadow-2xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900">{product.name}</h2>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -36,12 +38,12 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
             <span className="text-lg font-black text-[#5960A1]">$16.30</span>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Cuadrícula de Ingredientes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Leche entera */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs space-y-3">
+        <Card className="rounded-2xl shadow-2xs space-y-3">
           <h3 className="font-bold text-sm text-slate-900">Leche entera</h3>
           <div className="flex gap-2">
             <span className="border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-700">MED 220 ml</span>
@@ -54,10 +56,10 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
           <button className="text-xs text-rose-500 hover:underline font-medium cursor-pointer">
             Quitar ingrediente
           </button>
-        </div>
+        </Card>
 
         {/* Base de té */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs space-y-3">
+        <Card className="rounded-2xl shadow-2xs space-y-3">
           <h3 className="font-bold text-sm text-slate-900">Base de té</h3>
           <div className="flex gap-2">
             <span className="border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-700">MED 10 g</span>
@@ -70,10 +72,10 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
           <button className="text-xs text-rose-500 hover:underline font-medium cursor-pointer">
             Quitar ingrediente
           </button>
-        </div>
+        </Card>
 
         {/* Oreo */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs space-y-3">
+        <Card className="rounded-2xl shadow-2xs space-y-3">
           <h3 className="font-bold text-sm text-slate-900">Oreo</h3>
           <div className="flex gap-2">
             <span className="border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-400">MED —</span>
@@ -86,7 +88,7 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
           <button className="text-xs text-rose-500 hover:underline font-medium cursor-pointer">
             Quitar ingrediente
           </button>
-        </div>
+        </Card>
 
         {/* Botón Agregar Ingrediente */}
         <button className="border-2 border-dashed border-[#5960A1]/30 hover:border-[#5960A1] rounded-2xl p-6 flex items-center justify-center text-xs font-bold text-[#5960A1] hover:bg-[#5960A1]/5 transition cursor-pointer min-h-[140px]">
@@ -96,18 +98,12 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
 
       {/* Botones inferiores */}
       <div className="flex justify-end gap-3 pt-4">
-        <button
-          onClick={onBack}
-          className="px-5 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 transition cursor-pointer"
-        >
+        <Button variant="secondary" onClick={onBack} className="px-5 py-2">
           Cancelar
-        </button>
-        <button
-          onClick={onRequestSave}
-          className="px-5 py-2 bg-[#5960A1] hover:bg-[#484e85] text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs"
-        >
+        </Button>
+        <Button onClick={onRequestSave} className="px-5 py-2">
           Guardar cambios
-        </button>
+        </Button>
       </div>
     </div>
   );
