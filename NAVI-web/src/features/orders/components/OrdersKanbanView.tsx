@@ -1,16 +1,20 @@
 import type { OrderItemRecord } from '../types';
+import Card from '../../../components/ui/Card';
+import Badge from '../../../components/ui/Badge';
+import Button from '../../../components/ui/Button';
+import type { BadgeColor } from '../../../components/ui/Badge';
 
 interface Props {
   orders: OrderItemRecord[];
   onOpenCancelModal: (orderId: string) => void;
 }
 
-const columns: { status: OrderItemRecord['status']; label: string; count: number; badgeColor: string }[] = [
-  { status: 'Nuevo', label: 'Nuevo', count: 2, badgeColor: 'bg-indigo-100 text-indigo-700' },
-  { status: 'En preparación', label: 'En preparación', count: 2, badgeColor: 'bg-amber-100 text-amber-800' },
-  { status: 'Listo', label: 'Listo', count: 1, badgeColor: 'bg-emerald-100 text-emerald-800' },
-  { status: 'Recogido', label: 'Recogido', count: 2, badgeColor: 'bg-slate-200 text-slate-700' },
-  { status: 'Cancelado', label: 'Cancelado', count: 1, badgeColor: 'bg-rose-100 text-rose-700' },
+const columns: { status: OrderItemRecord['status']; label: string; badgeColor: BadgeColor }[] = [
+  { status: 'Nuevo', label: 'Nuevo', badgeColor: 'info' },
+  { status: 'En preparación', label: 'En preparación', badgeColor: 'warning' },
+  { status: 'Listo', label: 'Listo', badgeColor: 'success' },
+  { status: 'Recogido', label: 'Recogido', badgeColor: 'neutral' },
+  { status: 'Cancelado', label: 'Cancelado', badgeColor: 'danger' },
 ];
 
 export const OrdersKanbanView = ({ orders, onOpenCancelModal }: Props) => {
@@ -23,24 +27,19 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal }: Props) => {
           <div key={col.status} className="flex flex-col gap-3 min-w-[220px]">
             {/* Header de la columna */}
             <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${col.badgeColor}`}>
+              <Badge color={col.badgeColor} className="text-[11px]">
                 {col.label}
-              </span>
-              <span className="text-xs font-semibold text-slate-400">{col.count}</span>
+              </Badge>
+              <span className="text-xs font-semibold text-slate-400">{colOrders.length}</span>
             </div>
 
             {/* Tarjetas */}
             <div className="space-y-3">
               {colOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs space-y-3"
-                >
+                <Card key={order.id} className="shadow-2xs space-y-3">
                   <div className="flex justify-between items-start">
                     <span className="font-extrabold text-sm text-slate-900">{order.orderNumber}</span>
-                    <span className="text-[10px] bg-slate-100 font-semibold text-slate-600 px-2 py-0.5 rounded-full">
-                      {order.origin}
-                    </span>
+                    <Badge className="text-[10px]">{order.origin}</Badge>
                   </div>
 
                   <div>
@@ -60,32 +59,30 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal }: Props) => {
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
                         {order.dueTime}
                       </p>
-                      <span
-                        className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                      <Badge
+                        color={
                           order.dueStatusColor === 'urgent'
-                            ? 'bg-rose-100 text-rose-600'
+                            ? 'danger'
                             : order.dueStatusColor === 'warning'
-                            ? 'bg-amber-100 text-amber-700'
-                            : 'bg-emerald-50 text-emerald-700'
-                        }`}
+                            ? 'warning'
+                            : 'success'
+                        }
+                        className="rounded-md"
                       >
                         {order.dueStatusLabel}
-                      </span>
+                      </Badge>
                     </div>
                   )}
 
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                     <span className="text-sm font-bold text-slate-900">${order.total}</span>
                     {order.primaryActionLabel && (
-                      <button
-                        className={`px-3 py-1.5 text-xs font-bold rounded-lg text-white transition cursor-pointer shadow-2xs ${
-                          order.primaryActionColor === 'success'
-                            ? 'bg-emerald-600 hover:bg-emerald-700'
-                            : 'bg-[#5960A1] hover:bg-[#484e85]'
-                        }`}
+                      <Button
+                        variant={order.primaryActionColor === 'success' ? 'success' : 'primary'}
+                        className="px-3 py-1.5 shadow-2xs"
                       >
                         {order.primaryActionLabel}
-                      </button>
+                      </Button>
                     )}
                   </div>
 
@@ -99,7 +96,7 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal }: Props) => {
                       Cancelar
                     </button>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           </div>

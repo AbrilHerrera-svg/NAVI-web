@@ -1,6 +1,6 @@
 import type { ReactNode, HTMLAttributes } from "react";
 
-type BadgeColor = "danger" | "warning" | "success" | "info" | "neutral" | "brand";
+export type BadgeColor = "danger" | "warning" | "success" | "info" | "neutral" | "brand";
 
 interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
   color?: BadgeColor;
