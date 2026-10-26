@@ -4,6 +4,7 @@ import SalesPage from "./pages/SalesPage";
 import NewOrderPage from "./pages/NewOrderPage";
 import OrdersPage from "./pages/OrdersPage";
 import MenuPage from "./pages/MenuPage";
+import CashRegisterPage from "./pages/CashRegisterPage";
 import MainLayout from "./components/layout/MainLayout";
 import { type PageId } from "./components/layout/Sidebar";
 // Puedes importar aquí tus otras páginas a medida que las crees
@@ -28,6 +29,8 @@ function App() {
         );
       case "menu":
         return <MenuPage />;
+      case "cash-register":
+        return <CashRegisterPage />;
       default:
         return (
           <div className="p-8 text-center text-slate-400">
