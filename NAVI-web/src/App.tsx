@@ -7,6 +7,7 @@ import MenuPage from "./pages/MenuPage";
 import CashRegisterPage from "./pages/CashRegisterPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import MainLayout from "./components/layout/MainLayout";
 import { type PageId } from "./components/layout/Sidebar";
 // Puedes importar aquí tus otras páginas a medida que las crees
@@ -36,6 +37,8 @@ function App() {
         return <CashRegisterPage />;
       case "profile":
         return <ProfilePage />;
+      case "settings":
+        return <SettingsPage />;
       default:
         return (
           <div className="p-8 text-center text-slate-400">
