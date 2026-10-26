@@ -5,6 +5,7 @@ import NewOrderPage from "./pages/NewOrderPage";
 import OrdersPage from "./pages/OrdersPage";
 import MenuPage from "./pages/MenuPage";
 import CashRegisterPage from "./pages/CashRegisterPage";
+import InventoryPage from "./pages/InventoryPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
@@ -35,6 +36,8 @@ function App() {
         return <MenuPage />;
       case "cash-register":
         return <CashRegisterPage />;
+      case "inventory":
+        return <InventoryPage />;
       case "profile":
         return <ProfilePage />;
       case "settings":
