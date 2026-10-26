@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ProductItem } from '../types';
+import Card from '../../../components/ui/Card';
 
 interface Props {
   onAddProduct: (product: ProductItem) => void;
@@ -51,7 +52,7 @@ export const OrderCatalog = ({ onAddProduct, onOpenExtras }: Props) => {
       {/* Grid de productos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.map((prod) => (
-          <div key={prod.id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col justify-between">
+          <Card key={prod.id} className="shadow-xs flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start">
                 <span className="text-[11px] text-slate-400 font-medium">{prod.categoryLabel}</span>
@@ -77,7 +78,7 @@ export const OrderCatalog = ({ onAddProduct, onOpenExtras }: Props) => {
                 + Agregar extras
               </button>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
