@@ -115,15 +115,17 @@ export const OrdersTableView = ({ orders, onAdvanceStatus, onOpenCancelModal }: 
                       >
                         Editar
                       </button>
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onOpenCancelModal(item.id);
-                        }}
-                        className="w-full px-3 py-1.5 hover:bg-rose-50 text-rose-600 text-left cursor-pointer"
-                      >
-                        Cancelar
-                      </button>
+                      {item.status !== 'Cancelado' && item.status !== 'Recogido' && (
+                        <button
+                          onClick={() => {
+                            setOpenMenuId(null);
+                            onOpenCancelModal(item.id);
+                          }}
+                          className="w-full px-3 py-1.5 hover:bg-rose-50 text-rose-600 text-left cursor-pointer"
+                        >
+                          Cancelar
+                        </button>
+                      )}
                     </div>
                   )}
                 </td>

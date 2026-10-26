@@ -98,12 +98,14 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal, onAdvanceStatus }:
                     >
                       Editar
                     </button>
-                    <button
-                      onClick={() => onOpenCancelModal(order.id)}
-                      className="hover:text-rose-600 cursor-pointer"
-                    >
-                      Cancelar
-                    </button>
+                    {order.status !== 'Cancelado' && order.status !== 'Recogido' && (
+                      <button
+                        onClick={() => onOpenCancelModal(order.id)}
+                        className="hover:text-rose-600 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                    )}
                   </div>
                 </Card>
                 );
