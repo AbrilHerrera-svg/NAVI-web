@@ -31,6 +31,10 @@ const buildDateLabel = (date: string) => {
   return `${date.trim() || 'Hoy'} · ${time}`;
 };
 
+// Fecha ISO (yyyy-mm-dd) del momento real en que se registra el movimiento, para el
+// filtro por rango de fechas — independiente de la fecha en texto libre que capture el usuario.
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
 export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const [ingredients, setIngredients] = useState<InventoryIngredient[]>(mockIngredients);
   const [movements, setMovements] = useState<InventoryMovement[]>(mockMovements);
@@ -48,6 +52,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     setMovements((prev) => [
       {
         id: `mov-${Date.now()}`,
+        date: todayISO(),
         dateLabel: buildDateLabel(input.date),
         type: input.type,
         ingredientName: ingredient.name,
@@ -71,6 +76,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     setMovements((prev) => [
       {
         id: `mov-${Date.now()}`,
+        date: todayISO(),
         dateLabel: buildDateLabel(input.date),
         type: 'Compra',
         ingredientName: ingredient.name,
@@ -106,6 +112,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         const ingredient = ingredients.find((i) => i.id === line.ingredientId);
         return {
           id: `mov-${Date.now()}-${line.ingredientId}`,
+          date: todayISO(),
           dateLabel: buildDateLabel(''),
           type: 'Venta' as const,
           ingredientName: ingredient?.name ?? line.ingredientId,
@@ -133,6 +140,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         const ingredient = ingredients.find((i) => i.id === line.ingredientId);
         return {
           id: `mov-${Date.now()}-${line.ingredientId}`,
+          date: todayISO(),
           dateLabel: buildDateLabel(''),
           type: 'Cancelación' as const,
           ingredientName: ingredient?.name ?? line.ingredientId,
@@ -164,6 +172,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
       setMovements((prev) => [
         {
           id: `mov-${Date.now()}`,
+          date: todayISO(),
           dateLabel: buildDateLabel(''),
           type: 'Ajuste',
           ingredientName: input.name,

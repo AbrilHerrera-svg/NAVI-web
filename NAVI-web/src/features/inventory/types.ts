@@ -31,6 +31,7 @@ export const amountToBoxes = (ingredient: InventoryIngredient, amount: number) =
 
 export interface InventoryMovement {
   id: string;
+  date: string; // ISO yyyy-mm-dd, para filtrar por rango de fechas
   dateLabel: string; // ej. "17 Oct 2026 · 13:58"
   type: MovementType;
   ingredientName: string;

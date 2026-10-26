@@ -12,6 +12,7 @@ export const mockIngredients: InventoryIngredient[] = [
 export const mockMovements: InventoryMovement[] = [
   {
     id: 'mov-5',
+    date: '2026-10-17',
     dateLabel: '17 Oct 2026 · 13:58',
     type: 'Venta',
     ingredientName: 'Leche entera',
@@ -20,6 +21,7 @@ export const mockMovements: InventoryMovement[] = [
   },
   {
     id: 'mov-4',
+    date: '2026-10-17',
     dateLabel: '17 Oct 2026 · 13:45',
     type: 'Cancelación',
     ingredientName: 'Leche entera',
@@ -28,6 +30,7 @@ export const mockMovements: InventoryMovement[] = [
   },
   {
     id: 'mov-3',
+    date: '2026-10-17',
     dateLabel: '17 Oct 2026 · 10:30',
     type: 'Merma',
     ingredientName: 'Jarabe de chocolate',
@@ -36,6 +39,7 @@ export const mockMovements: InventoryMovement[] = [
   },
   {
     id: 'mov-2',
+    date: '2026-10-17',
     dateLabel: '17 Oct 2026 · 09:10',
     type: 'Ajuste',
     ingredientName: 'Base de té',
@@ -44,7 +48,8 @@ export const mockMovements: InventoryMovement[] = [
   },
   {
     id: 'mov-1',
-    dateLabel: '17 Oct 2026 · 08:30',
+    date: '2026-10-16',
+    dateLabel: '16 Oct 2026 · 18:20',
     type: 'Compra',
     ingredientName: 'Leche entera',
     quantity: 0.5,
