@@ -18,7 +18,11 @@ export const SalesCharts = () => {
       <Card className="shadow-xs lg:col-span-2 flex flex-col justify-between">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-sm font-bold text-slate-800">Ventas por hora</h2>
-          <Button variant="secondary" className="px-3 py-1.5 shadow-2xs">
+          <Button
+            variant="secondary"
+            onClick={() => alert('Exportar reporte — próximamente')}
+            className="px-3 py-1.5 shadow-2xs"
+          >
             Exportar
           </Button>
         </div>

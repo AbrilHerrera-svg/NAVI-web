@@ -1,28 +1,39 @@
-import { mockOrderExceptions } from '../data/ordersMock'; 
-
+import { useState } from 'react';
+import Card from '../../../components/ui/Card';
+import Badge from '../../../components/ui/Badge';
+import Button from '../../../components/ui/Button';
+import { mockOrderExceptions } from '../data/ordersMock';
 
 export const OrdersExceptionsView = () => {
+  const [exceptions, setExceptions] = useState(mockOrderExceptions);
+
+  const handleResolve = (id: string, actionLabel: string) => {
+    alert(`"${actionLabel}" aplicado — excepción resuelta`);
+    setExceptions((prev) => prev.filter((e) => e.id !== id));
+  };
+
+  if (exceptions.length === 0) {
+    return (
+      <div className="text-center text-sm text-slate-400 py-12">
+        No hay excepciones pendientes.
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {mockOrderExceptions.map((item) => (
-        <div
-          key={item.id}
-          className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col justify-between space-y-4"
-        >
+      {exceptions.map((item) => (
+        <Card key={item.id} className="shadow-2xs flex flex-col justify-between space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between items-start">
               <h2 className="font-bold text-sm text-slate-900">{item.type}</h2>
-              <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  item.tagColor === 'danger'
-                    ? 'bg-rose-100 text-rose-600'
-                    : item.tagColor === 'ready'
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-indigo-100 text-indigo-700'
-                }`}
+              <Badge
+                color={
+                  item.tagColor === 'danger' ? 'danger' : item.tagColor === 'ready' ? 'success' : 'info'
+                }
               >
                 {item.tag}
-              </span>
+              </Badge>
             </div>
             <p className="text-xs font-semibold text-slate-700">{item.orderRef}</p>
             <p className="text-xs text-slate-500 leading-relaxed">{item.description}</p>
@@ -35,17 +46,24 @@ export const OrdersExceptionsView = () => {
             </div>
 
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 bg-[#5960A1] hover:bg-[#484e85] text-white text-xs font-semibold rounded-lg transition shadow-2xs">
+              <Button
+                onClick={() => handleResolve(item.id, item.primaryAction)}
+                className="px-3 py-1.5 shadow-2xs"
+              >
                 {item.primaryAction}
-              </button>
+              </Button>
               {item.secondaryAction && (
-                <button className="px-3 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold rounded-lg transition">
+                <Button
+                  variant="secondary"
+                  onClick={() => handleResolve(item.id, item.secondaryAction!)}
+                  className="px-3 py-1.5"
+                >
                   {item.secondaryAction}
-                </button>
+                </Button>
               )}
             </div>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   );
