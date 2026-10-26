@@ -1,5 +1,4 @@
 import Button from "../../../components/ui/Button";
-import { mockOrderExceptions } from "../data/ordersMock";
 
 interface Props {
   viewMode: 'tarjetas' | 'lista' | 'excepciones';
@@ -7,6 +6,11 @@ interface Props {
   onGoToNewOrder: () => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
+  exceptionsCount: number;
+  statusFilter: string;
+  onStatusFilterChange: (status: string) => void;
+  originFilter: string;
+  onOriginFilterChange: (origin: string) => void;
 }
 
 export const OrdersNavHeader = ({
@@ -15,6 +19,11 @@ export const OrdersNavHeader = ({
   onGoToNewOrder,
   searchQuery,
   onSearchChange,
+  exceptionsCount,
+  statusFilter,
+  onStatusFilterChange,
+  originFilter,
+  onOriginFilterChange,
 }: Props) => {
   return (
     <div className="space-y-4">
@@ -50,7 +59,7 @@ export const OrdersNavHeader = ({
                 viewMode === 'excepciones' ? 'bg-[#5960A1] text-white shadow-xs' : 'hover:text-slate-900'
               }`}
             >
-              Excepciones · {mockOrderExceptions.length}
+              Excepciones · {exceptionsCount}
             </button>
           </div>
 
@@ -60,18 +69,27 @@ export const OrdersNavHeader = ({
 
       {/* Fila de Filtros */}
       <div className="flex flex-wrap items-center gap-3">
-        <select className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 shadow-2xs focus:outline-none focus:ring-1 focus:ring-[#5960A1]">
-          <option>Todos los estados</option>
-          <option>Nuevo</option>
-          <option>En preparación</option>
-          <option>Listo</option>
-          <option>Recogido</option>
+        <select
+          value={statusFilter}
+          onChange={(e) => onStatusFilterChange(e.target.value)}
+          className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 shadow-2xs focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
+        >
+          <option value="">Todos los estados</option>
+          <option value="Nuevo">Nuevo</option>
+          <option value="En preparación">En preparación</option>
+          <option value="Listo">Listo</option>
+          <option value="Recogido">Recogido</option>
+          <option value="Cancelado">Cancelado</option>
         </select>
 
-        <select className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 shadow-2xs focus:outline-none focus:ring-1 focus:ring-[#5960A1]">
-          <option>Todos los orígenes</option>
-          <option>App</option>
-          <option>Mostrador</option>
+        <select
+          value={originFilter}
+          onChange={(e) => onOriginFilterChange(e.target.value)}
+          className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 shadow-2xs focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
+        >
+          <option value="">Todos los orígenes</option>
+          <option value="App">App</option>
+          <option value="Mostrador">Mostrador</option>
         </select>
 
         <div className="relative flex-1 min-w-[200px]">

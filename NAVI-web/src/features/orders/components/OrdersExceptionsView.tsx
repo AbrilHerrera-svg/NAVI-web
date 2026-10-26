@@ -1,15 +1,17 @@
-import { useState } from 'react';
 import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
-import { mockOrderExceptions } from '../data/ordersMock';
+import type { OrderExceptionItem } from '../types';
 
-export const OrdersExceptionsView = () => {
-  const [exceptions, setExceptions] = useState(mockOrderExceptions);
+interface Props {
+  exceptions: OrderExceptionItem[];
+  onResolve: (id: string) => void;
+}
 
+export const OrdersExceptionsView = ({ exceptions, onResolve }: Props) => {
   const handleResolve = (id: string, actionLabel: string) => {
     alert(`"${actionLabel}" aplicado — excepción resuelta`);
-    setExceptions((prev) => prev.filter((e) => e.id !== id));
+    onResolve(id);
   };
 
   if (exceptions.length === 0) {
