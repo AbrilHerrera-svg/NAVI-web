@@ -1,4 +1,4 @@
-import type { OrderItemRecord } from '../types';
+import { type OrderItemRecord, getPrimaryAction } from '../types';
 import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
@@ -7,6 +7,7 @@ import type { BadgeColor } from '../../../components/ui/Badge';
 interface Props {
   orders: OrderItemRecord[];
   onOpenCancelModal: (orderId: string) => void;
+  onAdvanceStatus: (orderId: string) => void;
 }
 
 const columns: { status: OrderItemRecord['status']; label: string; badgeColor: BadgeColor }[] = [
@@ -17,7 +18,7 @@ const columns: { status: OrderItemRecord['status']; label: string; badgeColor: B
   { status: 'Cancelado', label: 'Cancelado', badgeColor: 'danger' },
 ];
 
-export const OrdersKanbanView = ({ orders, onOpenCancelModal }: Props) => {
+export const OrdersKanbanView = ({ orders, onOpenCancelModal, onAdvanceStatus }: Props) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
       {columns.map((col) => {
@@ -35,7 +36,9 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal }: Props) => {
 
             {/* Tarjetas */}
             <div className="space-y-3">
-              {colOrders.map((order) => (
+              {colOrders.map((order) => {
+                const action = getPrimaryAction(order.status);
+                return (
                 <Card key={order.id} className="shadow-2xs space-y-3">
                   <div className="flex justify-between items-start">
                     <span className="font-extrabold text-sm text-slate-900">{order.orderNumber}</span>
@@ -76,19 +79,25 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal }: Props) => {
 
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                     <span className="text-sm font-bold text-slate-900">${order.total}</span>
-                    {order.primaryActionLabel && (
+                    {action && (
                       <Button
-                        variant={order.primaryActionColor === 'success' ? 'success' : 'primary'}
+                        variant={action.color === 'success' ? 'success' : 'primary'}
+                        onClick={() => onAdvanceStatus(order.id)}
                         className="px-3 py-1.5 shadow-2xs"
                       >
-                        {order.primaryActionLabel}
+                        {action.label}
                       </Button>
                     )}
                   </div>
 
                   {/* Acciones secundarias */}
                   <div className="flex justify-between text-[11px] pt-1 text-slate-400 font-medium">
-                    <button className="hover:text-slate-700 cursor-pointer">Editar</button>
+                    <button
+                      onClick={() => alert('Edición de pedidos próximamente')}
+                      className="hover:text-slate-700 cursor-pointer"
+                    >
+                      Editar
+                    </button>
                     <button
                       onClick={() => onOpenCancelModal(order.id)}
                       className="hover:text-rose-600 cursor-pointer"
@@ -97,7 +106,8 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal }: Props) => {
                     </button>
                   </div>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           </div>
         );

@@ -1,11 +1,17 @@
+import { useState } from "react";
 import Badge from "../../../components/ui/Badge";
-import type { OrderItemRecord } from "../types";
+import Button from "../../../components/ui/Button";
+import { type OrderItemRecord, getPrimaryAction } from "../types";
 
 interface Props {
   orders: OrderItemRecord[];
+  onAdvanceStatus: (orderId: string) => void;
+  onOpenCancelModal: (orderId: string) => void;
 }
 
-export const OrdersTableView = ({ orders }: Props) => {
+export const OrdersTableView = ({ orders, onAdvanceStatus, onOpenCancelModal }: Props) => {
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
       <div className="overflow-x-auto">
@@ -23,7 +29,9 @@ export const OrdersTableView = ({ orders }: Props) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-medium">
-            {orders.map((item) => (
+            {orders.map((item) => {
+              const action = getPrimaryAction(item.status);
+              return (
               <tr key={item.id} className="hover:bg-slate-50/70 transition">
                 <td className="py-3.5 px-4 font-bold text-slate-900">
                   {item.orderNumber}
@@ -68,22 +76,60 @@ export const OrdersTableView = ({ orders }: Props) => {
                     {item.status}
                   </span>
                 </td>
-                <td className="py-3.5 px-4 text-right space-x-2">
-                  {item.primaryActionLabel ? (
-                    <button className="px-3 py-1 bg-[#5960A1] text-white rounded-lg text-xs font-semibold hover:bg-[#484e85] transition shadow-2xs">
-                      {item.primaryActionLabel}
-                    </button>
+                <td className="py-3.5 px-4 text-right relative space-x-2">
+                  {action ? (
+                    <Button
+                      variant={action.color === 'success' ? 'success' : 'primary'}
+                      onClick={() => onAdvanceStatus(item.id)}
+                      className="px-3 py-1 shadow-2xs"
+                    >
+                      {action.label}
+                    </Button>
                   ) : (
-                    <button className="px-3 py-1 border border-slate-200 text-slate-600 rounded-lg text-xs hover:bg-slate-100 transition">
+                    <button
+                      onClick={() =>
+                        alert(
+                          `${item.orderNumber} · ${item.productsSummary} · $${item.total}`
+                        )
+                      }
+                      className="px-3 py-1 border border-slate-200 text-slate-600 rounded-lg text-xs hover:bg-slate-100 transition cursor-pointer"
+                    >
                       Ver
                     </button>
                   )}
-                  <button className="text-slate-400 hover:text-slate-600 text-xs font-medium">
+                  <button
+                    onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
+                    className="text-slate-400 hover:text-slate-600 text-xs font-medium cursor-pointer"
+                  >
                     Más ▾
                   </button>
+
+                  {openMenuId === item.id && (
+                    <div className="absolute right-4 mt-2 w-36 bg-white rounded-lg shadow-xl border border-slate-100 py-1.5 z-20 text-left text-xs font-medium">
+                      <button
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          alert('Edición de pedidos próximamente');
+                        }}
+                        className="w-full px-3 py-1.5 hover:bg-slate-50 text-slate-700 text-left cursor-pointer"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          onOpenCancelModal(item.id);
+                        }}
+                        className="w-full px-3 py-1.5 hover:bg-rose-50 text-rose-600 text-left cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -45,6 +45,23 @@ export interface OrderItemRecord {
   primaryActionColor?: 'default' | 'success';
 }
 
+// Deriva la acción principal del pedido a partir de su estado actual,
+// para que el botón siempre coincida con el estado real (no con un valor fijo del mock).
+export const getPrimaryAction = (
+  status: OrderStatus
+): { label: string; color: 'default' | 'success' } | null => {
+  switch (status) {
+    case 'Nuevo':
+      return { label: 'Inicio', color: 'default' };
+    case 'En preparación':
+      return { label: 'Marcar listo', color: 'default' };
+    case 'Listo':
+      return { label: 'Cobrar', color: 'success' };
+    default:
+      return null;
+  }
+};
+
 export interface OrderExceptionItem {
   id: string;
   type: 'Producto agotado' | 'Pago rechazado' | 'No recogido' | 'Pedido duplicado';
