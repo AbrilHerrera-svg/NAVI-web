@@ -1,3 +1,6 @@
+import Card from "../../../components/ui/Card";
+import Button from "../../../components/ui/Button";
+
 export const SalesCharts = () => {
   const hourlyData = [
     { hour: '8h', height: 'h-16' },
@@ -12,12 +15,12 @@ export const SalesCharts = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Ventas por hora */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs lg:col-span-2 flex flex-col justify-between">
+      <Card className="shadow-xs lg:col-span-2 flex flex-col justify-between">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-sm font-bold text-slate-800">Ventas por hora</h2>
-          <button className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 transition shadow-2xs">
+          <Button variant="secondary" className="px-3 py-1.5 shadow-2xs">
             Exportar
-          </button>
+          </Button>
         </div>
 
         {/* Gráfica de barras */}
@@ -33,10 +36,10 @@ export const SalesCharts = () => {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Por método de pago */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col justify-between">
+      <Card className="shadow-xs flex flex-col justify-between">
         <div>
           <h2 className="text-sm font-bold text-slate-800 mb-6">Por método de pago</h2>
           <div className="space-y-5 text-sm">
@@ -58,7 +61,7 @@ export const SalesCharts = () => {
         <div className="pt-6 border-t border-slate-100 mt-6">
           <p className="text-xs text-slate-400">Todos los pagos · $4,280 en total</p>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
