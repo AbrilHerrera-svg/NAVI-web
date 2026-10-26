@@ -13,7 +13,7 @@ const nextStatus: Partial<Record<OrderItemRecord['status'], OrderItemRecord['sta
 };
 
 export const OrdersProvider = ({ children }: { children: ReactNode }) => {
-  const { ingredients, registerSale, registerCancellation } = useInventory();
+  const { ingredients, registerSale, registerCancellation, recipesByProductId } = useInventory();
   const [orders, setOrders] = useState<OrderItemRecord[]>(mockOrdersData);
   const [exceptions, setExceptions] = useState(mockOrderExceptions);
   const [nextOrderNumber, setNextOrderNumber] = useState(99);
@@ -62,7 +62,10 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
 
     // "Cobrar" es la transición Nuevo → En preparación: ahí se descuenta inventario real.
     if (order.status === 'Nuevo' && order.cart) {
-      const result = registerSale(`Pedido ${order.orderNumber}`, buildStockLines(order.cart, ingredients));
+      const result = registerSale(
+        `Pedido ${order.orderNumber}`,
+        buildStockLines(order.cart, ingredients, recipesByProductId)
+      );
       if (!result.ok) {
         alert(
           `No se puede cobrar ${order.orderNumber}: no alcanza el inventario de ${result.missing
@@ -83,7 +86,10 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
 
     // Solo restituye inventario si esta sesión lo había descontado al cobrar.
     if (chargedOrderIds.has(order.id) && order.cart) {
-      registerCancellation(`Cancelación ${order.orderNumber}`, buildStockLines(order.cart, ingredients));
+      registerCancellation(
+        `Cancelación ${order.orderNumber}`,
+        buildStockLines(order.cart, ingredients, recipesByProductId)
+      );
       setChargedOrderIds((prev) => {
         const next = new Set(prev);
         next.delete(order.id);

@@ -9,7 +9,7 @@ import { useOrders } from '../features/orders';
 import { useInventory } from '../features/inventory';
 
 export default function NewOrderPage() {
-  const { ingredients, registerSale } = useInventory();
+  const { ingredients, registerSale, recipesByProductId } = useInventory();
   const { addOrder } = useOrders();
 
   // Estado inicial simulado con los 2 productos de la captura
@@ -65,7 +65,7 @@ export default function NewOrderPage() {
   const handleFinalizeOrder = () => {
     setIsConfirmOpen(false);
 
-    const lines = buildStockLines(cart, ingredients);
+    const lines = buildStockLines(cart, ingredients, recipesByProductId);
     const result = registerSale(`Pedido mostrador · ${new Date().toLocaleTimeString('es-MX')}`, lines);
 
     if (!result.ok) {

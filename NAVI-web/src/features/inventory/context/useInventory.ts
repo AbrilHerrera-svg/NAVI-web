@@ -4,6 +4,7 @@ import type {
   InventoryMovement,
   NewIngredientInput,
   PurchaseInput,
+  RecipeLine,
   StockAdjustmentInput,
   UpdateIngredientInput,
 } from '../types';
@@ -39,6 +40,11 @@ export interface InventoryContextValue {
   // No borra si el ingrediente está en una receta o tiene existencia distinta de cero;
   // regresa por qué no se pudo en vez de fallar en silencio.
   deleteIngredient: (id: string) => DeleteResult;
+  // Receta de cada producto del catálogo (id de OrderCatalog → líneas de ingrediente).
+  // Única fuente de verdad: tanto Menú (para editarla) como Orders (para descontar
+  // stock al vender) leen de aquí, así una edición se refleja de inmediato en ventas.
+  recipesByProductId: Record<string, RecipeLine[]>;
+  updateRecipe: (productId: string, lines: RecipeLine[]) => void;
 }
 
 export const InventoryReactContext = createContext<InventoryContextValue | null>(null);

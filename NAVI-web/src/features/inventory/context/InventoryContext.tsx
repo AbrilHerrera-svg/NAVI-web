@@ -7,14 +7,15 @@ import {
   type InventoryMovement,
   type NewIngredientInput,
   type PurchaseInput,
+  type RecipeLine,
   type StockAdjustmentInput,
   type UpdateIngredientInput,
 } from '../types';
 import { InventoryReactContext, type DeleteResult, type SaleResult, type StockLine } from './useInventory';
 
 // Verdadero si algún producto o extra del catálogo usa este ingrediente en su receta.
-const isUsedInRecipe = (ingredientId: string) => {
-  const inProducts = Object.values(mockRecipesByProductId).some((lines) =>
+const isUsedInRecipe = (ingredientId: string, recipesByProductId: Record<string, RecipeLine[]>) => {
+  const inProducts = Object.values(recipesByProductId).some((lines) =>
     lines.some((line) => line.ingredientId === ingredientId)
   );
   const inExtras = Object.values(mockRecipesByExtraId).some((line) => line.ingredientId === ingredientId);
@@ -46,6 +47,8 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const [ingredients, setIngredients] = useState<InventoryIngredient[]>(mockIngredients);
   const [movements, setMovements] = useState<InventoryMovement[]>(mockMovements);
   const [purchaseFolio, setPurchaseFolio] = useState(mockNextPurchaseFolio);
+  const [recipesByProductId, setRecipesByProductId] =
+    useState<Record<string, RecipeLine[]>>(mockRecipesByProductId);
 
   const adjustStock = (input: StockAdjustmentInput) => {
     const ingredient = ingredients.find((i) => i.id === input.ingredientId);
@@ -204,7 +207,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const deleteIngredient = (id: string): DeleteResult => {
     const ingredient = ingredients.find((i) => i.id === id);
     if (!ingredient) return { ok: false, reason: 'El ingrediente ya no existe.' };
-    if (isUsedInRecipe(id)) {
+    if (isUsedInRecipe(id, recipesByProductId)) {
       return { ok: false, reason: 'Está en la receta de uno o más productos; quítalo de ahí primero.' };
     }
     if (ingredient.stock !== 0) {
@@ -213,6 +216,10 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
 
     setIngredients((prev) => prev.filter((i) => i.id !== id));
     return { ok: true };
+  };
+
+  const updateRecipe = (productId: string, lines: RecipeLine[]) => {
+    setRecipesByProductId((prev) => ({ ...prev, [productId]: lines }));
   };
 
   return (
@@ -227,6 +234,8 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         createIngredient,
         updateIngredient,
         deleteIngredient,
+        recipesByProductId,
+        updateRecipe,
       }}
     >
       {children}
