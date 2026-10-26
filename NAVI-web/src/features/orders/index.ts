@@ -1,5 +1,6 @@
 export * from './types';
 export * from './data/ordersMock';
+export * from './utils/buildStockLines';
 export * from './components/OrdersNavHeader';
 export * from './components/OrdersKanbanView';
 export * from './components/OrdersTableView';

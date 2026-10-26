@@ -13,7 +13,21 @@ export interface InventoryIngredient {
   minStock: number; // mínimo, en cajas
   costPerBox: number; // MXN
   dependentProducts: number; // productos del menú que usan este ingrediente
+  unit: string; // unidad en la que se consume dentro de una receta, ej. "ml", "g", "pieza"
+  unitsPerBox: number; // cuántas unidades (ml, g, piezas) trae una caja, para convertir consumo de receta a cajas
 }
+
+// Línea de receta: cuántas unidades de un ingrediente de inventario consume un producto por tamaño
+export interface RecipeLine {
+  ingredientId: string;
+  amountMed?: number;
+  amountGde?: number;
+  amountSingle?: number;
+}
+
+// Convierte el consumo de una receta (en la unidad del ingrediente) a cajas de inventario
+export const amountToBoxes = (ingredient: InventoryIngredient, amount: number) =>
+  roundBoxes(amount / ingredient.unitsPerBox);
 
 export interface InventoryMovement {
   id: string;

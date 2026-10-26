@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import type { MenuItem, RecipeIngredient } from '../types';
+import type { MenuItem } from '../types';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import { AddIngredientModal } from './AddIngredientModal';
+import { amountToBoxes, mockRecipesByProductId, useInventory, type RecipeLine } from '../../inventory';
 
 interface Props {
   product: MenuItem;
@@ -10,49 +11,35 @@ interface Props {
   onRequestSave: () => void;
 }
 
-const initialIngredients: RecipeIngredient[] = [
-  {
-    id: 'ing-1',
-    name: 'Leche entera',
-    unit: 'ml',
-    costPerUnit: '$0.028',
-    amountMed: '220',
-    costMed: '$6.16',
-    amountGde: '300',
-    costGde: '$8.40',
-  },
-  {
-    id: 'ing-2',
-    name: 'Base de té',
-    unit: 'g',
-    costPerUnit: '$0.45',
-    amountMed: '10',
-    costMed: '$4.50',
-    amountGde: '12',
-    costGde: '$5.40',
-  },
-  {
-    id: 'ing-3',
-    name: 'Oreo',
-    unit: 'pieza',
-    costPerUnit: '$2.50',
-    amountGde: '1',
-    costGde: '$2.50',
-  },
-];
-
-const parseCost = (cost?: string) => (cost ? parseFloat(cost.replace(/[^0-9.]/g, '')) || 0 : 0);
-
 export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => {
-  const [ingredients, setIngredients] = useState<RecipeIngredient[]>(initialIngredients);
+  const { ingredients: inventoryIngredients } = useInventory();
+  // La receta se precarga del catálogo compartido con Inventario (por id de producto);
+  // los cambios aquí son locales a la sesión hasta que se guarde (ver onRequestSave).
+  const [lines, setLines] = useState<RecipeLine[]>(mockRecipesByProductId[product.id] ?? []);
   const [isAddOpen, setIsAddOpen] = useState(false);
 
-  const handleRemove = (id: string) => {
-    setIngredients((prev) => prev.filter((ing) => ing.id !== id));
+  const handleRemove = (ingredientId: string) => {
+    setLines((prev) => prev.filter((line) => line.ingredientId !== ingredientId));
   };
 
-  const costMedTotal = ingredients.reduce((acc, ing) => acc + parseCost(ing.costMed), 0);
-  const costGdeTotal = ingredients.reduce((acc, ing) => acc + parseCost(ing.costGde), 0);
+  // Cada línea de receta apunta a un ingrediente real de Inventario; de ahí se derivan
+  // nombre, unidad y costo en vez de volver a capturarlos.
+  const rows = lines
+    .map((line) => {
+      const ingredient = inventoryIngredients.find((i) => i.id === line.ingredientId);
+      if (!ingredient) return null;
+      const costPerUnit = ingredient.costPerBox / ingredient.unitsPerBox;
+      return {
+        line,
+        ingredient,
+        costMed: line.amountMed ? line.amountMed * costPerUnit : undefined,
+        costGde: line.amountGde ? line.amountGde * costPerUnit : undefined,
+      };
+    })
+    .filter((row): row is NonNullable<typeof row> => row !== null);
+
+  const costMedTotal = rows.reduce((acc, row) => acc + (row.costMed ?? 0), 0);
+  const costGdeTotal = rows.reduce((acc, row) => acc + (row.costGde ?? 0), 0);
 
   return (
     <div className="space-y-6">
@@ -69,7 +56,7 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
         <div>
           <h2 className="text-lg font-bold text-slate-900">{product.name}</h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            {product.category} · Preparación {product.prepTime} · {ingredients.length} ingredientes
+            {product.category} · Preparación {product.prepTime} · {rows.length} ingredientes
           </p>
         </div>
 
@@ -87,35 +74,41 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
 
       {/* Cuadrícula de Ingredientes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {ingredients.map((ing) => (
-          <Card key={ing.id} className="rounded-2xl shadow-2xs space-y-3">
-            <h3 className="font-bold text-sm text-slate-900">{ing.name}</h3>
+        {rows.map(({ line, ingredient, costMed, costGde }) => (
+          <Card key={ingredient.id} className="rounded-2xl shadow-2xs space-y-3">
+            <h3 className="font-bold text-sm text-slate-900">{ingredient.name}</h3>
             <div className="flex gap-2">
               <span
                 className={`border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold ${
-                  ing.amountMed ? 'text-slate-700' : 'text-slate-400'
+                  line.amountMed ? 'text-slate-700' : 'text-slate-400'
                 }`}
               >
-                MED {ing.amountMed ? `${ing.amountMed} ${ing.unit}` : '—'}
+                MED {line.amountMed ? `${line.amountMed} ${ingredient.unit}` : '—'}
               </span>
               <span
                 className={`border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold ${
-                  ing.amountGde ? 'text-slate-700' : 'text-slate-400'
+                  line.amountGde ? 'text-slate-700' : 'text-slate-400'
                 }`}
               >
-                GDE {ing.amountGde ? `${ing.amountGde} ${ing.unit}` : '—'}
+                GDE {line.amountGde ? `${line.amountGde} ${ingredient.unit}` : '—'}
               </span>
             </div>
             <div className="flex justify-between text-xs text-slate-500 pt-1">
               <span>
-                MED {ing.costMed ?? '—'} · GDE {ing.costGde ?? '—'}
+                MED {costMed !== undefined ? `$${costMed.toFixed(2)}` : '—'} · GDE{' '}
+                {costGde !== undefined ? `$${costGde.toFixed(2)}` : '—'}
               </span>
               <span className="text-slate-400">
-                {ing.costPerUnit} / {ing.unit}
+                ${(ingredient.costPerBox / ingredient.unitsPerBox).toFixed(3)} / {ingredient.unit}
               </span>
             </div>
+            <p className="text-[11px] text-slate-400">
+              {line.amountGde ? `${amountToBoxes(ingredient, line.amountGde)} cajas por GDE vendida` : ''}
+              {line.amountGde && line.amountMed ? ' · ' : ''}
+              {line.amountMed ? `${amountToBoxes(ingredient, line.amountMed)} cajas por MED vendida` : ''}
+            </p>
             <button
-              onClick={() => handleRemove(ing.id)}
+              onClick={() => handleRemove(ingredient.id)}
               className="text-xs text-rose-500 hover:underline font-medium cursor-pointer"
             >
               Quitar ingrediente
@@ -144,8 +137,10 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
 
       <AddIngredientModal
         isOpen={isAddOpen}
+        ingredients={inventoryIngredients}
+        excludeIds={lines.map((line) => line.ingredientId)}
         onClose={() => setIsAddOpen(false)}
-        onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
+        onAdd={(line) => setLines((prev) => [...prev, line])}
       />
     </div>
   );

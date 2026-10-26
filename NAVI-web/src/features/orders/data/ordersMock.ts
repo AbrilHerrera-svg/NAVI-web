@@ -13,6 +13,13 @@ export const mockOrdersData: OrderItemRecord[] = [
     total: 95,
     status: 'Cancelado',
     primaryActionLabel: 'Marcar listo',
+    cart: [
+      {
+        product: { id: '4', name: 'Chilaquiles rojos', category: 'Cocina', categoryLabel: 'Cocina', price: 95 },
+        quantity: 1,
+        extras: [],
+      },
+    ],
   },
   {
     id: 'ord-94',
@@ -27,6 +34,18 @@ export const mockOrdersData: OrderItemRecord[] = [
     total: 165,
     status: 'En preparación',
     primaryActionLabel: 'Marcar listo',
+    cart: [
+      {
+        product: { id: '4', name: 'Chilaquiles rojos', category: 'Cocina', categoryLabel: 'Cocina', price: 95 },
+        quantity: 1,
+        extras: [],
+      },
+      {
+        product: { id: '1', name: 'Chai Milk Tea', category: 'Bebidas', categoryLabel: 'Té con leche', size: 'MED', price: 70 },
+        quantity: 1,
+        extras: [],
+      },
+    ],
   },
   {
     id: 'ord-95',
@@ -41,6 +60,13 @@ export const mockOrdersData: OrderItemRecord[] = [
     total: 80,
     status: 'En preparación',
     primaryActionLabel: 'Marcar listo',
+    cart: [
+      {
+        product: { id: '6', name: 'Waffle Dulce', category: 'Postres', categoryLabel: 'Postres', price: 80 },
+        quantity: 1,
+        extras: [],
+      },
+    ],
   },
   {
     id: 'ord-97',
@@ -55,6 +81,13 @@ export const mockOrdersData: OrderItemRecord[] = [
     total: 100,
     status: 'Nuevo',
     primaryActionLabel: 'Inicio',
+    cart: [
+      {
+        product: { id: '1', name: 'Chai Milk Tea', category: 'Bebidas', categoryLabel: 'Té con leche', size: 'GDE', price: 85 },
+        quantity: 1,
+        extras: [{ extraId: 'top-1', name: 'Topping Oreo', price: 15, quantity: 1 }],
+      },
+    ],
   },
   {
     id: 'ord-98',
@@ -69,6 +102,13 @@ export const mockOrdersData: OrderItemRecord[] = [
     total: 65,
     status: 'Nuevo',
     primaryActionLabel: 'Inicio',
+    cart: [
+      {
+        product: { id: '2', name: 'Taro Smoothie', category: 'Bebidas', categoryLabel: 'Smoothies', size: 'MED', price: 65 },
+        quantity: 1,
+        extras: [],
+      },
+    ],
   },
   {
     id: 'ord-92',
@@ -83,6 +123,13 @@ export const mockOrdersData: OrderItemRecord[] = [
     total: 60,
     status: 'Listo',
     primaryActionLabel: 'Cobrar',
+    cart: [
+      {
+        product: { id: '3', name: 'Mango Fruit Tea', category: 'Bebidas', categoryLabel: 'Té de frutas', size: 'MED', price: 60 },
+        quantity: 1,
+        extras: [],
+      },
+    ],
   },
   {
     id: 'ord-91',
@@ -96,6 +143,13 @@ export const mockOrdersData: OrderItemRecord[] = [
     productsSummary: 'Biscoff Smoothie MED',
     total: 75,
     status: 'Recogido',
+    cart: [
+      {
+        product: { id: 'biscoff', name: 'Biscoff Smoothie', category: 'Bebidas', categoryLabel: 'Smoothies', size: 'MED', price: 75 },
+        quantity: 1,
+        extras: [],
+      },
+    ],
   },
   {
     id: 'ord-90',
@@ -109,6 +163,13 @@ export const mockOrdersData: OrderItemRecord[] = [
     productsSummary: 'Crepa de Nutella',
     total: 75,
     status: 'Recogido',
+    cart: [
+      {
+        product: { id: '5', name: 'Crepa de Nutella', category: 'Postres', categoryLabel: 'Postres', price: 75 },
+        quantity: 1,
+        extras: [],
+      },
+    ],
   },
 ];
 

@@ -4,8 +4,12 @@ import { OrderCatalog } from '../features/orders/components/OrderCatalog';
 import { OrderExtrasView } from '../features/orders/components/OrderExtrasView';
 import { OrderSummarySidebar } from '../features/orders/components/OrderSummarySidebar';
 import { OrderConfirmModal } from '../features/orders/components/OrderConfirmModal';
+import { buildStockLines } from '../features/orders/utils/buildStockLines';
+import { useInventory } from '../features/inventory';
 
 export default function NewOrderPage() {
+  const { ingredients, registerSale } = useInventory();
+
   // Estado inicial simulado con los 2 productos de la captura
   const [cart, setCart] = useState<CartItem[]>([
     {
@@ -54,9 +58,22 @@ export default function NewOrderPage() {
     );
   };
 
-  // Confirmar y limpiar
+  // Confirmar: descuenta inventario según receta y, solo si alcanza, limpia el carrito
   const handleFinalizeOrder = () => {
     setIsConfirmOpen(false);
+
+    const lines = buildStockLines(cart, ingredients);
+    const result = registerSale(`Pedido mostrador · ${new Date().toLocaleTimeString('es-MX')}`, lines);
+
+    if (!result.ok) {
+      alert(
+        `No se puede confirmar: no alcanza el inventario de ${result.missing
+          .map((m) => m.ingredientName)
+          .join(', ')}.`
+      );
+      return;
+    }
+
     alert('¡Pedido confirmado y enviado a preparación!');
     setCart([]);
   };

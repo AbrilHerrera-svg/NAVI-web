@@ -1,32 +1,28 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import Button from '../../../components/ui/Button';
-import type { RecipeIngredient } from '../types';
+import type { InventoryIngredient, RecipeLine } from '../../inventory';
 
 interface Props {
   isOpen: boolean;
+  ingredients: InventoryIngredient[];
+  excludeIds: string[];
   onClose: () => void;
-  onAdd: (ingredient: RecipeIngredient) => void;
+  onAdd: (line: RecipeLine) => void;
 }
 
-export const AddIngredientModal = ({ isOpen, onClose, onAdd }: Props) => {
-  const [name, setName] = useState('');
-  const [unit, setUnit] = useState('');
-  const [costPerUnit, setCostPerUnit] = useState('');
+export const AddIngredientModal = ({ isOpen, ingredients, excludeIds, onClose, onAdd }: Props) => {
+  const [ingredientId, setIngredientId] = useState('');
   const [amountMed, setAmountMed] = useState('');
-  const [costMed, setCostMed] = useState('');
   const [amountGde, setAmountGde] = useState('');
-  const [costGde, setCostGde] = useState('');
 
   if (!isOpen) return null;
 
+  const available = ingredients.filter((i) => !excludeIds.includes(i.id));
+
   const reset = () => {
-    setName('');
-    setUnit('');
-    setCostPerUnit('');
+    setIngredientId('');
     setAmountMed('');
-    setCostMed('');
     setAmountGde('');
-    setCostGde('');
   };
 
   const resetAndClose = () => {
@@ -34,19 +30,16 @@ export const AddIngredientModal = ({ isOpen, onClose, onAdd }: Props) => {
     onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !unit.trim() || !costPerUnit.trim()) return;
+    const med = parseFloat(amountMed);
+    const gde = parseFloat(amountGde);
+    if (!ingredientId || (!(med > 0) && !(gde > 0))) return;
 
     onAdd({
-      id: `ing-${Date.now()}`,
-      name,
-      unit,
-      costPerUnit,
-      amountMed: amountMed.trim() || undefined,
-      costMed: costMed.trim() || undefined,
-      amountGde: amountGde.trim() || undefined,
-      costGde: costGde.trim() || undefined,
+      ingredientId,
+      amountMed: med > 0 ? med : undefined,
+      amountGde: gde > 0 ? gde : undefined,
     });
     resetAndClose();
   };
@@ -62,44 +55,34 @@ export const AddIngredientModal = ({ isOpen, onClose, onAdd }: Props) => {
       >
         <div>
           <h3 className="text-base font-bold text-slate-800">Agregar ingrediente</h3>
-          <p className="text-xs text-slate-400 mt-0.5">Cantidad y costo por tamaño de preparación</p>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Toma el insumo y su costo directo de Inventario, solo captura cuánto se usa por tamaño.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-xs font-bold text-slate-700 mb-1">Nombre</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="ej. Leche entera"
-                required
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Unidad</label>
-              <input
-                type="text"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-                placeholder="ej. ml, g, pieza"
-                required
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Costo por unidad</label>
-              <input
-                type="text"
-                value={costPerUnit}
-                onChange={(e) => setCostPerUnit(e.target.value)}
-                placeholder="ej. $0.028"
-                required
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Ingrediente de inventario</label>
+            <select
+              value={ingredientId}
+              onChange={(e) => setIngredientId(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
+            >
+              <option value="" disabled>
+                Selecciona un ingrediente
+              </option>
+              {available.map((ingredient) => (
+                <option key={ingredient.id} value={ingredient.id}>
+                  {ingredient.name} ({ingredient.unit})
+                </option>
+              ))}
+            </select>
+            {available.length === 0 && (
+              <p className="text-[11px] text-slate-400 mt-1">
+                Ya se agregaron todos los ingredientes disponibles en Inventario.
+              </p>
+            )}
           </div>
 
           <div className="pt-2 border-t border-slate-100 space-y-3">
@@ -111,6 +94,7 @@ export const AddIngredientModal = ({ isOpen, onClose, onAdd }: Props) => {
                 <label className="block text-xs font-bold text-slate-700 mb-1">Cantidad MED</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={amountMed}
                   onChange={(e) => setAmountMed(e.target.value)}
                   placeholder="ej. 220"
@@ -118,32 +102,13 @@ export const AddIngredientModal = ({ isOpen, onClose, onAdd }: Props) => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Costo MED</label>
-                <input
-                  type="text"
-                  value={costMed}
-                  onChange={(e) => setCostMed(e.target.value)}
-                  placeholder="ej. $6.16"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
-                />
-              </div>
-              <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Cantidad GDE</label>
                 <input
                   type="text"
+                  inputMode="decimal"
                   value={amountGde}
                   onChange={(e) => setAmountGde(e.target.value)}
                   placeholder="ej. 300"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Costo GDE</label>
-                <input
-                  type="text"
-                  value={costGde}
-                  onChange={(e) => setCostGde(e.target.value)}
-                  placeholder="ej. $8.40"
                   className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#5960A1]"
                 />
               </div>
