@@ -1,4 +1,5 @@
 import Button from "../../../components/ui/Button";
+import { mockOrderExceptions } from "../data/ordersMock";
 
 interface Props {
   viewMode: 'tarjetas' | 'lista' | 'excepciones';
@@ -49,7 +50,7 @@ export const OrdersNavHeader = ({
                 viewMode === 'excepciones' ? 'bg-[#5960A1] text-white shadow-xs' : 'hover:text-slate-900'
               }`}
             >
-              Excepciones · 4
+              Excepciones · {mockOrderExceptions.length}
             </button>
           </div>
 

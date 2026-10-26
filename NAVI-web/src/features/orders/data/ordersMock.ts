@@ -1,5 +1,4 @@
-import type { OrderItemRecord } from '../types';
-
+import type { OrderItemRecord, OrderExceptionItem } from '../types'; 
 export const mockOrdersData: OrderItemRecord[] = [
   {
     id: 'ord-88',
@@ -110,5 +109,59 @@ export const mockOrdersData: OrderItemRecord[] = [
     productsSummary: 'Crepa de Nutella',
     total: 75,
     status: 'Recogido',
+  },
+];
+
+export const mockOrderExceptions: OrderExceptionItem[] = [
+  {
+    id: 'e-1',
+    type: 'Producto agotado',
+    tag: 'Existencias 0',
+    tagColor: 'danger',
+    orderRef: '#98 · Taro Smoothie MED · Mostrador',
+    description:
+      'Se agotó un insumo mientras se armaba el pedido. Aún no se cobra; el artículo no puede enviarse a preparación.',
+    metaLabel: 'Total actual',
+    metaValue: '$65',
+    primaryAction: 'Cambiar producto',
+    secondaryAction: 'Quitar del pedido',
+  },
+  {
+    id: 'e-2',
+    type: 'Pago rechazado',
+    tag: 'No cobrado',
+    tagColor: 'danger',
+    orderRef: '#91 · Biscoff Smoothie MED · App',
+    description:
+      'El banco rechazó el cargo. No se registró pago ni reembolso. Mantén el pedido mientras eliges otro método.',
+    metaLabel: 'Pago pendiente',
+    metaValue: '$75',
+    primaryAction: 'Reintentar',
+    secondaryAction: 'Cambiar método',
+  },
+  {
+    id: 'e-3',
+    type: 'No recogido',
+    tag: 'Listo',
+    tagColor: 'ready',
+    orderRef: '#92 · Mango Fruit Tea MED · App',
+    description:
+      'Listo desde las 14:03. Recogida acordada hace rato; cliente contactado, sin respuesta. Pagado con tarjeta.',
+    metaLabel: 'Cobrado · posible reembolso',
+    metaValue: '$60',
+    primaryAction: 'Reprogramar',
+    secondaryAction: 'Cancelar',
+  },
+  {
+    id: 'e-4',
+    type: 'Pedido duplicado',
+    tag: 'Revisar',
+    tagColor: 'info',
+    orderRef: '#97 · María López · App',
+    description:
+      'Posible pedido repetido del mismo cliente en un corto periodo. Verifica con el cliente antes de preparar ambos.',
+    metaLabel: 'Pedido relacionado',
+    metaValue: '#94 · $165',
+    primaryAction: 'Marcar y unir al pedido original',
   },
 ];
