@@ -8,4 +8,5 @@ export * from './components/ProductRecipeView';
 export * from './components/NewProductForm';
 export * from './components/MenuModals';
 export * from './components/NewPromotionModal';
+export * from './components/EditPromotionModal';
 export * from './components/AddIngredientModal';

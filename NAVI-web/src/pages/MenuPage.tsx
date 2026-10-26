@@ -11,6 +11,7 @@ import {
   SaveRecipeModal,
   CreateProductModal,
   NewPromotionModal,
+  EditPromotionModal,
   mockMenuItems,
   mockPromotions,
   type MenuTab,
@@ -33,6 +34,7 @@ export default function MenuPage() {
   const [isSaveRecipeOpen, setIsSaveRecipeOpen] = useState(false);
   const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
   const [isNewPromoOpen, setIsNewPromoOpen] = useState(false);
+  const [editPromoTarget, setEditPromoTarget] = useState<PromotionItem | null>(null);
 
   // Toggle switch de disponibilidad (también sincroniza el estado Activo/Inactivo)
   const handleToggleAvailable = (id: string) => {
@@ -127,7 +129,7 @@ export default function MenuPage() {
                   prev.map((p) => (p.id === promo.id ? { ...p, active: !p.active } : p))
                 )
               }
-              onEdit={(promo) => alert(`Editar "${promo.name}" — próximamente`)}
+              onEdit={setEditPromoTarget}
             />
           )}
         </>
@@ -169,6 +171,14 @@ export default function MenuPage() {
         isOpen={isNewPromoOpen}
         onClose={() => setIsNewPromoOpen(false)}
         onCreate={(promo) => setPromotions((prev) => [...prev, promo])}
+      />
+
+      <EditPromotionModal
+        promo={editPromoTarget}
+        onClose={() => setEditPromoTarget(null)}
+        onSave={(updated) =>
+          setPromotions((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+        }
       />
     </div>
   );
