@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { ProductItem, SelectedItemExtra } from '../types';
+import Card from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
 
 interface Props {
   product: ProductItem;
@@ -46,11 +48,11 @@ export const OrderExtrasView = ({ product, onBack, onConfirm }: Props) => {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Agregar extras</h1>
         <p className="text-sm text-slate-400 mt-1">
-          {product.name} {product.size ? `${product.size} · ` : ''}${product.price} · choose toppings
+          {product.name} {product.size ? `${product.size} · ` : ''}${product.price} · elige los toppings
         </p>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6">
+      <Card className="shadow-xs space-y-6">
         <div className="flex justify-between items-center pb-2 border-b border-slate-100">
           <span className="font-bold text-sm text-slate-800">Toppings extra · $15 c/u</span>
           <span className="text-xs text-slate-400">Opcional</span>
@@ -90,21 +92,15 @@ export const OrderExtrasView = ({ product, onBack, onConfirm }: Props) => {
             Total de extras ${totalExtras.toFixed(2)}
           </span>
           <div className="flex gap-3">
-            <button
-              onClick={onBack}
-              className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition cursor-pointer"
-            >
+            <Button variant="secondary" onClick={onBack} className="px-4 py-2">
               Regresar al pedido
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-5 py-2 bg-[#5960A1] hover:bg-[#484e85] text-white rounded-lg text-xs font-semibold transition cursor-pointer shadow-xs"
-            >
+            </Button>
+            <Button onClick={handleSave} className="px-5 py-2">
               Agregar al pedido
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
