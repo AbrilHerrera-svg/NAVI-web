@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <g fill="none" stroke="#5B5EA6" stroke-width="12" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Cuerpo del cohete -->
+    <path d="M180 38 C140 75 118 130 118 190 L118 235 L242 235 L242 190 C242 130 220 75 180 38 Z"/>
+    <!-- Aletas -->
+    <path d="M118 190 L85 262 L130 245"/>
+    <path d="M242 190 L275 262 L230 245"/>
+    <!-- Tobera -->
+    <path d="M155 240 H205 V252 H155 Z"/>
+    <!-- Llama -->
+    <path d="M162 272 L180 305 L200 272"/>
+    <!-- N invertida -->
+    <path d="M210 200 V148 L150 198 V146"/>
+  </g>
+</svg>

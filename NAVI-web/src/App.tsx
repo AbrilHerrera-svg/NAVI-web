@@ -1,63 +1,68 @@
-import DashboardPage from './pages/DashboardPage';
+import { useState } from "react";
+import DashboardPage from "./pages/DashboardPage";
+import SalesPage from "./pages/SalesPage";
+import NewOrderPage from "./pages/NewOrderPage";
+import OrdersPage from "./pages/OrdersPage";
+import MenuPage from "./pages/MenuPage";
+import CashRegisterPage from "./pages/CashRegisterPage";
+import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
+import MainLayout from "./components/layout/MainLayout";
+import { type PageId } from "./components/layout/Sidebar";
+// Puedes importar aquí tus otras páginas a medida que las crees
 
 function App() {
-  return (
-    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-800">
-      {/* Sidebar simulado de NAVI */}
-      <aside className="w-64 border-r border-slate-200 bg-white p-4 flex flex-col justify-between shrink-0 hidden md:flex">
-        <div>
-          {/* Logo */}
-          <div className="flex items-center gap-2 px-3 py-4 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-navi flex items-center justify-center text-white font-bold text-sm">
-              🚀
-            </div>
-            <span className="font-extrabold text-lg tracking-wider text-slate-800">NAVI</span>
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentPage, setCurrentPage] = useState<PageId>("dashboard");
+
+  // Renderizado dinámico según la opción seleccionada
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      case "dashboard":
+        return <DashboardPage />;
+      case "sales":
+        return <SalesPage />;
+      case "new-order":
+        return <NewOrderPage />;
+      case "orders":
+        return (
+          <OrdersPage
+            onNavigateToNewOrder={() => setCurrentPage("new-order")}
+          />
+        );
+      case "menu":
+        return <MenuPage />;
+      case "cash-register":
+        return <CashRegisterPage />;
+      case "profile":
+        return <ProfilePage />;
+      case "settings":
+        return <SettingsPage />;
+      default:
+        return (
+          <div className="p-8 text-center text-slate-400">
+            <h2 className="text-xl font-bold text-slate-700 mb-2 capitalize">
+              {currentPage}
+            </h2>
+            <p>Esta pantalla aún está en construcción.</p>
           </div>
+        );
+    }
+  };
 
-          {/* Menú de navegación */}
-          <nav className="space-y-1 text-sm font-medium">
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-navi text-white font-semibold">
-              <span>🏠</span> Inicio
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>📈</span> Ventas
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>📋</span> Pedidos
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>➕</span> Nuevo pedido
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>📖</span> Menú
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>💳</span> Caja
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>📉</span> Finanzas
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>📦</span> Inventario
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>📅</span> Reservaciones
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>☑️</span> Tareas
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100">
-              <span>👥</span> Usuarios
-            </button>
-          </nav>
-        </div>
-      </aside>
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={() => setIsAuthenticated(true)} />;
+  }
 
-      {/* Contenido principal (Dashboard) */}
-      <main className="flex-1 overflow-y-auto">
-        <DashboardPage />
-      </main>
-    </div>
+  return (
+    <MainLayout
+      currentPage={currentPage}
+      onNavigate={setCurrentPage}
+      onLogout={() => setIsAuthenticated(false)}
+    >
+      {renderCurrentPage()}
+    </MainLayout>
   );
 }
 
