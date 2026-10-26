@@ -1,3 +1,5 @@
+import Button from '../../../components/ui/Button';
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -19,18 +21,12 @@ export const OrderCancelModal = ({ isOpen, onClose, onConfirm }: Props) => {
         </p>
 
         <div className="flex gap-3 w-full pt-2">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2 px-3 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50 transition cursor-pointer"
-          >
+          <Button variant="secondary" onClick={onClose} className="flex-1 py-2 px-3">
             Mantener pedido
-          </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold transition cursor-pointer shadow-xs"
-          >
+          </Button>
+          <Button variant="danger" onClick={onConfirm} className="flex-1 py-2 px-3">
             Sí, cancelar pedido
-          </button>
+          </Button>
         </div>
       </div>
     </div>
