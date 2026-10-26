@@ -9,11 +9,16 @@ import InventoryPage from "./pages/InventoryPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
+import UsersPage from "./pages/UsersPage";
 import MainLayout from "./components/layout/MainLayout";
+import TasksPage from "./pages/TasksPage";
 import { type PageId } from "./components/layout/Sidebar";
 import { InventoryProvider } from "./features/inventory";
 import { OrdersProvider } from "./features/orders";
 import { SessionProvider } from "./features/profile";
+import { UsersProvider } from "./features/users";
+import { TasksProvider } from "./features/tasks";
+
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 function App() {
@@ -37,10 +42,18 @@ function App() {
         );
       case "menu":
         return <MenuPage />;
+      case "users":
+        return <UsersPage />;
       case "cash-register":
         return <CashRegisterPage />;
       case "inventory":
         return <InventoryPage />;
+      case "tasks":
+        return (
+          <TasksPage
+            onNavigateToCashRegister={() => setCurrentPage("cash-register")}
+          />
+        );
       case "profile":
         return <ProfilePage />;
       case "settings":
@@ -63,17 +76,21 @@ function App() {
 
   return (
     <SessionProvider>
-      <InventoryProvider>
-        <OrdersProvider>
-          <MainLayout
-            currentPage={currentPage}
-            onNavigate={setCurrentPage}
-            onLogout={() => setIsAuthenticated(false)}
-          >
-            {renderCurrentPage()}
-          </MainLayout>
-        </OrdersProvider>
-      </InventoryProvider>
+      <UsersProvider>
+        <TasksProvider>
+          <InventoryProvider>
+            <OrdersProvider>
+              <MainLayout
+                currentPage={currentPage}
+                onNavigate={setCurrentPage}
+                onLogout={() => setIsAuthenticated(false)}
+              >
+                {renderCurrentPage()}
+              </MainLayout>
+            </OrdersProvider>
+          </InventoryProvider>
+        </TasksProvider>
+      </UsersProvider>
     </SessionProvider>
   );
 }
