@@ -52,11 +52,11 @@ export const getPrimaryAction = (
 ): { label: string; color: 'default' | 'success' } | null => {
   switch (status) {
     case 'Nuevo':
-      return { label: 'Inicio', color: 'default' };
+      return { label: 'Cobrar', color: 'success' };
     case 'En preparación':
       return { label: 'Marcar listo', color: 'default' };
     case 'Listo':
-      return { label: 'Cobrar', color: 'success' };
+      return { label: 'Entregar', color: 'default' };
     default:
       return null;
   }

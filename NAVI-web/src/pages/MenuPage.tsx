@@ -10,6 +10,8 @@ import {
   RemovePromoModal,
   SaveRecipeModal,
   CreateProductModal,
+  NewPromotionModal,
+  EditPromotionModal,
   mockMenuItems,
   mockPromotions,
   type MenuTab,
@@ -31,11 +33,17 @@ export default function MenuPage() {
   const [removePromoTarget, setRemovePromoTarget] = useState<PromotionItem | null>(null);
   const [isSaveRecipeOpen, setIsSaveRecipeOpen] = useState(false);
   const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
+  const [isNewPromoOpen, setIsNewPromoOpen] = useState(false);
+  const [editPromoTarget, setEditPromoTarget] = useState<PromotionItem | null>(null);
 
-  // Toggle switch de disponibilidad
+  // Toggle switch de disponibilidad (también sincroniza el estado Activo/Inactivo)
   const handleToggleAvailable = (id: string) => {
     setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, available: !item.available } : item))
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, available: !item.available, status: item.available ? 'Inactivo' : 'Activo' }
+          : item
+      )
     );
   };
 
@@ -43,9 +51,18 @@ export default function MenuPage() {
   const handleConfirmArchive = () => {
     if (!archiveTarget) return;
     setItems((prev) =>
-      prev.map((item) => (item.id === archiveTarget.id ? { ...item, status: 'Archivado' } : item))
+      prev.map((item) =>
+        item.id === archiveTarget.id ? { ...item, status: 'Archivado', available: false } : item
+      )
     );
     setArchiveTarget(null);
+  };
+
+  // Desarchivar: regresa el producto a Activo y disponible
+  const handleUnarchive = (item: MenuItem) => {
+    setItems((prev) =>
+      prev.map((i) => (i.id === item.id ? { ...i, status: 'Activo', available: true } : i))
+    );
   };
 
   // Confirmar quitar promoción
@@ -77,6 +94,7 @@ export default function MenuPage() {
             currentTab={currentTab}
             onChangeTab={setCurrentTab}
             onOpenNewProduct={() => setIsCreatingProduct(true)}
+            onOpenNewPromotion={() => setIsNewPromoOpen(true)}
             title={currentTab === 'promociones' ? 'Promociones' : 'Menú'}
             subtitle={
               currentTab === 'promociones'
@@ -90,6 +108,7 @@ export default function MenuPage() {
               items={items}
               onToggleAvailable={handleToggleAvailable}
               onRequestArchive={setArchiveTarget}
+              onUnarchive={handleUnarchive}
               onOpenRecipe={setSelectedRecipeProduct}
             />
           )}
@@ -110,7 +129,7 @@ export default function MenuPage() {
                   prev.map((p) => (p.id === promo.id ? { ...p, active: !p.active } : p))
                 )
               }
-              onEdit={(promo) => alert(`Editar "${promo.name}" — próximamente`)}
+              onEdit={setEditPromoTarget}
             />
           )}
         </>
@@ -146,6 +165,20 @@ export default function MenuPage() {
           setIsCreateProductOpen(false);
           setIsCreatingProduct(false);
         }}
+      />
+
+      <NewPromotionModal
+        isOpen={isNewPromoOpen}
+        onClose={() => setIsNewPromoOpen(false)}
+        onCreate={(promo) => setPromotions((prev) => [...prev, promo])}
+      />
+
+      <EditPromotionModal
+        promo={editPromoTarget}
+        onClose={() => setEditPromoTarget(null)}
+        onSave={(updated) =>
+          setPromotions((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+        }
       />
     </div>
   );

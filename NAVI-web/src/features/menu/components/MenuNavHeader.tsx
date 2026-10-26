@@ -5,6 +5,7 @@ interface Props {
   currentTab: MenuTab;
   onChangeTab: (tab: MenuTab) => void;
   onOpenNewProduct: () => void;
+  onOpenNewPromotion: () => void;
   title?: string;
   subtitle?: string;
 }
@@ -13,6 +14,7 @@ export const MenuNavHeader = ({
   currentTab,
   onChangeTab,
   onOpenNewProduct,
+  onOpenNewPromotion,
   title = 'Menú',
   subtitle = 'Precios, tamaños y disponibilidad',
 }: Props) => {
@@ -52,7 +54,7 @@ export const MenuNavHeader = ({
         </div>
 
         {currentTab === 'promociones' ? (
-          <Button onClick={() => alert('Nueva promoción')}>
+          <Button onClick={onOpenNewPromotion}>
             Nueva promoción
           </Button>
         ) : (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Search } from 'lucide-react';
 import type { MenuItem } from '../types';
 import Badge from '../../../components/ui/Badge';
 
@@ -6,6 +7,7 @@ interface Props {
   items: MenuItem[];
   onToggleAvailable: (id: string) => void;
   onRequestArchive: (item: MenuItem) => void;
+  onUnarchive: (item: MenuItem) => void;
   onOpenRecipe: (item: MenuItem) => void;
 }
 
@@ -13,6 +15,7 @@ export const MenuTableView = ({
   items,
   onToggleAvailable,
   onRequestArchive,
+  onUnarchive,
   onOpenRecipe,
 }: Props) => {
   const [filterState, setFilterState] = useState<'Activo' | 'Archivado'>('Activo');
@@ -33,7 +36,7 @@ export const MenuTableView = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200">
         <div className="flex items-center gap-2 flex-1 max-w-md">
           <div className="relative w-full">
-            <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 text-xs">🔍</span>
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
@@ -96,10 +99,11 @@ export const MenuTableView = ({
                   <td className="py-3.5 px-4">
                     <button
                       type="button"
+                      disabled={item.status === 'Archivado'}
                       onClick={() => onToggleAvailable(item.id)}
-                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        item.available ? 'bg-[#5960A1]' : 'bg-slate-300'
-                      }`}
+                      className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        item.status === 'Archivado' ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'
+                      } ${item.available ? 'bg-[#5960A1]' : 'bg-slate-300'}`}
                     >
                       <span
                         className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
@@ -144,15 +148,27 @@ export const MenuTableView = ({
                         >
                           Ver receta
                         </button>
-                        <button
-                          onClick={() => {
-                            setOpenDropdownId(null);
-                            onRequestArchive(item);
-                          }}
-                          className="w-full px-3 py-1.5 hover:bg-slate-50 text-rose-600 text-left"
-                        >
-                          Archivar
-                        </button>
+                        {item.status === 'Archivado' ? (
+                          <button
+                            onClick={() => {
+                              setOpenDropdownId(null);
+                              onUnarchive(item);
+                            }}
+                            className="w-full px-3 py-1.5 hover:bg-slate-50 text-emerald-600 text-left"
+                          >
+                            Desarchivar
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setOpenDropdownId(null);
+                              onRequestArchive(item);
+                            }}
+                            className="w-full px-3 py-1.5 hover:bg-slate-50 text-rose-600 text-left"
+                          >
+                            Archivar
+                          </button>
+                        )}
                       </div>
                     )}
                   </td>

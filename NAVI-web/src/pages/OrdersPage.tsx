@@ -6,6 +6,7 @@ import {
   OrdersExceptionsView,
   OrderCancelModal,
   mockOrdersData,
+  mockOrderExceptions,
   type OrderItemRecord,
 } from '../features/orders';
 
@@ -22,17 +23,23 @@ const nextStatus: Partial<Record<OrderItemRecord['status'], OrderItemRecord['sta
 
 export default function OrdersPage({ onNavigateToNewOrder }: Props) {
   const [orders, setOrders] = useState<OrderItemRecord[]>(mockOrdersData);
+  const [exceptions, setExceptions] = useState(mockOrderExceptions);
   const [viewMode, setViewMode] = useState<'tarjetas' | 'lista' | 'excepciones'>('tarjetas');
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [originFilter, setOriginFilter] = useState('');
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
-  const filteredOrders = orders.filter(
-    (o) =>
+  const filteredOrders = orders.filter((o) => {
+    const matchesSearch =
       o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       o.productsSummary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.customerName?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      o.customerName?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = !statusFilter || o.status === statusFilter;
+    const matchesOrigin = !originFilter || o.origin === originFilter;
+    return matchesSearch && matchesStatus && matchesOrigin;
+  });
 
   const handleOpenCancel = (id: string) => {
     setSelectedOrderId(id);
@@ -67,6 +74,11 @@ export default function OrdersPage({ onNavigateToNewOrder }: Props) {
         onGoToNewOrder={() => onNavigateToNewOrder?.()}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        exceptionsCount={exceptions.length}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        originFilter={originFilter}
+        onOriginFilterChange={setOriginFilter}
       />
 
       {viewMode === 'tarjetas' && (
@@ -86,7 +98,10 @@ export default function OrdersPage({ onNavigateToNewOrder }: Props) {
       )}
 
       {viewMode === 'excepciones' && (
-        <OrdersExceptionsView />
+        <OrdersExceptionsView
+          exceptions={exceptions}
+          onResolve={(id) => setExceptions((prev) => prev.filter((e) => e.id !== id))}
+        />
       )}
 
       <OrderCancelModal
