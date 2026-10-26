@@ -4,10 +4,12 @@ import {
   ExpectedCashCard,
   SalesByMethodCard,
   DailyExpensesCard,
+  RefundsCard,
   mockCashOpening,
   mockExpectedCash,
   mockSalesByMethod,
   mockDailyExpenses,
+  mockRefunds,
 } from '../features/cash-register';
 
 export default function CashRegisterPage() {
@@ -21,6 +23,8 @@ export default function CashRegisterPage() {
         <SalesByMethodCard items={mockSalesByMethod} />
         <DailyExpensesCard items={mockDailyExpenses} />
       </div>
+
+      <RefundsCard items={mockRefunds} />
     </div>
   );
 }
