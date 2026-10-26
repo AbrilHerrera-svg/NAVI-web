@@ -2,13 +2,15 @@ import { useState } from 'react';
 import type { CartItem } from '../types';
 import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
+import * as Icons from 'lucide-react';
 
 interface Props {
   cart: CartItem[];
+  onRemoveItem: (index: number) => void;
   onRequestConfirm: () => void;
 }
 
-export const OrderSummarySidebar = ({ cart, onRequestConfirm }: Props) => {
+export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Props) => {
   const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Terminal de tarjeta' | 'Transferencia'>('Efectivo');
   const [receivedAmount, setReceivedAmount] = useState<string>('200.00');
 
@@ -37,12 +39,22 @@ export const OrderSummarySidebar = ({ cart, onRequestConfirm }: Props) => {
             <p className="text-xs text-slate-400 text-center py-4">No hay productos agregados</p>
           ) : (
             cart.map((item, idx) => (
-              <div key={idx} className="text-xs space-y-1">
-                <div className="flex justify-between text-slate-700 font-medium">
+              <div key={idx} className="text-xs space-y-1 group">
+                <div className="flex justify-between items-center text-slate-700 font-medium">
                   <span>
                     {item.quantity} × {item.product.name} {item.product.size || ''}
                   </span>
-                  <span className="font-bold text-slate-900">${item.product.price * item.quantity}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="font-bold text-slate-900">${item.product.price * item.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => onRemoveItem(idx)}
+                      title="Quitar producto"
+                      className="text-slate-300 hover:text-rose-500 transition cursor-pointer"
+                    >
+                      <Icons.X size={14} />
+                    </button>
+                  </span>
                 </div>
                 {item.extras.map((ex, eIdx) => (
                   <div key={eIdx} className="flex justify-between text-[11px] text-[#5960A1] pl-3">

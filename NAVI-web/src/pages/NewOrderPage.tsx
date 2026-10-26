@@ -45,6 +45,15 @@ export default function NewOrderPage() {
     setActiveExtraProduct(null);
   };
 
+  // Quitar una unidad del producto; si queda en 0, lo quita del carrito
+  const handleRemoveItem = (index: number) => {
+    setCart((prev) =>
+      prev
+        .map((item, i) => (i === index ? { ...item, quantity: item.quantity - 1 } : item))
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
   // Confirmar y limpiar
   const handleFinalizeOrder = () => {
     setIsConfirmOpen(false);
@@ -71,6 +80,7 @@ export default function NewOrderPage() {
       {/* Columna Derecha: Resumen del Pedido */}
       <OrderSummarySidebar
         cart={cart}
+        onRemoveItem={handleRemoveItem}
         onRequestConfirm={() => setIsConfirmOpen(true)}
       />
 
