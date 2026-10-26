@@ -2,8 +2,10 @@ import {
   CashRegisterHeader,
   OpeningCard,
   ExpectedCashCard,
+  SalesByMethodCard,
   mockCashOpening,
   mockExpectedCash,
+  mockSalesByMethod,
 } from '../features/cash-register';
 
 export default function CashRegisterPage() {
@@ -14,6 +16,7 @@ export default function CashRegisterPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <OpeningCard opening={mockCashOpening} />
         <ExpectedCashCard expected={mockExpectedCash} />
+        <SalesByMethodCard items={mockSalesByMethod} />
       </div>
     </div>
   );
