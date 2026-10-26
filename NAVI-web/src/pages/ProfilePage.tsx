@@ -1,8 +1,7 @@
-import { useState } from "react";
-import { ProfileCard, SecurityCard, mockProfile, type ProfileInfo } from "../features/profile";
+import { ProfileCard, SecurityCard, useSession } from "../features/profile";
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<ProfileInfo>(mockProfile);
+  const { profile, updateProfile } = useSession();
 
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-6">
@@ -14,7 +13,7 @@ export default function ProfilePage() {
       <ProfileCard
         profile={profile}
         onSave={(updated) => {
-          setProfile(updated);
+          updateProfile(updated);
           alert("Perfil actualizado");
         }}
       />
