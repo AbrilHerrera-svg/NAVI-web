@@ -1,3 +1,11 @@
+import { mockTodayTasks, mockTodayShift } from "../data/dashboardMock";
+import type { TaskStatus } from "../types";
+
+const taskStatusStyles: Record<TaskStatus, { label: string; className: string }> = {
+  completed: { label: "Completado", className: "text-emerald-600 font-semibold" },
+  pending: { label: "Pendiente", className: "text-amber-600 font-semibold" },
+  blocked: { label: "Bloqueado", className: "text-slate-400 font-medium" },
+};
 
 export const TeamAndTasks = () => {
   return (
@@ -12,23 +20,15 @@ export const TeamAndTasks = () => {
               Limpieza por área: Cocina ✓ · Barra pendiente · Mesas ✓ · Baños ✓
             </p>
           </div>
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-              <span className="text-slate-700">Apertura · Barista · 9:00 a. m.</span>
-              <span className="text-emerald-600 font-semibold">Completado</span>
-            </div>
-            <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-              <span className="text-slate-700">Inventario de leche · Cocina · 6:00 p. m.</span>
-              <span className="text-amber-600 font-semibold">Pendiente</span>
-            </div>
-            <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-              <span className="text-slate-700">Limpieza de cierre · Cocina · 9:00 p. m.</span>
-              <span className="text-amber-600 font-semibold">Pendiente</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-700">Cierre de caja · Venceño · 9:30 p. m.</span>
-              <span className="text-slate-400 font-medium">Bloqueado</span>
-            </div>
+          <div className="divide-y divide-slate-100 text-xs">
+            {mockTodayTasks.map((task, idx) => (
+              <div key={idx} className="flex justify-between items-center py-2 first:pt-0 last:pb-0">
+                <span className="text-slate-700">{task.label}</span>
+                <span className={taskStatusStyles[task.status].className}>
+                  {taskStatusStyles[task.status].label}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -36,22 +36,16 @@ export const TeamAndTasks = () => {
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
           <h3 className="font-semibold text-sm text-slate-800 mb-4">Turno de hoy</h3>
           <div className="space-y-3 text-xs">
-            <div className="flex justify-between items-center">
-              <span className="text-slate-700">Venceño · Abril Herrera</span>
-              <span className="text-emerald-600 font-semibold">En turno</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-700">Cajero</span>
-              <span className="text-emerald-600 font-semibold">En turno</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-700">Barista</span>
-              <span className="text-emerald-600 font-semibold">En turno</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-700">Cocina</span>
-              <span className="text-slate-500 font-medium">Inicia 3:00 p. m.</span>
-            </div>
+            {mockTodayShift.map((shift, idx) => (
+              <div key={idx} className="flex justify-between items-center">
+                <span className="text-slate-700">{shift.role}</span>
+                {shift.active ? (
+                  <span className="text-emerald-600 font-semibold">En turno</span>
+                ) : (
+                  <span className="text-slate-500 font-medium">{shift.detail}</span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>

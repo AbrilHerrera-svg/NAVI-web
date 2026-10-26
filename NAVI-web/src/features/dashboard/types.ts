@@ -65,3 +65,16 @@ export interface QueueStatusItem {
   count: number;
   isAlert?: boolean;
 }
+
+export type TaskStatus = "completed" | "pending" | "blocked";
+
+export interface TaskItem {
+  label: string;
+  status: TaskStatus;
+}
+
+export interface ShiftItem {
+  role: string;
+  active: boolean;
+  detail?: string; // ej. "Inicia 3:00 p. m." cuando no está activo
+}

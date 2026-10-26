@@ -1,5 +1,5 @@
 import type { AlertCardItem, MetricCardItem, TopProductItem, OutOfStockItem, LowStockItem, HourlySalesItem, PaymentMethodItem, WeeklyFinanceItem,
-  UpcomingExpenseItem, QueueStatusItem
+  UpcomingExpenseItem, QueueStatusItem, TaskItem, ShiftItem
  } from "../types";
 
 export const mockUrgentAlerts: AlertCardItem[] = [
@@ -78,4 +78,18 @@ export const mockQueueStatus: QueueStatusItem[] = [
   { label: 'Listo', count: 1 },
   { label: 'Por cobrar', count: 1 },
   { label: 'Cancelados hoy', count: 1, isAlert: true },
+];
+
+export const mockTodayTasks: TaskItem[] = [
+  { label: 'Apertura · Barista · 9:00 a. m.', status: 'completed' },
+  { label: 'Inventario de leche · Cocina · 6:00 p. m.', status: 'pending' },
+  { label: 'Limpieza de cierre · Cocina · 9:00 p. m.', status: 'pending' },
+  { label: 'Cierre de caja · Venceño · 9:30 p. m.', status: 'blocked' },
+];
+
+export const mockTodayShift: ShiftItem[] = [
+  { role: 'Venceño · Abril Herrera', active: true },
+  { role: 'Cajero', active: true },
+  { role: 'Barista', active: true },
+  { role: 'Cocina', active: false, detail: 'Inicia 3:00 p. m.' },
 ];
