@@ -6,6 +6,7 @@ import OrdersPage from "./pages/OrdersPage";
 import MenuPage from "./pages/MenuPage";
 import CashRegisterPage from "./pages/CashRegisterPage";
 import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
 import MainLayout from "./components/layout/MainLayout";
 import { type PageId } from "./components/layout/Sidebar";
 // Puedes importar aquí tus otras páginas a medida que las crees
@@ -33,6 +34,8 @@ function App() {
         return <MenuPage />;
       case "cash-register":
         return <CashRegisterPage />;
+      case "profile":
+        return <ProfilePage />;
       default:
         return (
           <div className="p-8 text-center text-slate-400">

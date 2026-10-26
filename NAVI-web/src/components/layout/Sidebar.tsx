@@ -9,7 +9,9 @@ export type PageId =
   | "cash-register"
   | "inventory"
   | "tasks"
-  | "users";
+  | "users"
+  | "profile"
+  | "settings";
 
 const menuItems: { id: PageId; label: string; icon: Icons.LucideIcon }[] = [
   { id: "dashboard", label: "Inicio", icon: Icons.House },

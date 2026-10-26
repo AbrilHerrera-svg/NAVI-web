@@ -12,7 +12,9 @@ const pageTitles: Record<PageId, string> =
       inventory: "Inventario",
       tasks: "Tareas",
       users: "Usuarios",
-      "cash-register": "Caja",    
+      "cash-register": "Caja",
+      profile: "Mi perfil",
+      settings: "Configuración",
     }
 
 
@@ -58,7 +60,7 @@ export default function Topbar({ currentPage, onNavigate, onLogout }: TopbarProp
               <button
                 onClick={() => {
                   setIsMenuOpen(false);
-                  onNavigate("users");
+                  onNavigate("profile");
                 }}
                 className="w-full px-3 py-1.5 hover:bg-slate-50 text-slate-700 text-left cursor-pointer"
               >
@@ -67,7 +69,7 @@ export default function Topbar({ currentPage, onNavigate, onLogout }: TopbarProp
               <button
                 onClick={() => {
                   setIsMenuOpen(false);
-                  onNavigate("users");
+                  onNavigate("settings");
                 }}
                 className="w-full px-3 py-1.5 hover:bg-slate-50 text-slate-700 text-left cursor-pointer"
               >
