@@ -49,7 +49,7 @@ export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Pr
                     <button
                       type="button"
                       onClick={() => onRemoveItem(idx)}
-                      title="Quitar producto"
+                      title={item.quantity > 1 ? 'Quitar una unidad' : 'Quitar producto'}
                       className="text-slate-300 hover:text-rose-500 transition cursor-pointer"
                     >
                       <Icons.X size={14} />
