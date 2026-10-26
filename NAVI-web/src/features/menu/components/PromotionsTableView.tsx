@@ -1,12 +1,29 @@
+import { useState } from 'react';
 import type { PromotionItem } from '../types';
 import Badge from '../../../components/ui/Badge';
 
 interface Props {
   promotions: PromotionItem[];
   onRequestRemove: (promo: PromotionItem) => void;
+  onToggleActive: (promo: PromotionItem) => void;
+  onEdit: (promo: PromotionItem) => void;
 }
 
-export const PromotionsTableView = ({ promotions, onRequestRemove }: Props) => {
+export const PromotionsTableView = ({
+  promotions,
+  onRequestRemove,
+  onToggleActive,
+  onEdit,
+}: Props) => {
+  const [tab, setTab] = useState<'Activo' | 'Terminado'>('Activo');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filtered = promotions.filter((p) => {
+    const matchesTab = tab === 'Activo' ? p.status !== 'Terminado' : p.status === 'Terminado';
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
+
   return (
     <div className="space-y-4">
       {/* Buscador superior */}
@@ -15,16 +32,32 @@ export const PromotionsTableView = ({ promotions, onRequestRemove }: Props) => {
           <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 text-xs">🔍</span>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por nombre de promoción"
             className="w-full pl-8 pr-3 py-1.5 text-xs bg-transparent focus:outline-none placeholder-slate-400 text-slate-800"
           />
         </div>
         <div className="flex items-center gap-2">
           <div className="flex bg-slate-100 p-0.5 rounded-lg text-xs font-semibold text-slate-600">
-            <button className="px-3 py-1 rounded-md bg-[#5960A1] text-white shadow-2xs">Activo</button>
-            <button className="px-3 py-1 rounded-md hover:text-slate-900">Terminado</button>
+            <button
+              onClick={() => setTab('Activo')}
+              className={`px-3 py-1 rounded-md transition cursor-pointer ${
+                tab === 'Activo' ? 'bg-[#5960A1] text-white shadow-2xs' : 'hover:text-slate-900'
+              }`}
+            >
+              Activo
+            </button>
+            <button
+              onClick={() => setTab('Terminado')}
+              className={`px-3 py-1 rounded-md transition cursor-pointer ${
+                tab === 'Terminado' ? 'bg-[#5960A1] text-white shadow-2xs' : 'hover:text-slate-900'
+              }`}
+            >
+              Terminado
+            </button>
           </div>
-          <span className="text-xs text-slate-400 ml-2">{promotions.length} promociones</span>
+          <span className="text-xs text-slate-400 ml-2">{filtered.length} promociones</span>
         </div>
       </div>
 
@@ -45,19 +78,29 @@ export const PromotionsTableView = ({ promotions, onRequestRemove }: Props) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
-              {promotions.map((p) => (
+              {filtered.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50/70 transition">
                   <td className="py-3.5 px-4 font-bold text-slate-900">{p.name}</td>
                   <td className="py-3.5 px-4 text-slate-600">{p.appliesTo}</td>
                   <td className="py-3.5 px-4">{p.discount}</td>
                   <td className="py-3.5 px-4">{p.price ? `$${p.price}` : '—'}</td>
                   <td className="py-3.5 px-4 text-slate-600">{p.schedule}</td>
-                  
+
                   {/* Switch */}
                   <td className="py-3.5 px-4">
-                    <span className="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-[#5960A1]">
-                      <span className="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg translate-x-4" />
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onToggleActive(p)}
+                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                        p.active ? 'bg-[#5960A1]' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition duration-200 ease-in-out ${
+                          p.active ? 'translate-x-4' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
                   </td>
 
                   {/* Estado */}
@@ -77,7 +120,12 @@ export const PromotionsTableView = ({ promotions, onRequestRemove }: Props) => {
 
                   {/* Acciones */}
                   <td className="py-3.5 px-4 text-right text-xs">
-                    <button className="text-slate-600 hover:text-slate-900 font-medium mr-2">Editar</button>
+                    <button
+                      onClick={() => onEdit(p)}
+                      className="text-slate-600 hover:text-slate-900 font-medium mr-2 cursor-pointer"
+                    >
+                      Editar
+                    </button>
                     <span className="text-slate-300">·</span>
                     <button
                       onClick={() => onRequestRemove(p)}
