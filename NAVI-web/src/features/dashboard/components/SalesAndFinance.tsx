@@ -1,6 +1,7 @@
 import ProgressBar from "../../../components/ui/ProgressBar";
 import { mockHourlySales } from "../data/dashboardMock";
 import { mockPaymentMethods } from "../data/dashboardMock";
+import { mockWeeklyFinance } from "../data/dashboardMock";
 export const SalesAndFinance = () => {
   return (
     <section className="space-y-4">
@@ -61,18 +62,18 @@ export const SalesAndFinance = () => {
             Morado: ingresos · Lila: gastos
           </p>
           <div className="flex items-end justify-between h-32 px-4 pb-2 border-b border-slate-100 gap-3">
-            {[40, 65, 55, 80, 95, 70, 85].map((val, idx) => (
+            {mockWeeklyFinance.map((item, idx) => (
               <div
                 key={idx}
-                className="flex gap-1 items-end flex-1 justify-center"
+                className="flex gap-1 items-end flex-1 justify-center h-full"
               >
                 <div
                   className="w-3 rounded-t-sm bg-[#5960A1]"
-                  style={{ height: `${val}%` }}
+                  style={{ height: `${item.ingresos}%` }}
                 />
                 <div
                   className="w-3 rounded-t-sm bg-[#5960A1]/30"
-                  style={{ height: `${val * 0.45}%` }}
+                  style={{ height: `${item.gastos}%` }}
                 />
               </div>
             ))}

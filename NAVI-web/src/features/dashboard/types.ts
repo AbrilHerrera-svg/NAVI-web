@@ -48,3 +48,8 @@ export interface PaymentMethodItem {
   percent: number;
   tone: ProgressBarTone;
 }
+
+export interface WeeklyFinanceItem {
+  ingresos: number;
+  gastos: number;
+}
