@@ -68,6 +68,19 @@ export interface PurchaseInput {
   paymentMethod: PaymentMethod;
 }
 
+export interface NewIngredientInput {
+  name: string;
+  unit: string;
+  unitsPerBox: number;
+  costPerBox: number;
+  minStock: number;
+  initialStock: number;
+}
+
+// No incluye stock: la existencia solo cambia por ajuste, compra o venta, para que el
+// historial de movimientos siga siendo la única fuente de verdad del inventario.
+export type UpdateIngredientInput = Omit<NewIngredientInput, 'initialStock'>;
+
 // Evita residuos de punto flotante al sumar/restar fracciones de caja (0.1 + 0.2)
 export const roundBoxes = (value: number) => Math.round(value * 1000) / 1000;
 

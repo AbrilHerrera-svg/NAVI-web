@@ -3,6 +3,8 @@ import { formatBoxes, formatMoney, getStockStatus, type InventoryIngredient, typ
 
 interface Props {
   ingredients: InventoryIngredient[];
+  onEdit: (ingredient: InventoryIngredient) => void;
+  onDelete: (ingredient: InventoryIngredient) => void;
 }
 
 const statusColor: Record<StockStatus, 'success' | 'warning' | 'danger'> = {
@@ -11,7 +13,7 @@ const statusColor: Record<StockStatus, 'success' | 'warning' | 'danger'> = {
   Agotado: 'danger',
 };
 
-export const IngredientsTableView = ({ ingredients }: Props) => {
+export const IngredientsTableView = ({ ingredients, onEdit, onDelete }: Props) => {
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
       <div className="overflow-x-auto">
@@ -24,6 +26,7 @@ export const IngredientsTableView = ({ ingredients }: Props) => {
               <th className="py-3 px-4">Costo por caja</th>
               <th className="py-3 px-4">Valor</th>
               <th className="py-3 px-4">Estado</th>
+              <th className="py-3 px-4 text-right">Acción</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-medium">
@@ -40,6 +43,20 @@ export const IngredientsTableView = ({ ingredients }: Props) => {
                   </td>
                   <td className="py-3.5 px-4">
                     <Badge color={statusColor[status]}>{status}</Badge>
+                  </td>
+                  <td className="py-3.5 px-4 text-right space-x-3">
+                    <button
+                      onClick={() => onEdit(item)}
+                      className="text-xs font-medium text-[#5960A1] hover:underline cursor-pointer"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => onDelete(item)}
+                      className="text-xs font-medium text-rose-500 hover:underline cursor-pointer"
+                    >
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               );

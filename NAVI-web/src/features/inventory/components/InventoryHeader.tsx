@@ -3,9 +3,10 @@ import Button from '../../../components/ui/Button';
 interface Props {
   onAdjustStock: () => void;
   onRegisterPurchase: () => void;
+  onNewIngredient: () => void;
 }
 
-export const InventoryHeader = ({ onAdjustStock, onRegisterPurchase }: Props) => {
+export const InventoryHeader = ({ onAdjustStock, onRegisterPurchase, onNewIngredient }: Props) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
       <div>
@@ -14,6 +15,9 @@ export const InventoryHeader = ({ onAdjustStock, onRegisterPurchase }: Props) =>
       </div>
 
       <div className="flex items-center gap-2">
+        <Button variant="secondary" onClick={onNewIngredient} className="bg-white">
+          Nuevo ingrediente
+        </Button>
         <Button variant="secondary" onClick={onAdjustStock} className="bg-white">
           Ajustar existencias
         </Button>

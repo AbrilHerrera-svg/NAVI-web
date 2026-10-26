@@ -1,13 +1,25 @@
 import { useState, type ReactNode } from 'react';
 import { mockIngredients, mockMovements, mockNextPurchaseFolio } from '../data/inventoryMock';
+import { mockRecipesByExtraId, mockRecipesByProductId } from '../data/recipesMock';
 import {
   roundBoxes,
   type InventoryIngredient,
   type InventoryMovement,
+  type NewIngredientInput,
   type PurchaseInput,
   type StockAdjustmentInput,
+  type UpdateIngredientInput,
 } from '../types';
-import { InventoryReactContext, type SaleResult, type StockLine } from './useInventory';
+import { InventoryReactContext, type DeleteResult, type SaleResult, type StockLine } from './useInventory';
+
+// Verdadero si algún producto o extra del catálogo usa este ingrediente en su receta.
+const isUsedInRecipe = (ingredientId: string) => {
+  const inProducts = Object.values(mockRecipesByProductId).some((lines) =>
+    lines.some((line) => line.ingredientId === ingredientId)
+  );
+  const inExtras = Object.values(mockRecipesByExtraId).some((line) => line.ingredientId === ingredientId);
+  return inProducts || inExtras;
+};
 
 // Etiqueta de fecha para movimientos nuevos: la fecha capturada (o "Hoy") + hora actual
 const buildDateLabel = (date: string) => {
@@ -132,9 +144,74 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     ]);
   };
 
+  const createIngredient = (input: NewIngredientInput) => {
+    const id = `ing-${Date.now()}`;
+    setIngredients((prev) => [
+      ...prev,
+      {
+        id,
+        name: input.name,
+        unit: input.unit,
+        unitsPerBox: input.unitsPerBox,
+        costPerBox: input.costPerBox,
+        minStock: input.minStock,
+        stock: input.initialStock,
+        dependentProducts: 0,
+      },
+    ]);
+
+    if (input.initialStock > 0) {
+      setMovements((prev) => [
+        {
+          id: `mov-${Date.now()}`,
+          dateLabel: buildDateLabel(''),
+          type: 'Ajuste',
+          ingredientName: input.name,
+          quantity: input.initialStock,
+          reference: 'Alta de ingrediente · existencia inicial',
+        },
+        ...prev,
+      ]);
+    }
+  };
+
+  const updateIngredient = (id: string, input: UpdateIngredientInput) => {
+    setIngredients((prev) =>
+      prev.map((i) =>
+        i.id === id
+          ? { ...i, name: input.name, unit: input.unit, unitsPerBox: input.unitsPerBox, costPerBox: input.costPerBox, minStock: input.minStock }
+          : i
+      )
+    );
+  };
+
+  const deleteIngredient = (id: string): DeleteResult => {
+    const ingredient = ingredients.find((i) => i.id === id);
+    if (!ingredient) return { ok: false, reason: 'El ingrediente ya no existe.' };
+    if (isUsedInRecipe(id)) {
+      return { ok: false, reason: 'Está en la receta de uno o más productos; quítalo de ahí primero.' };
+    }
+    if (ingredient.stock !== 0) {
+      return { ok: false, reason: 'Tiene existencia distinta de cero; ajústala a 0 antes de eliminarlo.' };
+    }
+
+    setIngredients((prev) => prev.filter((i) => i.id !== id));
+    return { ok: true };
+  };
+
   return (
     <InventoryReactContext.Provider
-      value={{ ingredients, movements, adjustStock, registerPurchase, registerSale, registerCancellation }}
+      value={{
+        ingredients,
+        movements,
+        adjustStock,
+        registerPurchase,
+        registerSale,
+        registerCancellation,
+        createIngredient,
+        updateIngredient,
+        deleteIngredient,
+      }}
     >
       {children}
     </InventoryReactContext.Provider>

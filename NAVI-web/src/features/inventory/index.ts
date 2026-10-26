@@ -11,3 +11,5 @@ export * from './components/MovementsView';
 export * from './components/TodayMovementsCard';
 export * from './components/AdjustStockForm';
 export * from './components/RegisterPurchaseForm';
+export * from './components/IngredientFormModal';
+export * from './components/DeleteIngredientModal';
