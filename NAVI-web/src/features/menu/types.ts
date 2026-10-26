@@ -23,14 +23,3 @@ export interface PromotionItem {
   status: 'Activo' | 'Programado' | 'Terminado';
   active: boolean;
 }
-
-export interface RecipeIngredient {
-  id: string;
-  name: string;
-  unit: string;
-  costPerUnit: string;
-  amountMed?: string;
-  costMed?: string;
-  amountGde?: string;
-  costGde?: string;
-}

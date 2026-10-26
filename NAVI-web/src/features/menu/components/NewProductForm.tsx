@@ -3,7 +3,7 @@ import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
 import { AddIngredientModal } from './AddIngredientModal';
-import type { RecipeIngredient } from '../types';
+import { useInventory, type RecipeLine } from '../../inventory';
 
 interface Props {
   onCancel: () => void;
@@ -11,11 +11,12 @@ interface Props {
 }
 
 export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
-  const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
+  const { ingredients: inventoryIngredients } = useInventory();
+  const [lines, setLines] = useState<RecipeLine[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
 
-  const handleRemoveIngredient = (id: string) => {
-    setIngredients((prev) => prev.filter((ing) => ing.id !== id));
+  const handleRemoveIngredient = (ingredientId: string) => {
+    setLines((prev) => prev.filter((line) => line.ingredientId !== ingredientId));
   };
 
   return (
@@ -95,20 +96,23 @@ export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
         <div className="pt-4 border-t border-slate-100 space-y-3">
           <h2 className="font-bold text-sm text-slate-900">Receta</h2>
 
-          {ingredients.length > 0 && (
+          {lines.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {ingredients.map((ing) => (
-                <Badge key={ing.id} className="inline-flex items-center gap-1.5 text-[11px] py-1">
-                  {ing.name}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveIngredient(ing.id)}
-                    className="text-slate-400 hover:text-rose-500 cursor-pointer"
-                  >
-                    ×
-                  </button>
-                </Badge>
-              ))}
+              {lines.map((line) => {
+                const ingredient = inventoryIngredients.find((i) => i.id === line.ingredientId);
+                return (
+                  <Badge key={line.ingredientId} className="inline-flex items-center gap-1.5 text-[11px] py-1">
+                    {ingredient?.name ?? line.ingredientId}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveIngredient(line.ingredientId)}
+                      className="text-slate-400 hover:text-rose-500 cursor-pointer"
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                );
+              })}
             </div>
           )}
 
@@ -134,8 +138,10 @@ export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
 
       <AddIngredientModal
         isOpen={isAddOpen}
+        ingredients={inventoryIngredients}
+        excludeIds={lines.map((line) => line.ingredientId)}
         onClose={() => setIsAddOpen(false)}
-        onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
+        onAdd={(line) => setLines((prev) => [...prev, line])}
       />
     </div>
   );

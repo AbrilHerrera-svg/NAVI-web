@@ -1,12 +1,12 @@
 import type { InventoryIngredient, InventoryMovement, TodayMovement } from '../types';
 
 export const mockIngredients: InventoryIngredient[] = [
-  { id: 'ing-1', name: 'Leche entera', stock: 2, minStock: 3, costPerBox: 336, dependentProducts: 5 },
-  { id: 'ing-2', name: 'Jarabe de chocolate', stock: 0, minStock: 1, costPerBox: 420, dependentProducts: 3 },
-  { id: 'ing-3', name: 'Base de té', stock: 1, minStock: 2, costPerBox: 480, dependentProducts: 8 },
-  { id: 'ing-4', name: 'Oreo', stock: 3, minStock: 2, costPerBox: 96, dependentProducts: 2 },
-  { id: 'ing-5', name: 'Leche de coco', stock: 2, minStock: 1, costPerBox: 162, dependentProducts: 1 },
-  { id: 'ing-6', name: 'Perlas de tapioca', stock: 4, minStock: 2, costPerBox: 30, dependentProducts: 6 },
+  { id: 'ing-1', name: 'Leche entera', stock: 2, minStock: 3, costPerBox: 336, dependentProducts: 5, unit: 'ml', unitsPerBox: 12000 },
+  { id: 'ing-2', name: 'Jarabe de chocolate', stock: 0, minStock: 1, costPerBox: 420, dependentProducts: 3, unit: 'ml', unitsPerBox: 6000 },
+  { id: 'ing-3', name: 'Base de té', stock: 1, minStock: 2, costPerBox: 480, dependentProducts: 8, unit: 'g', unitsPerBox: 4000 },
+  { id: 'ing-4', name: 'Oreo', stock: 3, minStock: 2, costPerBox: 96, dependentProducts: 2, unit: 'pieza', unitsPerBox: 48 },
+  { id: 'ing-5', name: 'Leche de coco', stock: 2, minStock: 1, costPerBox: 162, dependentProducts: 1, unit: 'ml', unitsPerBox: 6000 },
+  { id: 'ing-6', name: 'Perlas de tapioca', stock: 4, minStock: 2, costPerBox: 30, dependentProducts: 6, unit: 'g', unitsPerBox: 2000 },
 ];
 
 export const mockMovements: InventoryMovement[] = [

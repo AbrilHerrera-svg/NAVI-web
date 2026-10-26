@@ -43,6 +43,10 @@ export interface OrderItemRecord {
   status: OrderStatus;
   primaryActionLabel?: string;
   primaryActionColor?: 'default' | 'success';
+  // Carrito estructurado del pedido, usado para descontar/restituir inventario al cobrar
+  // o cancelar. Los pedidos sin receta registrada (ej. platillos de cocina) quedan sin
+  // efecto en inventario aunque tengan línea aquí.
+  cart?: CartItem[];
 }
 
 // Deriva la acción principal del pedido a partir de su estado actual,
