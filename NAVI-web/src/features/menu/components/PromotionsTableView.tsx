@@ -1,4 +1,5 @@
 import type { PromotionItem } from '../types';
+import Badge from '../../../components/ui/Badge';
 
 interface Props {
   promotions: PromotionItem[];
@@ -14,7 +15,7 @@ export const PromotionsTableView = ({ promotions, onRequestRemove }: Props) => {
           <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 text-xs">🔍</span>
           <input
             type="text"
-            placeholder="pedidos / clientes / productos / reservaciones"
+            placeholder="Buscar por nombre de promoción"
             className="w-full pl-8 pr-3 py-1.5 text-xs bg-transparent focus:outline-none placeholder-slate-400 text-slate-800"
           />
         </div>
@@ -61,17 +62,17 @@ export const PromotionsTableView = ({ promotions, onRequestRemove }: Props) => {
 
                   {/* Estado */}
                   <td className="py-3.5 px-4">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                    <Badge
+                      color={
                         p.status === 'Activo'
-                          ? 'bg-emerald-50 text-emerald-700'
+                          ? 'success'
                           : p.status === 'Programado'
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-emerald-50 text-emerald-700'
-                      }`}
+                          ? 'info'
+                          : 'neutral'
+                      }
                     >
                       {p.status}
-                    </span>
+                    </Badge>
                   </td>
 
                   {/* Acciones */}
