@@ -1,3 +1,4 @@
+export * from './types';
 export * from './components/DashboardHeader';
 export * from './components/UrgentAlerts';
 export * from './components/QuickMetrics';

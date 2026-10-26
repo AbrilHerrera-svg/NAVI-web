@@ -1,28 +1,44 @@
 import { useState, type ReactNode } from 'react';
+import { todayISO, formatIsoDateEs } from '../../../lib/date';
 import { mockIngredients, mockMovements, mockNextPurchaseFolio } from '../data/inventoryMock';
+import { mockRecipesByExtraId, mockRecipesByProductId } from '../data/recipesMock';
 import {
   roundBoxes,
   type InventoryIngredient,
   type InventoryMovement,
+  type NewIngredientInput,
   type PurchaseInput,
+  type RecipeLine,
   type StockAdjustmentInput,
+  type UpdateIngredientInput,
 } from '../types';
-import { InventoryReactContext, type SaleResult, type StockLine } from './useInventory';
+import { InventoryReactContext, type DeleteResult, type SaleResult, type StockLine } from './useInventory';
 
-// Etiqueta de fecha para movimientos nuevos: la fecha capturada (o "Hoy") + hora actual
-const buildDateLabel = (date: string) => {
+// Verdadero si algún producto o extra del catálogo usa este ingrediente en su receta.
+const isUsedInRecipe = (ingredientId: string, recipesByProductId: Record<string, RecipeLine[]>) => {
+  const inProducts = Object.values(recipesByProductId).some((lines) =>
+    lines.some((line) => line.ingredientId === ingredientId)
+  );
+  const inExtras = Object.values(mockRecipesByExtraId).some((line) => line.ingredientId === ingredientId);
+  return inProducts || inExtras;
+};
+
+// Etiqueta de fecha para movimientos nuevos: la fecha (capturada o de hoy) + hora actual.
+const buildDateLabel = (isoDate: string) => {
   const time = new Date().toLocaleTimeString('es-MX', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
   });
-  return `${date.trim() || 'Hoy'} · ${time}`;
+  return `${formatIsoDateEs(isoDate || todayISO())} · ${time}`;
 };
 
 export const InventoryProvider = ({ children }: { children: ReactNode }) => {
   const [ingredients, setIngredients] = useState<InventoryIngredient[]>(mockIngredients);
   const [movements, setMovements] = useState<InventoryMovement[]>(mockMovements);
   const [purchaseFolio, setPurchaseFolio] = useState(mockNextPurchaseFolio);
+  const [recipesByProductId, setRecipesByProductId] =
+    useState<Record<string, RecipeLine[]>>(mockRecipesByProductId);
 
   const adjustStock = (input: StockAdjustmentInput) => {
     const ingredient = ingredients.find((i) => i.id === input.ingredientId);
@@ -36,6 +52,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     setMovements((prev) => [
       {
         id: `mov-${Date.now()}`,
+        date: input.date || todayISO(),
         dateLabel: buildDateLabel(input.date),
         type: input.type,
         ingredientName: ingredient.name,
@@ -59,6 +76,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     setMovements((prev) => [
       {
         id: `mov-${Date.now()}`,
+        date: input.date || todayISO(),
         dateLabel: buildDateLabel(input.date),
         type: 'Compra',
         ingredientName: ingredient.name,
@@ -94,6 +112,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         const ingredient = ingredients.find((i) => i.id === line.ingredientId);
         return {
           id: `mov-${Date.now()}-${line.ingredientId}`,
+          date: todayISO(),
           dateLabel: buildDateLabel(''),
           type: 'Venta' as const,
           ingredientName: ingredient?.name ?? line.ingredientId,
@@ -121,6 +140,7 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
         const ingredient = ingredients.find((i) => i.id === line.ingredientId);
         return {
           id: `mov-${Date.now()}-${line.ingredientId}`,
+          date: todayISO(),
           dateLabel: buildDateLabel(''),
           type: 'Cancelación' as const,
           ingredientName: ingredient?.name ?? line.ingredientId,
@@ -132,9 +152,81 @@ export const InventoryProvider = ({ children }: { children: ReactNode }) => {
     ]);
   };
 
+  const createIngredient = (input: NewIngredientInput) => {
+    const id = `ing-${Date.now()}`;
+    setIngredients((prev) => [
+      ...prev,
+      {
+        id,
+        name: input.name,
+        unit: input.unit,
+        unitsPerBox: input.unitsPerBox,
+        costPerBox: input.costPerBox,
+        minStock: input.minStock,
+        stock: input.initialStock,
+        dependentProducts: 0,
+      },
+    ]);
+
+    if (input.initialStock > 0) {
+      setMovements((prev) => [
+        {
+          id: `mov-${Date.now()}`,
+          date: todayISO(),
+          dateLabel: buildDateLabel(''),
+          type: 'Ajuste',
+          ingredientName: input.name,
+          quantity: input.initialStock,
+          reference: 'Alta de ingrediente · existencia inicial',
+        },
+        ...prev,
+      ]);
+    }
+  };
+
+  const updateIngredient = (id: string, input: UpdateIngredientInput) => {
+    setIngredients((prev) =>
+      prev.map((i) =>
+        i.id === id
+          ? { ...i, name: input.name, unit: input.unit, unitsPerBox: input.unitsPerBox, costPerBox: input.costPerBox, minStock: input.minStock }
+          : i
+      )
+    );
+  };
+
+  const deleteIngredient = (id: string): DeleteResult => {
+    const ingredient = ingredients.find((i) => i.id === id);
+    if (!ingredient) return { ok: false, reason: 'El ingrediente ya no existe.' };
+    if (isUsedInRecipe(id, recipesByProductId)) {
+      return { ok: false, reason: 'Está en la receta de uno o más productos; quítalo de ahí primero.' };
+    }
+    if (ingredient.stock !== 0) {
+      return { ok: false, reason: 'Tiene existencia distinta de cero; ajústala a 0 antes de eliminarlo.' };
+    }
+
+    setIngredients((prev) => prev.filter((i) => i.id !== id));
+    return { ok: true };
+  };
+
+  const updateRecipe = (productId: string, lines: RecipeLine[]) => {
+    setRecipesByProductId((prev) => ({ ...prev, [productId]: lines }));
+  };
+
   return (
     <InventoryReactContext.Provider
-      value={{ ingredients, movements, adjustStock, registerPurchase, registerSale, registerCancellation }}
+      value={{
+        ingredients,
+        movements,
+        adjustStock,
+        registerPurchase,
+        registerSale,
+        registerCancellation,
+        createIngredient,
+        updateIngredient,
+        deleteIngredient,
+        recipesByProductId,
+        updateRecipe,
+      }}
     >
       {children}
     </InventoryReactContext.Provider>

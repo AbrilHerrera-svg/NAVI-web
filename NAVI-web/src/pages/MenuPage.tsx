@@ -18,8 +18,10 @@ import {
   type MenuItem,
   type PromotionItem,
 } from '../features/menu';
+import { useInventory, type RecipeLine } from '../features/inventory';
 
 export default function MenuPage() {
+  const { updateRecipe } = useInventory();
   const [currentTab, setCurrentTab] = useState<MenuTab>('lista');
   const [items, setItems] = useState<MenuItem[]>(mockMenuItems);
   const [promotions, setPromotions] = useState<PromotionItem[]>(mockPromotions);
@@ -31,7 +33,7 @@ export default function MenuPage() {
   // Estados de los Modales
   const [archiveTarget, setArchiveTarget] = useState<MenuItem | null>(null);
   const [removePromoTarget, setRemovePromoTarget] = useState<PromotionItem | null>(null);
-  const [isSaveRecipeOpen, setIsSaveRecipeOpen] = useState(false);
+  const [pendingRecipeLines, setPendingRecipeLines] = useState<RecipeLine[] | null>(null);
   const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
   const [isNewPromoOpen, setIsNewPromoOpen] = useState(false);
   const [editPromoTarget, setEditPromoTarget] = useState<PromotionItem | null>(null);
@@ -79,7 +81,7 @@ export default function MenuPage() {
         <ProductRecipeView
           product={selectedRecipeProduct}
           onBack={() => setSelectedRecipeProduct(null)}
-          onRequestSave={() => setIsSaveRecipeOpen(true)}
+          onRequestSave={(lines) => setPendingRecipeLines(lines)}
         />
       ) : isCreatingProduct ? (
         /* 2. Formulario de Alta de Producto */
@@ -150,10 +152,13 @@ export default function MenuPage() {
       />
 
       <SaveRecipeModal
-        isOpen={isSaveRecipeOpen}
-        onClose={() => setIsSaveRecipeOpen(false)}
+        isOpen={pendingRecipeLines !== null}
+        onClose={() => setPendingRecipeLines(null)}
         onConfirm={() => {
-          setIsSaveRecipeOpen(false);
+          if (selectedRecipeProduct && pendingRecipeLines) {
+            updateRecipe(selectedRecipeProduct.id, pendingRecipeLines);
+          }
+          setPendingRecipeLines(null);
           setSelectedRecipeProduct(null);
         }}
       />

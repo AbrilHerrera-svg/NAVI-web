@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
+import { todayISO } from '../../../lib/date';
+import { useSession } from '../../profile';
 import { IngredientSearchInput } from './IngredientSearchInput';
 import {
   formatBoxes,
@@ -21,13 +23,13 @@ const inputClass =
   'w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#5960A1]';
 
 export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
+  const { profile } = useSession();
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<InventoryIngredient | null>(null);
   const [notes, setNotes] = useState('');
   const [adjustmentType, setAdjustmentType] = useState<AdjustmentType | ''>('');
   const [countedBoxes, setCountedBoxes] = useState('');
-  const [responsible, setResponsible] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(todayISO());
   const [reason, setReason] = useState('');
   const [reference, setReference] = useState('');
 
@@ -40,8 +42,8 @@ export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
     adjustmentType !== '' &&
     hasCounted &&
     difference !== 0 &&
-    responsible.trim().length > 0 &&
-    reason.trim().length > 0;
+    reason.trim().length > 0 &&
+    date.trim().length > 0;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -52,7 +54,8 @@ export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
       type: adjustmentType,
       countedBoxes: counted,
       notes: notes.trim(),
-      responsible: responsible.trim(),
+      // Quien hace el ajuste es quien tiene la sesión abierta, no texto libre capturado a mano.
+      responsible: profile.name,
       date,
       reason: reason.trim(),
       reference: reference.trim(),
@@ -133,21 +136,18 @@ export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1">Responsable</label>
-            <input
-              type="text"
-              value={responsible}
-              onChange={(e) => setResponsible(e.target.value)}
-              placeholder="Persona que hace el ajuste"
-              className={inputClass}
-            />
+            <div className={`${inputClass} bg-slate-50 text-slate-600 flex items-center justify-between`}>
+              <span>{profile.name}</span>
+              <span className="text-[10px] text-slate-400">{profile.role}</span>
+            </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1">Fecha</label>
             <input
-              type="text"
+              type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              placeholder="Hoy o una fecha"
+              max={todayISO()}
               className={inputClass}
             />
           </div>

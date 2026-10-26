@@ -2,7 +2,6 @@ import type { CartItem } from '../types';
 import {
   amountToBoxes,
   mockRecipesByExtraId,
-  mockRecipesByProductId,
   type InventoryIngredient,
   type RecipeLine,
   type StockLine,
@@ -18,8 +17,13 @@ const amountForSize = (line: RecipeLine, size?: string) => {
 
 // Convierte un carrito/pedido en líneas de consumo por ingrediente (en cajas), sumando
 // el consumo cuando dos productos/extras comparten el mismo ingrediente. Los productos
-// sin receta registrada en mockRecipesByProductId no descuentan inventario.
-export const buildStockLines = (cart: CartItem[], ingredients: InventoryIngredient[]): StockLine[] => {
+// sin receta registrada en recipesByProductId no descuentan inventario. recipesByProductId
+// debe venir del InventoryContext (useInventory) para reflejar ediciones recientes a la receta.
+export const buildStockLines = (
+  cart: CartItem[],
+  ingredients: InventoryIngredient[],
+  recipesByProductId: Record<string, RecipeLine[]>
+): StockLine[] => {
   const boxesByIngredient = new Map<string, number>();
 
   const addBoxes = (ingredientId: string, boxes: number) => {
@@ -28,7 +32,7 @@ export const buildStockLines = (cart: CartItem[], ingredients: InventoryIngredie
   };
 
   for (const item of cart) {
-    const recipe = mockRecipesByProductId[item.product.id] ?? [];
+    const recipe = recipesByProductId[item.product.id] ?? [];
     for (const line of recipe) {
       const ingredient = ingredients.find((i) => i.id === line.ingredientId);
       const amount = amountForSize(line, item.product.size);

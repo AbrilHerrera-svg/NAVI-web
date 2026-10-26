@@ -31,6 +31,7 @@ export const amountToBoxes = (ingredient: InventoryIngredient, amount: number) =
 
 export interface InventoryMovement {
   id: string;
+  date: string; // ISO yyyy-mm-dd, para filtrar por rango de fechas
   dateLabel: string; // ej. "17 Oct 2026 · 13:58"
   type: MovementType;
   ingredientName: string;
@@ -39,13 +40,11 @@ export interface InventoryMovement {
   notes?: string;
 }
 
-export interface TodayMovement {
-  id: string;
-  time: string; // ej. "09:00"
-  label: string;
-  type: MovementType;
-  quantity: number;
-}
+// "Hoy" se define como la fecha del movimiento más reciente, no el reloj del navegador:
+// así funciona igual con datos de ejemplo (fecha fija en el pasado) y con movimientos
+// reales creados en la sesión. Compartido por MovementsView y TodayMovementsCard.
+export const getLatestMovementDate = (movements: InventoryMovement[]) =>
+  movements.reduce((max, m) => (m.date > max ? m.date : max), movements[0]?.date ?? '');
 
 export interface StockAdjustmentInput {
   ingredientId: string;
@@ -53,7 +52,7 @@ export interface StockAdjustmentInput {
   countedBoxes: number;
   notes: string;
   responsible: string;
-  date: string;
+  date: string; // ISO yyyy-mm-dd (viene de un <input type="date">)
   reason: string;
   reference: string;
 }
@@ -64,9 +63,22 @@ export interface PurchaseInput {
   totalCost: number;
   notes: string;
   supplier: string;
-  date: string;
+  date: string; // ISO yyyy-mm-dd (viene de un <input type="date">)
   paymentMethod: PaymentMethod;
 }
+
+export interface NewIngredientInput {
+  name: string;
+  unit: string;
+  unitsPerBox: number;
+  costPerBox: number;
+  minStock: number;
+  initialStock: number;
+}
+
+// No incluye stock: la existencia solo cambia por ajuste, compra o venta, para que el
+// historial de movimientos siga siendo la única fuente de verdad del inventario.
+export type UpdateIngredientInput = Omit<NewIngredientInput, 'initialStock'>;
 
 // Evita residuos de punto flotante al sumar/restar fracciones de caja (0.1 + 0.2)
 export const roundBoxes = (value: number) => Math.round(value * 1000) / 1000;

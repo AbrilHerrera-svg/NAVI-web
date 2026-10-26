@@ -1,9 +1,11 @@
+import { formatLongDateEs } from '../../../lib/date';
+
 export const SalesHeader = () => {
   return (
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Ventas</h1>
-        <p className="text-sm text-slate-400">Sábado, 17 de octubre</p>
+        <p className="text-sm text-slate-400">{formatLongDateEs(new Date())}</p>
       </div>
 
       <div className="w-48">

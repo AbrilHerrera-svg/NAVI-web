@@ -3,19 +3,20 @@ import type { MenuItem } from '../types';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import { AddIngredientModal } from './AddIngredientModal';
-import { amountToBoxes, mockRecipesByProductId, useInventory, type RecipeLine } from '../../inventory';
+import { amountToBoxes, useInventory, type RecipeLine } from '../../inventory';
 
 interface Props {
   product: MenuItem;
   onBack: () => void;
-  onRequestSave: () => void;
+  // Entrega las líneas editadas; quien llama decide cuándo confirmarlas (ver SaveRecipeModal).
+  onRequestSave: (lines: RecipeLine[]) => void;
 }
 
 export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => {
-  const { ingredients: inventoryIngredients } = useInventory();
-  // La receta se precarga del catálogo compartido con Inventario (por id de producto);
-  // los cambios aquí son locales a la sesión hasta que se guarde (ver onRequestSave).
-  const [lines, setLines] = useState<RecipeLine[]>(mockRecipesByProductId[product.id] ?? []);
+  const { ingredients: inventoryIngredients, recipesByProductId } = useInventory();
+  // La receta se precarga de Inventario (fuente compartida con las ventas); los cambios
+  // aquí son locales a esta vista hasta que se confirme guardar (ver onRequestSave).
+  const [lines, setLines] = useState<RecipeLine[]>(recipesByProductId[product.id] ?? []);
   const [isAddOpen, setIsAddOpen] = useState(false);
 
   const handleRemove = (ingredientId: string) => {
@@ -130,7 +131,7 @@ export const ProductRecipeView = ({ product, onBack, onRequestSave }: Props) => 
         <Button variant="secondary" onClick={onBack} className="px-5 py-2">
           Cancelar
         </Button>
-        <Button onClick={onRequestSave} className="px-5 py-2">
+        <Button onClick={() => onRequestSave(lines)} className="px-5 py-2">
           Guardar cambios
         </Button>
       </div>

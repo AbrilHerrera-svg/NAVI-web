@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
+import { todayISO } from '../../../lib/date';
 import { IngredientSearchInput } from './IngredientSearchInput';
 import { formatMoney, type InventoryIngredient, type PaymentMethod, type PurchaseInput } from '../types';
 
@@ -22,7 +23,7 @@ export const RegisterPurchaseForm = ({ ingredients, onCancel, onSubmit }: Props)
   const [receivedBoxes, setReceivedBoxes] = useState('');
   const [totalCost, setTotalCost] = useState('');
   const [supplier, setSupplier] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(todayISO());
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | ''>('');
 
   const received = parseFloat(receivedBoxes) || 0;
@@ -34,7 +35,8 @@ export const RegisterPurchaseForm = ({ ingredients, onCancel, onSubmit }: Props)
     received > 0 &&
     total > 0 &&
     supplier.trim().length > 0 &&
-    paymentMethod !== '';
+    paymentMethod !== '' &&
+    date.trim().length > 0;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -133,10 +135,10 @@ export const RegisterPurchaseForm = ({ ingredients, onCancel, onSubmit }: Props)
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1">Fecha de compra</label>
             <input
-              type="text"
+              type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              placeholder="17 oct 2026"
+              max={todayISO()}
               className={inputClass}
             />
           </div>

@@ -1,6 +1,8 @@
 import type { AlertTagColor } from "../../components/ui/AlertCard";
 import type { ProgressBarTone } from "../../components/ui/ProgressBar";
 
+export type DashboardPeriod = "hoy" | "semana";
+
 
 export interface MetricCardItem {
   label: string;
