@@ -1,22 +1,15 @@
 import Card from "../../../components/ui/Card";
 import Badge from "../../../components/ui/Badge";
+import { mockTopProducts } from "../../dashboard";
 
 export const SalesTopProducts = () => {
-  const topProducts = [
-    { name: 'Chai Milk Tea GDE', count: 24 },
-    { name: 'Taro Smoothie MED', count: 18 },
-    { name: 'Chilaquiles rojos', count: 15 },
-    { name: 'Mango Fruit Tea MED', count: 12 },
-    { name: 'Crepas de Nutella', count: 9 },
-  ];
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Más vendidos */}
       <Card className="shadow-xs">
         <h2 className="text-sm font-bold text-slate-800 mb-4">Más vendidos</h2>
         <div className="space-y-3.5 text-xs">
-          {topProducts.map((product, idx) => (
+          {mockTopProducts.map((product, idx) => (
             <div key={idx} className="flex justify-between items-center text-slate-700">
               <span className="font-medium">{product.name}</span>
               <span className="font-bold text-slate-900 text-sm">{product.count}</span>
