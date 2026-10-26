@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { todayISO, formatIsoDateEs } from '../../../lib/date';
 import { mockIngredients, mockMovements, mockNextPurchaseFolio } from '../data/inventoryMock';
 import { mockRecipesByExtraId, mockRecipesByProductId } from '../data/recipesMock';
 import {
@@ -22,17 +23,6 @@ const isUsedInRecipe = (ingredientId: string, recipesByProductId: Record<string,
   return inProducts || inExtras;
 };
 
-// Fecha ISO (yyyy-mm-dd) del momento real en que se registra el movimiento.
-const todayISO = () => new Date().toISOString().slice(0, 10);
-
-const monthAbbrev = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
-// "2026-10-17" → "17 Oct 2026"
-const formatIsoDate = (iso: string) => {
-  const [year, month, day] = iso.split('-').map(Number);
-  return `${String(day).padStart(2, '0')} ${monthAbbrev[month - 1]} ${year}`;
-};
-
 // Etiqueta de fecha para movimientos nuevos: la fecha (capturada o de hoy) + hora actual.
 const buildDateLabel = (isoDate: string) => {
   const time = new Date().toLocaleTimeString('es-MX', {
@@ -40,7 +30,7 @@ const buildDateLabel = (isoDate: string) => {
     minute: '2-digit',
     hour12: false,
   });
-  return `${formatIsoDate(isoDate || todayISO())} · ${time}`;
+  return `${formatIsoDateEs(isoDate || todayISO())} · ${time}`;
 };
 
 export const InventoryProvider = ({ children }: { children: ReactNode }) => {

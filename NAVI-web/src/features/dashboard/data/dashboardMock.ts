@@ -21,6 +21,15 @@ export const mockQuickMetrics: MetricCardItem[] = [
   { label: 'Productos agotados', value: '3', sub: '+1 vs. el mismo día', isAlert: true },
 ];
 
+export const mockQuickMetricsWeek: MetricCardItem[] = [
+  { label: 'Ventas de la semana', value: '$26,940', sub: '+8% vs. la semana pasada' },
+  { label: 'Pedidos', value: '612', sub: '401 app · 211 mostrador' },
+  { label: 'Ticket promedio', value: '$44.02', sub: '+2% vs. la semana pasada' },
+  { label: 'Tiempo de prep.', value: '9 min', sub: 'dentro de lo estimado' },
+  { label: 'Utilidad estimada', value: '$7,850', sub: 'margen 29%' },
+  { label: 'Productos agotados', value: '5', sub: 'distintos esta semana', isAlert: true },
+];
+
 export const mockTopProducts: TopProductItem[] = [
   { name: 'Chai Milk Tea GDE', count: 24 },
   { name: 'Taro Smoothie MED', count: 18 },

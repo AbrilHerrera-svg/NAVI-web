@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
+import { todayISO } from '../../../lib/date';
 import { useSession } from '../../profile';
 import { IngredientSearchInput } from './IngredientSearchInput';
 import {
@@ -20,8 +21,6 @@ interface Props {
 
 const inputClass =
   'w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#5960A1]';
-
-const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export const AdjustStockForm = ({ ingredients, onCancel, onSubmit }: Props) => {
   const { profile } = useSession();

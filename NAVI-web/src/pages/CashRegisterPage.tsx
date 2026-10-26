@@ -15,11 +15,14 @@ import {
   mockClosingInputs,
   mockClosingReason,
 } from '../features/cash-register';
+import { formatLongDateEs } from '../lib/date';
 
 export default function CashRegisterPage() {
+  const todayLabel = formatLongDateEs(new Date());
+
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
-      <CashRegisterHeader dateLabel="Sábado, 17 de octubre" />
+      <CashRegisterHeader dateLabel={todayLabel} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <OpeningCard opening={mockCashOpening} />
@@ -34,7 +37,7 @@ export default function CashRegisterPage() {
         summary={mockClosingSummary}
         inputs={mockClosingInputs}
         initialReason={mockClosingReason}
-        dateLabel="Sábado, 17 de octubre"
+        dateLabel={todayLabel}
         onCloseDay={() => alert('¡Día cerrado!')}
       />
     </div>
