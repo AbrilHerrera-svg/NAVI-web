@@ -105,6 +105,12 @@ export default function MenuPage() {
             <PromotionsTableView
               promotions={promotions}
               onRequestRemove={setRemovePromoTarget}
+              onToggleActive={(promo) =>
+                setPromotions((prev) =>
+                  prev.map((p) => (p.id === promo.id ? { ...p, active: !p.active } : p))
+                )
+              }
+              onEdit={(promo) => alert(`Editar "${promo.name}" — próximamente`)}
             />
           )}
         </>

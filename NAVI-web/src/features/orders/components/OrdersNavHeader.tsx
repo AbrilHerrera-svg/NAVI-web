@@ -1,3 +1,6 @@
+import Button from "../../../components/ui/Button";
+import { mockOrderExceptions } from "../data/ordersMock";
+
 interface Props {
   viewMode: 'tarjetas' | 'lista' | 'excepciones';
   onChangeView: (mode: 'tarjetas' | 'lista' | 'excepciones') => void;
@@ -47,16 +50,11 @@ export const OrdersNavHeader = ({
                 viewMode === 'excepciones' ? 'bg-[#5960A1] text-white shadow-xs' : 'hover:text-slate-900'
               }`}
             >
-              Excepciones · 4
+              Excepciones · {mockOrderExceptions.length}
             </button>
           </div>
 
-          <button
-            onClick={onGoToNewOrder}
-            className="px-4 py-2 bg-[#5960A1] hover:bg-[#484e85] text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
-          >
-            Nuevo pedido
-          </button>
+        <Button onClick={onGoToNewOrder}>Nuevo pedido</Button> 
         </div>
       </div>
 

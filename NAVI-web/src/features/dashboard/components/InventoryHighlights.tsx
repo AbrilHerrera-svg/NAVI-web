@@ -1,23 +1,5 @@
+import { mockTopProducts, mockOutOfStock, mockLowStock } from "../data/dashboardMock";
 export const InventorySection = () => {
-  const topProducts = [
-    { name: 'Chai Milk Tea GDE', count: 24 },
-    { name: 'Taro Smoothie MED', count: 18 },
-    { name: 'Chilaquiles rojos', count: 15 },
-    { name: 'Mango Fruit Tea MED', count: 12 },
-    { name: 'Crepas de Nutella', count: 9 },
-  ];
-
-  const outOfStock = [
-    { name: 'Coconut Milk Tea', status: 'agotado' },
-    { name: 'Biscoff Smoothie', status: 'agotado 6:40 p. m.' },
-    { name: 'Waffle Dulce', status: 'agotado 7:10 p. m.' },
-  ];
-
-  const lowStock = [
-    { name: 'Leche entera', detail: '4,200 de 6,000 ml', time: '~2 days', isUrgent: false },
-    { name: 'Jarabe de chocolate', detail: '0 ml', time: 'agotado', isUrgent: true },
-    { name: 'Base de té', detail: '900 de 500 g', time: '~4 days', isUrgent: false },
-  ];
 
   return (
     <section className="space-y-3">
@@ -27,7 +9,7 @@ export const InventorySection = () => {
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
           <h3 className="font-semibold text-sm text-slate-800 mb-4">Más vendidos hoy</h3>
           <div className="space-y-3 text-xs">
-            {topProducts.map((p, i) => (
+            {mockTopProducts.map((p, i) => (
               <div key={i} className="flex justify-between items-center text-slate-700">
                 <span>{p.name}</span>
                 <span className="font-bold text-slate-900">{p.count}</span>
@@ -43,7 +25,7 @@ export const InventorySection = () => {
             <p className="text-[11px] text-slate-400">Por ingrediente o caducidad</p>
           </div>
           <div className="space-y-3 text-xs">
-            {outOfStock.map((p, i) => (
+            {mockOutOfStock.map((p, i) => (
               <div key={i} className="flex justify-between items-center">
                 <span className="text-slate-700">{p.name}</span>
                 <span className="text-rose-500 font-medium">{p.status}</span>
@@ -59,7 +41,7 @@ export const InventorySection = () => {
             <p className="text-[11px] text-slate-400">Compras sugeridas: leche, jarabe</p>
           </div>
           <div className="space-y-3 text-xs">
-            {lowStock.map((ing, i) => (
+            {mockLowStock.map((ing, i) => (
               <div key={i} className="flex justify-between items-center">
                 <span className="text-slate-700">
                   {ing.name} <span className="text-slate-400">· {ing.detail}</span>

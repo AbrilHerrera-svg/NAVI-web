@@ -1,4 +1,5 @@
 import type { MenuTab } from '../types';
+import Button from '../../../components/ui/Button';
 
 interface Props {
   currentTab: MenuTab;
@@ -51,19 +52,11 @@ export const MenuNavHeader = ({
         </div>
 
         {currentTab === 'promociones' ? (
-          <button
-            onClick={() => alert('Nueva promoción')}
-            className="px-4 py-2 bg-[#5960A1] hover:bg-[#484e85] text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
-          >
+          <Button onClick={() => alert('Nueva promoción')}>
             Nueva promoción
-          </button>
+          </Button>
         ) : (
-          <button
-            onClick={onOpenNewProduct}
-            className="px-4 py-2 bg-[#5960A1] hover:bg-[#484e85] text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
-          >
-            Agregar producto
-          </button>
+          <Button onClick={onOpenNewProduct}>Agregar producto</Button>
         )}
       </div>
     </div>

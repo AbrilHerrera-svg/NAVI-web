@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { MenuItem } from '../types';
+import Badge from '../../../components/ui/Badge';
 
 interface Props {
   items: MenuItem[];
@@ -37,7 +38,7 @@ export const MenuTableView = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="pedidos / clientes / productos / reservaciones"
+              placeholder="Buscar por nombre o categoría"
               className="w-full pl-8 pr-3 py-1.5 text-xs bg-transparent focus:outline-none placeholder-slate-400 text-slate-800"
             />
           </div>
@@ -110,17 +111,17 @@ export const MenuTableView = ({
 
                   {/* Estado Badge */}
                   <td className="py-3.5 px-4">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                    <Badge
+                      color={
                         item.status === 'Activo'
-                          ? 'bg-emerald-50 text-emerald-700'
+                          ? 'success'
                           : item.status === 'Inactivo'
-                          ? 'bg-rose-50 text-rose-600'
-                          : 'bg-indigo-50 text-[#5960A1]'
-                      }`}
+                          ? 'danger'
+                          : 'brand'
+                      }
                     >
                       {item.status}
-                    </span>
+                    </Badge>
                   </td>
 
                   {/* Dropdown Acciones */}

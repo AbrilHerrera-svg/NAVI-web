@@ -1,3 +1,5 @@
+import Button from '../../../components/ui/Button';
+
 // 1. Modal Archivar Producto
 export const ArchiveProductModal = ({
   isOpen,
@@ -19,18 +21,12 @@ export const ArchiveProductModal = ({
           Pasa a Archivado y desaparece del menú. Puedes restaurarlo después.
         </p>
         <div className="flex gap-3 pt-2">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2 px-3 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50"
-          >
+          <Button variant="secondary" onClick={onClose} className="flex-1 py-2 px-3">
             Mantener en el menú
-          </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-xs"
-          >
+          </Button>
+          <Button variant="danger" onClick={onConfirm} className="flex-1 py-2 px-3">
             Sí, archivar
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -56,18 +52,12 @@ export const RemovePromoModal = ({
           Deja de aplicarse de inmediato. Queda en el historial como terminada.
         </p>
         <div className="flex gap-3 pt-2">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2 px-3 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50"
-          >
+          <Button variant="secondary" onClick={onClose} className="flex-1 py-2 px-3">
             Mantener promoción
-          </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-xs"
-          >
+          </Button>
+          <Button variant="danger" onClick={onConfirm} className="flex-1 py-2 px-3">
             Sí, quitar
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -93,18 +83,12 @@ export const SaveRecipeModal = ({
           Las ventas futuras usarán las nuevas cantidades. Las ventas pasadas conservan la receta con la que se hicieron.
         </p>
         <div className="flex gap-3 pt-2">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2 px-3 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50"
-          >
+          <Button variant="secondary" onClick={onClose} className="flex-1 py-2 px-3">
             Seguir editando
-          </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs"
-          >
+          </Button>
+          <Button variant="success" onClick={onConfirm} className="flex-1 py-2 px-3">
             Sí, guardar cambios
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -130,18 +114,12 @@ export const CreateProductModal = ({
           Este producto aparecerá en el menú y en Nuevo pedido, con la receta que ingresaste. Puedes editarlo después.
         </p>
         <div className="flex gap-3 pt-2">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2 px-3 border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50"
-          >
+          <Button variant="secondary" onClick={onClose} className="flex-1 py-2 px-3">
             Regresar al formulario
-          </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs"
-          >
+          </Button>
+          <Button variant="success" onClick={onConfirm} className="flex-1 py-2 px-3">
             Sí, agregar producto
-          </button>
+          </Button>
         </div>
       </div>
     </div>

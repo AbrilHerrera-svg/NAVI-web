@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import type { CartItem } from '../types';
+import Badge from '../../../components/ui/Badge';
+import Button from '../../../components/ui/Button';
+import * as Icons from 'lucide-react';
 
 interface Props {
   cart: CartItem[];
+  onRemoveItem: (index: number) => void;
   onRequestConfirm: () => void;
 }
 
-export const OrderSummarySidebar = ({ cart, onRequestConfirm }: Props) => {
+export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Props) => {
   const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Terminal de tarjeta' | 'Transferencia'>('Efectivo');
   const [receivedAmount, setReceivedAmount] = useState<string>('200.00');
 
@@ -26,9 +30,7 @@ export const OrderSummarySidebar = ({ cart, onRequestConfirm }: Props) => {
       <div>
         <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
           <h2 className="font-bold text-sm text-slate-800">Resumen del pedido</h2>
-          <span className="text-[11px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">
-            Mostrador
-          </span>
+          <Badge className="text-[11px]">Mostrador</Badge>
         </div>
 
         {/* Lista de productos en el carrito */}
@@ -37,12 +39,22 @@ export const OrderSummarySidebar = ({ cart, onRequestConfirm }: Props) => {
             <p className="text-xs text-slate-400 text-center py-4">No hay productos agregados</p>
           ) : (
             cart.map((item, idx) => (
-              <div key={idx} className="text-xs space-y-1">
-                <div className="flex justify-between text-slate-700 font-medium">
+              <div key={idx} className="text-xs space-y-1 group">
+                <div className="flex justify-between items-center text-slate-700 font-medium">
                   <span>
                     {item.quantity} × {item.product.name} {item.product.size || ''}
                   </span>
-                  <span className="font-bold text-slate-900">${item.product.price * item.quantity}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="font-bold text-slate-900">${item.product.price * item.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => onRemoveItem(idx)}
+                      title={item.quantity > 1 ? 'Quitar una unidad' : 'Quitar producto'}
+                      className="text-slate-300 hover:text-rose-500 transition cursor-pointer"
+                    >
+                      <Icons.X size={14} />
+                    </button>
+                  </span>
                 </div>
                 {item.extras.map((ex, eIdx) => (
                   <div key={eIdx} className="flex justify-between text-[11px] text-[#5960A1] pl-3">
@@ -110,13 +122,13 @@ export const OrderSummarySidebar = ({ cart, onRequestConfirm }: Props) => {
         )}
       </div>
 
-      <button
+      <Button
         onClick={onRequestConfirm}
         disabled={cart.length === 0}
-        className="w-full py-3 bg-[#5960A1] hover:bg-[#484e85] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition shadow-xs cursor-pointer mt-4"
+        className="w-full py-3 text-sm disabled:bg-slate-300 disabled:cursor-not-allowed mt-4"
       >
         Confirmar pedido
-      </button>
+      </Button>
     </aside>
   );
 };
