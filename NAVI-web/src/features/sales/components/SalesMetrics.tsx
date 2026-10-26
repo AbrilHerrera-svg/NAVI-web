@@ -1,3 +1,5 @@
+import Card from "../../../components/ui/Card";
+
 export const SalesMetrics = () => {
   const metrics = [
     { label: 'Ventas totales', value: '$4,280' },
@@ -9,10 +11,10 @@ export const SalesMetrics = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {metrics.map((item, idx) => (
-        <div key={idx} className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <Card key={idx} className="shadow-xs">
           <p className="text-xs text-slate-400 font-medium">{item.label}</p>
           <p className="text-3xl font-bold text-slate-900 mt-2">{item.value}</p>
-        </div>
+        </Card>
       ))}
     </div>
   );
