@@ -5,11 +5,13 @@ import NewOrderPage from "./pages/NewOrderPage";
 import OrdersPage from "./pages/OrdersPage";
 import MenuPage from "./pages/MenuPage";
 import CashRegisterPage from "./pages/CashRegisterPage";
+import LoginPage from "./pages/LoginPage";
 import MainLayout from "./components/layout/MainLayout";
 import { type PageId } from "./components/layout/Sidebar";
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageId>("dashboard");
 
   // Renderizado dinámico según la opción seleccionada
@@ -43,12 +45,19 @@ function App() {
     }
   };
 
-   return (
-  <MainLayout currentPage={currentPage} onNavigate={setCurrentPage}>
-    {renderCurrentPage()}
-  </MainLayout>
-);
-  
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={() => setIsAuthenticated(true)} />;
+  }
+
+  return (
+    <MainLayout
+      currentPage={currentPage}
+      onNavigate={setCurrentPage}
+      onLogout={() => setIsAuthenticated(false)}
+    >
+      {renderCurrentPage()}
+    </MainLayout>
+  );
 }
 
 export default App;

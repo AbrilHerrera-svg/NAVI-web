@@ -18,9 +18,11 @@ const pageTitles: Record<PageId, string> =
 
 interface TopbarProps {
   currentPage: PageId;
+  onNavigate: (page: PageId) => void;
+  onLogout: () => void;
 }
 
-export default function Topbar({ currentPage }: TopbarProps) {
+export default function Topbar({ currentPage, onNavigate, onLogout }: TopbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -54,19 +56,30 @@ export default function Topbar({ currentPage }: TopbarProps) {
             <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)} />
             <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-slate-100 py-1.5 z-20 text-left text-xs font-medium">
               <button
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onNavigate("users");
+                }}
                 className="w-full px-3 py-1.5 hover:bg-slate-50 text-slate-700 text-left cursor-pointer"
               >
                 Mi perfil
               </button>
               <button
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onNavigate("users");
+                }}
                 className="w-full px-3 py-1.5 hover:bg-slate-50 text-slate-700 text-left cursor-pointer"
               >
                 Configuración
               </button>
               <button
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  if (confirm("¿Cerrar sesión?")) {
+                    onLogout();
+                  }
+                }}
                 className="w-full px-3 py-1.5 hover:bg-rose-50 text-rose-600 text-left cursor-pointer"
               >
                 Cerrar sesión
