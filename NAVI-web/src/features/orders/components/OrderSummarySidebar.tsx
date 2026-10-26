@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { CartItem } from '../types';
+import Badge from '../../../components/ui/Badge';
+import Button from '../../../components/ui/Button';
 
 interface Props {
   cart: CartItem[];
@@ -26,9 +28,7 @@ export const OrderSummarySidebar = ({ cart, onRequestConfirm }: Props) => {
       <div>
         <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
           <h2 className="font-bold text-sm text-slate-800">Resumen del pedido</h2>
-          <span className="text-[11px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">
-            Mostrador
-          </span>
+          <Badge className="text-[11px]">Mostrador</Badge>
         </div>
 
         {/* Lista de productos en el carrito */}
@@ -110,13 +110,13 @@ export const OrderSummarySidebar = ({ cart, onRequestConfirm }: Props) => {
         )}
       </div>
 
-      <button
+      <Button
         onClick={onRequestConfirm}
         disabled={cart.length === 0}
-        className="w-full py-3 bg-[#5960A1] hover:bg-[#484e85] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition shadow-xs cursor-pointer mt-4"
+        className="w-full py-3 text-sm disabled:bg-slate-300 disabled:cursor-not-allowed mt-4"
       >
         Confirmar pedido
-      </button>
+      </Button>
     </aside>
   );
 };
