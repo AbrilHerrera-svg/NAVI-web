@@ -106,25 +106,29 @@ export const OrdersTableView = ({ orders, onAdvanceStatus, onOpenCancelModal }: 
 
                   {openMenuId === item.id && (
                     <div className="absolute right-4 mt-2 w-36 bg-white rounded-lg shadow-xl border border-slate-100 py-1.5 z-20 text-left text-xs font-medium">
-                      <button
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          alert('Edición de pedidos próximamente');
-                        }}
-                        className="w-full px-3 py-1.5 hover:bg-slate-50 text-slate-700 text-left cursor-pointer"
-                      >
-                        Editar
-                      </button>
-                      {item.status !== 'Cancelado' && item.status !== 'Recogido' && (
-                        <button
-                          onClick={() => {
-                            setOpenMenuId(null);
-                            onOpenCancelModal(item.id);
-                          }}
-                          className="w-full px-3 py-1.5 hover:bg-rose-50 text-rose-600 text-left cursor-pointer"
-                        >
-                          Cancelar
-                        </button>
+                      {item.status !== 'Cancelado' && item.status !== 'Recogido' ? (
+                        <>
+                          <button
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              alert('Edición de pedidos próximamente');
+                            }}
+                            className="w-full px-3 py-1.5 hover:bg-slate-50 text-slate-700 text-left cursor-pointer"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              onOpenCancelModal(item.id);
+                            }}
+                            className="w-full px-3 py-1.5 hover:bg-rose-50 text-rose-600 text-left cursor-pointer"
+                          >
+                            Cancelar
+                          </button>
+                        </>
+                      ) : (
+                        <span className="block px-3 py-1.5 text-slate-400">Sin acciones</span>
                       )}
                     </div>
                   )}

@@ -90,23 +90,23 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal, onAdvanceStatus }:
                     )}
                   </div>
 
-                  {/* Acciones secundarias */}
-                  <div className="flex justify-between text-[11px] pt-1 text-slate-400 font-medium">
-                    <button
-                      onClick={() => alert('Edición de pedidos próximamente')}
-                      className="hover:text-slate-700 cursor-pointer"
-                    >
-                      Editar
-                    </button>
-                    {order.status !== 'Cancelado' && order.status !== 'Recogido' && (
+                  {/* Acciones secundarias: solo si el pedido sigue en curso */}
+                  {order.status !== 'Cancelado' && order.status !== 'Recogido' && (
+                    <div className="flex justify-between text-[11px] pt-1 text-slate-400 font-medium">
+                      <button
+                        onClick={() => alert('Edición de pedidos próximamente')}
+                        className="hover:text-slate-700 cursor-pointer"
+                      >
+                        Editar
+                      </button>
                       <button
                         onClick={() => onOpenCancelModal(order.id)}
                         className="hover:text-rose-600 cursor-pointer"
                       >
                         Cancelar
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </Card>
                 );
               })}
