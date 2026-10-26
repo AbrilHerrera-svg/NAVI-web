@@ -5,3 +5,4 @@ export * from './components/LiveOperations';
 export * from './components/InventoryHighlights';
 export * from './components/TeamAndTasks';
 export * from './components/SalesAndFinance';
+export * from './data/dashboardMock';

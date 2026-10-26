@@ -1,3 +1,5 @@
+import type { AlertTagColor } from "../../components/ui/AlertCard";
+
 export interface MetricCardItem {
   label: string;
   value: string;
@@ -6,9 +8,9 @@ export interface MetricCardItem {
 
 export interface AlertCardItem {
   tag: string;
-  tagColor: 'red' | 'yellow' | 'purple' | 'orange';
-  title: string;
-  subtitle: string;
-  actionText: string;
+  tagColor: AlertTagColor;
   count: number;
+  title: string;
+  desc: string;
+  link: string;
 }
