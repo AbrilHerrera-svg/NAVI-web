@@ -1,9 +1,13 @@
 import { mockQueueStatus } from "../data/dashboardMock";
-import { mockOrdersData } from "../../orders";
+import { useOrders } from "../../orders";
 
 export const LiveOperations = () => {
-  const lateOrders = mockOrdersData.filter(
-    (o) => o.dueStatusColor === "urgent" || o.dueStatusColor === "warning"
+  const { orders } = useOrders();
+  const lateOrders = orders.filter(
+    (o) =>
+      (o.dueStatusColor === "urgent" || o.dueStatusColor === "warning") &&
+      o.status !== "Cancelado" &&
+      o.status !== "Recogido"
   );
 
   return (
