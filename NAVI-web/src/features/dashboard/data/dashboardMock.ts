@@ -1,5 +1,5 @@
 import type { AlertCardItem, MetricCardItem, TopProductItem, OutOfStockItem, LowStockItem, HourlySalesItem, PaymentMethodItem, WeeklyFinanceItem,
-  UpcomingExpenseItem
+  UpcomingExpenseItem, QueueStatusItem
  } from "../types";
 
 export const mockUrgentAlerts: AlertCardItem[] = [
@@ -70,4 +70,12 @@ export const mockWeeklyFinance: WeeklyFinanceItem[] = [
 export const mockUpcomingExpenses: UpcomingExpenseItem[] = [
   { label: 'Rent · Nov 1', amount: '$1,800' },
   { label: 'Proveedor de lácteos · vence 3 nov', amount: '$620 · pendiente', pending: true },
+];
+
+export const mockQueueStatus: QueueStatusItem[] = [
+  { label: 'Nuevo', count: 2 },
+  { label: 'En preparación', count: 2 },
+  { label: 'Listo', count: 1 },
+  { label: 'Por cobrar', count: 1 },
+  { label: 'Cancelados hoy', count: 1, isAlert: true },
 ];

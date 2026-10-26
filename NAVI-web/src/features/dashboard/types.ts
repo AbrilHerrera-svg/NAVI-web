@@ -59,3 +59,9 @@ export interface UpcomingExpenseItem {
   amount: string;
   pending?: boolean;
 }
+
+export interface QueueStatusItem {
+  label: string;
+  count: number;
+  isAlert?: boolean;
+}
