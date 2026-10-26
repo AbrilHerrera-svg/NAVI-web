@@ -1,3 +1,6 @@
+import Card from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
+
 interface Props {
   onCancel: () => void;
   onSubmit: () => void;
@@ -11,7 +14,7 @@ export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
         <p className="text-xs text-slate-400 mt-0.5">Agrega los datos del producto y su receta. Puedes cambiarlos después.</p>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-2xs space-y-6">
+      <Card className="rounded-2xl shadow-2xs space-y-6">
         <h2 className="font-bold text-sm text-slate-900">Detalles del producto</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -90,22 +93,14 @@ export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
 
         {/* Botones de acción */}
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-5 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 transition cursor-pointer"
-          >
+          <Button type="button" variant="secondary" onClick={onCancel} className="px-5 py-2">
             Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={onSubmit}
-            className="px-5 py-2 bg-[#5960A1] hover:bg-[#484e85] text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs"
-          >
+          </Button>
+          <Button type="button" onClick={onSubmit} className="px-5 py-2">
             Crear producto
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
