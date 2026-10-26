@@ -2,6 +2,8 @@ import { useState } from 'react';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
+import { AddIngredientModal } from './AddIngredientModal';
+import type { RecipeIngredient } from '../types';
 
 interface Props {
   onCancel: () => void;
@@ -9,16 +11,11 @@ interface Props {
 }
 
 export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
-  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
-  const handleAddIngredient = () => {
-    const name = window.prompt('Nombre del ingrediente');
-    if (!name) return;
-    setIngredients((prev) => [...prev, name]);
-  };
-
-  const handleRemoveIngredient = (idx: number) => {
-    setIngredients((prev) => prev.filter((_, i) => i !== idx));
+  const handleRemoveIngredient = (id: string) => {
+    setIngredients((prev) => prev.filter((ing) => ing.id !== id));
   };
 
   return (
@@ -100,12 +97,12 @@ export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
 
           {ingredients.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {ingredients.map((name, idx) => (
-                <Badge key={idx} className="inline-flex items-center gap-1.5 text-[11px] py-1">
-                  {name}
+              {ingredients.map((ing) => (
+                <Badge key={ing.id} className="inline-flex items-center gap-1.5 text-[11px] py-1">
+                  {ing.name}
                   <button
                     type="button"
-                    onClick={() => handleRemoveIngredient(idx)}
+                    onClick={() => handleRemoveIngredient(ing.id)}
                     className="text-slate-400 hover:text-rose-500 cursor-pointer"
                   >
                     ×
@@ -117,7 +114,7 @@ export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
 
           <button
             type="button"
-            onClick={handleAddIngredient}
+            onClick={() => setIsAddOpen(true)}
             className="w-full max-w-xs border-2 border-dashed border-[#5960A1]/30 hover:border-[#5960A1] rounded-2xl p-6 flex items-center justify-center text-xs font-bold text-[#5960A1] hover:bg-[#5960A1]/5 transition cursor-pointer"
           >
             + Agregar ingrediente
@@ -134,6 +131,12 @@ export const NewProductForm = ({ onCancel, onSubmit }: Props) => {
           </Button>
         </div>
       </Card>
+
+      <AddIngredientModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
+      />
     </div>
   );
 };
