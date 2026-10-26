@@ -53,3 +53,9 @@ export interface WeeklyFinanceItem {
   ingresos: number;
   gastos: number;
 }
+
+export interface UpcomingExpenseItem {
+  label: string;
+  amount: string;
+  pending?: boolean;
+}

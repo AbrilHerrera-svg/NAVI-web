@@ -1,5 +1,5 @@
 import ProgressBar from "../../../components/ui/ProgressBar";
-import { mockHourlySales } from "../data/dashboardMock";
+import { mockHourlySales, mockUpcomingExpenses } from "../data/dashboardMock";
 import { mockPaymentMethods } from "../data/dashboardMock";
 import { mockWeeklyFinance } from "../data/dashboardMock";
 export const SalesAndFinance = () => {
@@ -87,21 +87,26 @@ export const SalesAndFinance = () => {
               Próximos gastos y gastos de hoy
             </h3>
             <p className="text-[11px] text-slate-400 mb-4">
-              Registrado en Finanzas
+              Gastos registrados manualmente
             </p>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                <span className="text-slate-700">Rent · Nov 1</span>
-                <span className="font-bold text-slate-800">$1,800</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-700">
-                  Proveedor de lácteos · vence 3 nov
-                </span>
-                <span className="font-semibold text-amber-600">
-                  $620 · pendiente
-                </span>
-              </div>
+            <div className="divide-y divide-slate-100 text-xs">
+              {mockUpcomingExpenses.map((exp, idx) => (
+                <div
+                  key={idx}
+                  className="flex justify-between items-center py-2 first:pt-0 last:pb-0"
+                >
+                  <span className="text-slate-700">{exp.label}</span>
+                  <span
+                    className={
+                      exp.pending
+                        ? "font-semibold text-amber-600"
+                        : "font-bold text-slate-800"
+                    }
+                  >
+                    {exp.amount}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

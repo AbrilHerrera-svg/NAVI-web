@@ -1,4 +1,6 @@
-import type { AlertCardItem, MetricCardItem, TopProductItem, OutOfStockItem, LowStockItem, HourlySalesItem, PaymentMethodItem, WeeklyFinanceItem } from "../types";
+import type { AlertCardItem, MetricCardItem, TopProductItem, OutOfStockItem, LowStockItem, HourlySalesItem, PaymentMethodItem, WeeklyFinanceItem,
+  UpcomingExpenseItem
+ } from "../types";
 
 export const mockUrgentAlerts: AlertCardItem[] = [
   { tag: 'Atrasado', tagColor: 'danger', count: 2, title: 'Pedidos atrasados / por vencer', desc: '#88 Chilaquiles rojos · atrasado +8 min', link: 'Ver Pedidos →' },
@@ -63,4 +65,9 @@ export const mockWeeklyFinance: WeeklyFinanceItem[] = [
   { ingresos: 95, gastos: 43 },
   { ingresos: 70, gastos: 32 },
   { ingresos: 85, gastos: 38 },
+];
+
+export const mockUpcomingExpenses: UpcomingExpenseItem[] = [
+  { label: 'Rent · Nov 1', amount: '$1,800' },
+  { label: 'Proveedor de lácteos · vence 3 nov', amount: '$620 · pendiente', pending: true },
 ];
