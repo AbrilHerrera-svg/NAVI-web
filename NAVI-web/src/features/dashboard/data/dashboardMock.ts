@@ -1,4 +1,4 @@
-import type { AlertCardItem, MetricCardItem, TopProductItem, OutOfStockItem, LowStockItem, HourlySalesItem } from "../types";
+import type { AlertCardItem, MetricCardItem, TopProductItem, OutOfStockItem, LowStockItem, HourlySalesItem, PaymentMethodItem } from "../types";
 
 export const mockUrgentAlerts: AlertCardItem[] = [
   { tag: 'Atrasado', tagColor: 'danger', count: 2, title: 'Pedidos atrasados / por vencer', desc: '#88 Chilaquiles rojos · atrasado +8 min', link: 'Ver Pedidos →' },
@@ -47,4 +47,10 @@ export const mockHourlySales: HourlySalesItem[] = [
   { hour: '12h', height: 'h-10' },
   { hour: '1h', height: 'h-24' },
   { hour: '2h', height: 'h-14' },
+];
+
+export const mockPaymentMethods: PaymentMethodItem[] = [
+  { label: 'Efectivo', amount: '$1,860 · 43%', percent: 43, tone: 'solid' },
+  { label: 'Terminal de tarjeta', amount: '$1,620 · 38%', percent: 38, tone: 'medium' },
+  { label: 'Transferencia', amount: '$800 · 19%', percent: 19, tone: 'light' },
 ];

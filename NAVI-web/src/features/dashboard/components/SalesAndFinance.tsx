@@ -1,7 +1,7 @@
 import ProgressBar from "../../../components/ui/ProgressBar";
 import { mockHourlySales } from "../data/dashboardMock";
+import { mockPaymentMethods } from "../data/dashboardMock";
 export const SalesAndFinance = () => {
-
   return (
     <section className="space-y-4">
       <h2 className="text-base font-bold text-slate-800">
@@ -32,38 +32,20 @@ export const SalesAndFinance = () => {
           </div>
         </div>
 
-        {/* Métodos de pago */}
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
           <h3 className="font-semibold text-sm text-slate-800 mb-4">
             Métodos de pago
           </h3>
           <div className="space-y-4 text-xs">
-            {/* Efectivo */}
-            <div>
-              <div className="flex justify-between font-medium text-slate-700 mb-1.5">
-                <span>Efectivo</span>
-                <span className="font-bold text-slate-800">$1,860 · 43%</span>
+            {mockPaymentMethods.map((pm, idx) => (
+              <div key={idx}>
+                <div className="flex justify-between font-medium text-slate-700 mb-1.5">
+                  <span>{pm.label}</span>
+                  <span className="font-bold text-slate-800">{pm.amount}</span>
+                </div>
+                <ProgressBar value={pm.percent} tone={pm.tone} />
               </div>
-              <ProgressBar value={43} />
-            </div>
-
-            {/* Terminal */}
-            <div>
-              <div className="flex justify-between font-medium text-slate-700 mb-1.5">
-                <span>Terminal de tarjeta</span>
-                <span className="font-bold text-slate-800">$1,620 · 38%</span>
-              </div>
-              <ProgressBar value={38} tone="medium" />
-            </div>
-
-            {/* Transferencia */}
-            <div>
-              <div className="flex justify-between font-medium text-slate-700 mb-1.5">
-                <span>Transferencia</span>
-                <span className="font-bold text-slate-800">$800 · 19%</span>
-              </div>
-              <ProgressBar value={19} tone="light" />
-            </div>
+            ))}
           </div>
         </div>
       </div>

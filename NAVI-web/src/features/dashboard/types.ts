@@ -1,4 +1,6 @@
 import type { AlertTagColor } from "../../components/ui/AlertCard";
+import type { ProgressBarTone } from "../../components/ui/ProgressBar";
+
 
 export interface MetricCardItem {
   label: string;
@@ -37,4 +39,12 @@ export interface HourlySalesItem {
   hour: string;
   height: string;
   peak?: boolean;
+}
+
+
+export interface PaymentMethodItem {
+  label: string;
+  amount: string;
+  percent: number;
+  tone: ProgressBarTone;
 }

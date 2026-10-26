@@ -1,4 +1,4 @@
-type ProgressBarTone = "solid" | "medium" | "light";
+export type ProgressBarTone = "solid" | "medium" | "light";
 
 interface ProgressBarProps {
   value: number; // 0 a 100
