@@ -15,3 +15,20 @@ export interface AlertCardItem {
   desc: string;
   link: string;
 }
+
+export interface TopProductItem {
+  name: string;
+  count: number;
+}
+
+export interface OutOfStockItem {
+  name: string;
+  status: string;
+}
+
+export interface LowStockItem {
+  name: string;
+  detail: string;
+  time: string;
+  isUrgent: boolean;
+}
