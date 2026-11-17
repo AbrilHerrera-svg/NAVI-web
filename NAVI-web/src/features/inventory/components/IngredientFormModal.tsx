@@ -23,14 +23,15 @@ export const IngredientFormModal = ({ isOpen, ingredient, onClose, onCreate, onU
   const [unitsPerBox, setUnitsPerBox] = useState(ingredient ? String(ingredient.unitsPerBox) : '');
   const [costPerBox, setCostPerBox] = useState(ingredient ? String(ingredient.costPerBox) : '');
   const [minStock, setMinStock] = useState(ingredient ? String(ingredient.minStock) : '');
-  const [initialStock, setInitialStock] = useState(ingredient ? '' : '0');
+  const [initialStock, setInitialStock] = useState('');
 
   if (!isOpen) return null;
 
   const unitsPerBoxNum = parseFloat(unitsPerBox);
   const costPerBoxNum = parseFloat(costPerBox);
   const minStockNum = parseFloat(minStock);
-  const initialStockNum = parseFloat(initialStock);
+  // Si se deja vacío, el ingrediente se da de alta sin existencia (0).
+  const initialStockNum = initialStock.trim() === '' ? 0 : parseFloat(initialStock);
 
   const canSave =
     name.trim().length > 0 &&
@@ -149,7 +150,7 @@ export const IngredientFormModal = ({ isOpen, ingredient, onClose, onCreate, onU
                 inputMode="decimal"
                 value={initialStock}
                 onChange={(e) => setInitialStock(e.target.value)}
-                placeholder="0"
+                placeholder="ej. 0"
                 className={inputClass}
               />
             </div>
