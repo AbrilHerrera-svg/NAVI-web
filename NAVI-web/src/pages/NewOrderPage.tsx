@@ -25,6 +25,8 @@ export default function NewOrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const [activeExtraProduct, setActiveExtraProduct] = useState<ProductItem | null>(null);
+  // Índice del renglón del carrito que se está editando (null = se está agregando uno nuevo).
+  const [editingCartIndex, setEditingCartIndex] = useState<number | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingPaymentMethod, setPendingPaymentMethod] = useState<OrderPaymentMethod>('Efectivo');
 
@@ -54,11 +56,26 @@ export default function NewOrderPage() {
     });
   };
 
-  // Guardar producto con extras seleccionados
+  // Guardar producto con extras seleccionados (nuevo renglón o edición de uno existente)
   const handleAddWithExtras = (extras: SelectedItemExtra[]) => {
-    if (!activeExtraProduct || !isProductAvailable(activeExtraProduct)) return;
+    if (!activeExtraProduct) return;
+
+    if (editingCartIndex !== null) {
+      setCart((prev) => prev.map((item, i) => (i === editingCartIndex ? { ...item, extras } : item)));
+      setActiveExtraProduct(null);
+      setEditingCartIndex(null);
+      return;
+    }
+
+    if (!isProductAvailable(activeExtraProduct)) return;
     setCart((prev) => [...prev, { product: activeExtraProduct, quantity: 1, extras }]);
     setActiveExtraProduct(null);
+  };
+
+  // Editar los extras de un renglón ya agregado al carrito (solo bebidas)
+  const handleEditExtras = (index: number) => {
+    setEditingCartIndex(index);
+    setActiveExtraProduct(cart[index].product);
   };
 
   // Quitar una unidad del producto; si queda en 0, lo quita del carrito
@@ -111,7 +128,12 @@ export default function NewOrderPage() {
       {activeExtraProduct ? (
         <OrderExtrasView
           product={activeExtraProduct}
-          onBack={() => setActiveExtraProduct(null)}
+          initialExtras={editingCartIndex !== null ? cart[editingCartIndex].extras : []}
+          isEditing={editingCartIndex !== null}
+          onBack={() => {
+            setActiveExtraProduct(null);
+            setEditingCartIndex(null);
+          }}
           onConfirm={handleAddWithExtras}
         />
       ) : (
@@ -127,6 +149,7 @@ export default function NewOrderPage() {
       <OrderSummarySidebar
         cart={cart}
         onRemoveItem={handleRemoveItem}
+        onEditExtras={handleEditExtras}
         onRequestConfirm={(method) => {
           setPendingPaymentMethod(method);
           setIsConfirmOpen(true);

@@ -30,7 +30,7 @@ export const OrderCatalog = ({ products, onAddProduct, onOpenExtras, isAvailable
     <div className="flex-1 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Nuevo pedido</h1>
-        <p className="text-sm text-slate-400 mt-1">Pedido en mostrador para clientes sin la app · Extras $15 c/u</p>
+        <p className="text-sm text-slate-400 mt-1">Pedido en mostrador para clientes sin la app · Extras en bebidas $15 c/u</p>
       </div>
 
       {/* Filtros de categoría */}
@@ -82,13 +82,15 @@ export const OrderCatalog = ({ products, onAddProduct, onOpenExtras, isAvailable
                         {variant.size ? `${variant.size} · ` : ''}${variant.price}
                       </span>
                       <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => onOpenExtras(variant)}
-                          disabled={!available}
-                          className="text-xs font-medium text-slate-600 hover:text-[#5960A1] bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-50 disabled:hover:text-slate-600"
-                        >
-                          + Extras
-                        </button>
+                        {variant.category === 'Bebidas' && (
+                          <button
+                            onClick={() => onOpenExtras(variant)}
+                            disabled={!available}
+                            className="text-xs font-medium text-slate-600 hover:text-[#5960A1] bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-50 disabled:hover:text-slate-600"
+                          >
+                            + Extras
+                          </button>
+                        )}
                         {available ? (
                           <button
                             onClick={() => onAddProduct(variant)}
@@ -110,11 +112,13 @@ export const OrderCatalog = ({ products, onAddProduct, onOpenExtras, isAvailable
         })}
       </div>
 
-      {/* Banner inferior de extras informativos */}
-      <div className="bg-[#5960A1]/5 border border-[#5960A1]/15 rounded-xl p-4 text-xs text-slate-600">
-        <span className="font-bold text-[#5960A1] block mb-1">Extras</span>
-        Topping Oreo, perlas de tapioca o gelatina de coco · $15 c/u.
-      </div>
+      {/* Banner inferior de extras informativos: solo aplica a Bebidas */}
+      {selectedCategory !== 'Cocina' && selectedCategory !== 'Postres' && (
+        <div className="bg-[#5960A1]/5 border border-[#5960A1]/15 rounded-xl p-4 text-xs text-slate-600">
+          <span className="font-bold text-[#5960A1] block mb-1">Extras · solo bebidas</span>
+          Topping Oreo, perlas de tapioca o gelatina de coco · $15 c/u.
+        </div>
+      )}
     </div>
   );
 };

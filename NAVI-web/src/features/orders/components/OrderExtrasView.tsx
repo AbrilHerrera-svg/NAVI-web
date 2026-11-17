@@ -5,6 +5,8 @@ import Button from '../../../components/ui/Button';
 
 interface Props {
   product: ProductItem;
+  initialExtras?: SelectedItemExtra[];
+  isEditing?: boolean;
   onBack: () => void;
   onConfirm: (extras: SelectedItemExtra[]) => void;
 }
@@ -15,8 +17,12 @@ const availableToppings = [
   { id: 'top-3', name: 'Gelatina de coco', price: 15 },
 ];
 
-export const OrderExtrasView = ({ product, onBack, onConfirm }: Props) => {
-  const [counts, setCounts] = useState<Record<string, number>>({});
+export const OrderExtrasView = ({ product, initialExtras = [], isEditing = false, onBack, onConfirm }: Props) => {
+  const [counts, setCounts] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    for (const ex of initialExtras) initial[ex.extraId] = ex.quantity;
+    return initial;
+  });
 
   const updateCount = (id: string, delta: number) => {
     setCounts((prev) => {
@@ -46,7 +52,7 @@ export const OrderExtrasView = ({ product, onBack, onConfirm }: Props) => {
   return (
     <div className="flex-1 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Agregar extras</h1>
+        <h1 className="text-2xl font-bold text-slate-900">{isEditing ? 'Editar extras' : 'Agregar extras'}</h1>
         <p className="text-sm text-slate-400 mt-1">
           {product.name} {product.size ? `${product.size} · ` : ''}${product.price} · elige los toppings
         </p>
@@ -96,7 +102,7 @@ export const OrderExtrasView = ({ product, onBack, onConfirm }: Props) => {
               Regresar al pedido
             </Button>
             <Button onClick={handleSave} className="px-5 py-2">
-              Agregar al pedido
+              {isEditing ? 'Guardar cambios' : 'Agregar al pedido'}
             </Button>
           </div>
         </div>

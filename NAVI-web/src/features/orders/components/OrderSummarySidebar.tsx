@@ -7,12 +7,14 @@ import * as Icons from 'lucide-react';
 interface Props {
   cart: CartItem[];
   onRemoveItem: (index: number) => void;
+  // Abre la vista de extras para editar ese renglón del carrito (solo bebidas).
+  onEditExtras: (index: number) => void;
   // Solo se llama con el método de pago ya elegido; en efectivo, el monto recibido
   // ya alcanzó el total (el botón se deshabilita si no).
   onRequestConfirm: (paymentMethod: OrderPaymentMethod) => void;
 }
 
-export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Props) => {
+export const OrderSummarySidebar = ({ cart, onRemoveItem, onEditExtras, onRequestConfirm }: Props) => {
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>('Efectivo');
   const [receivedAmount, setReceivedAmount] = useState<string>('200.00');
 
@@ -41,32 +43,45 @@ export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Pr
           {cart.length === 0 ? (
             <p className="text-xs text-slate-400 text-center py-4">No hay productos agregados</p>
           ) : (
-            cart.map((item, idx) => (
-              <div key={idx} className="text-xs space-y-1 group">
-                <div className="flex justify-between items-center text-slate-700 font-medium">
-                  <span>
-                    {item.quantity} × {item.product.name} {item.product.size || ''}
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900">${item.product.price * item.quantity}</span>
-                    <button
-                      type="button"
-                      onClick={() => onRemoveItem(idx)}
-                      title={item.quantity > 1 ? 'Quitar una unidad' : 'Quitar producto'}
-                      className="text-slate-300 hover:text-rose-500 transition cursor-pointer"
-                    >
-                      <Icons.X size={14} />
-                    </button>
-                  </span>
-                </div>
-                {item.extras.map((ex, eIdx) => (
-                  <div key={eIdx} className="flex justify-between text-[11px] text-[#5960A1] pl-3">
-                    <span>+ {ex.name} ×{ex.quantity}</span>
-                    <span>${ex.price * ex.quantity}</span>
+            cart.map((item, idx) => {
+              const canEditExtras = item.product.category === 'Bebidas';
+              return (
+                <div
+                  key={idx}
+                  onClick={() => canEditExtras && onEditExtras(idx)}
+                  title={canEditExtras ? 'Editar extras' : undefined}
+                  className={`text-xs space-y-1 group rounded-lg -mx-1 px-1 py-0.5 ${
+                    canEditExtras ? 'cursor-pointer hover:bg-slate-50' : ''
+                  }`}
+                >
+                  <div className="flex justify-between items-center text-slate-700 font-medium">
+                    <span>
+                      {item.quantity} × {item.product.name} {item.product.size || ''}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span className="font-bold text-slate-900">${item.product.price * item.quantity}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRemoveItem(idx);
+                        }}
+                        title={item.quantity > 1 ? 'Quitar una unidad' : 'Quitar producto'}
+                        className="text-slate-300 hover:text-rose-500 transition cursor-pointer"
+                      >
+                        <Icons.X size={14} />
+                      </button>
+                    </span>
                   </div>
-                ))}
-              </div>
-            ))
+                  {item.extras.map((ex, eIdx) => (
+                    <div key={eIdx} className="flex justify-between text-[11px] text-[#5960A1] pl-3">
+                      <span>+ {ex.name} ×{ex.quantity}</span>
+                      <span>${ex.price * ex.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })
           )}
         </div>
 
@@ -123,7 +138,7 @@ export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Pr
               <p className="text-[11px] text-rose-500">El monto recibido no puede ser menor al total.</p>
             ) : (
               <div className="flex justify-between text-xs pt-1">
-                <span className="text-slate-500 font-medium">Cambiar</span>
+                <span className="text-slate-500 font-medium">Cambio</span>
                 <span className="font-bold text-slate-900">${change.toFixed(2)}</span>
               </div>
             )}
