@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { getUsuarios, postUsuario, putUsuario, deleteUsuario } from "../controllers/userController";
+import { validateBody, validateIdParam } from "../middleware/validate";
+import { crearUsuarioSchema, actualizarUsuarioSchema } from "../schemas/userSchemas";
 
 const router = Router();
 
 router.get("/", getUsuarios);
-router.post("/", postUsuario);
-router.put("/:id", putUsuario);
-router.delete("/:id", deleteUsuario);
+router.post("/", validateBody(crearUsuarioSchema), postUsuario);
+router.put("/:id", validateIdParam("id"), validateBody(actualizarUsuarioSchema), putUsuario);
+router.delete("/:id", validateIdParam("id"), deleteUsuario);
 
 export default router;

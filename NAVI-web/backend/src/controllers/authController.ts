@@ -60,12 +60,47 @@ export const login = async (req: Request, res: Response) => {
     // 4. mandar el perfil con el formato del front
     res.json({
       token: datos.idToken,
+      refreshToken: datos.refreshToken,
+      expiresIn: Number(datos.expiresIn), // segundos de vida del token (Firebase: 3600)
       perfil: {
         name: usuario.name,
         email: usuario.email,
         phone: usuario.phone,
         role: roles[usuario.role] ?? usuario.role,
       },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};
+
+// El idToken dura 1 hora; el front debe pedir uno nuevo con el refreshToken
+// (que no expira hasta que se revoque) en vez de forzar un login de nuevo.
+export const refresh = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+
+  try {
+    const url = `https://securetoken.googleapis.com/v1/token?key=${process.env.FIREBASE_API_KEY}`;
+
+    const respuesta = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ grant_type: "refresh_token", refresh_token: refreshToken }),
+    });
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+      console.log("Error al refrescar token:", datos.error?.message);
+      res.status(401).json({ mensaje: "Sesión expirada, vuelve a iniciar sesión" });
+      return;
+    }
+
+    res.json({
+      token: datos.id_token,
+      refreshToken: datos.refresh_token,
+      expiresIn: Number(datos.expires_in),
     });
   } catch (error) {
     console.log(error);
