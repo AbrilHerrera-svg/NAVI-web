@@ -12,8 +12,8 @@ import {
   CreateProductModal,
   NewPromotionModal,
   EditPromotionModal,
-  mockMenuItems,
   mockPromotions,
+  useMenu,
   type MenuTab,
   type MenuItem,
   type PromotionItem,
@@ -22,8 +22,8 @@ import { useInventory, type RecipeLine } from '../features/inventory';
 
 export default function MenuPage() {
   const { updateRecipe } = useInventory();
+  const { items, toggleAvailable, archiveProduct, unarchiveProduct } = useMenu();
   const [currentTab, setCurrentTab] = useState<MenuTab>('lista');
-  const [items, setItems] = useState<MenuItem[]>(mockMenuItems);
   const [promotions, setPromotions] = useState<PromotionItem[]>(mockPromotions);
 
   // Sub-vistas (Receta y Nuevo Producto)
@@ -38,33 +38,16 @@ export default function MenuPage() {
   const [isNewPromoOpen, setIsNewPromoOpen] = useState(false);
   const [editPromoTarget, setEditPromoTarget] = useState<PromotionItem | null>(null);
 
-  // Toggle switch de disponibilidad (también sincroniza el estado Activo/Inactivo)
-  const handleToggleAvailable = (id: string) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, available: !item.available, status: item.available ? 'Inactivo' : 'Activo' }
-          : item
-      )
-    );
-  };
-
   // Confirmar archivar
   const handleConfirmArchive = () => {
     if (!archiveTarget) return;
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === archiveTarget.id ? { ...item, status: 'Archivado', available: false } : item
-      )
-    );
+    archiveProduct(archiveTarget.id);
     setArchiveTarget(null);
   };
 
   // Desarchivar: regresa el producto a Activo y disponible
   const handleUnarchive = (item: MenuItem) => {
-    setItems((prev) =>
-      prev.map((i) => (i.id === item.id ? { ...i, status: 'Activo', available: true } : i))
-    );
+    unarchiveProduct(item.id);
   };
 
   // Confirmar quitar promoción
@@ -108,7 +91,7 @@ export default function MenuPage() {
           {currentTab === 'lista' && (
             <MenuTableView
               items={items}
-              onToggleAvailable={handleToggleAvailable}
+              onToggleAvailable={toggleAvailable}
               onRequestArchive={setArchiveTarget}
               onUnarchive={handleUnarchive}
               onOpenRecipe={setSelectedRecipeProduct}

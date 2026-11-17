@@ -15,6 +15,9 @@ export const mockCashOpening: CashOpeningInfo = {
   openedBy: "Ana García",
 };
 
+// Monto final con el que cerró la caja el día anterior; la apertura de hoy debe coincidir.
+export const mockPreviousCloseAmount = 300;
+
 export const mockExpectedCash: ExpectedCashInfo = {
   initialFund: 300,
   netCashSales: 1860,

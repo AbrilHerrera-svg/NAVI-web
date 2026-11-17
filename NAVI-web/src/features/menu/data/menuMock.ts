@@ -9,8 +9,8 @@ export const mockMenuItems: MenuItem[] = [
   { id: '6', name: 'Chilaquiles rojos', category: 'Cocina', priceSingle: 95, prepTime: '12 min', available: true, status: 'Activo' },
   { id: '7', name: 'Waffle Dulce', category: 'Postres', priceSingle: 80, prepTime: '10 min', available: true, status: 'Activo' },
   { id: '8', name: 'Crepas de Nutella', category: 'Postres', priceSingle: 75, prepTime: '8 min', available: true, status: 'Activo' },
-  { id: '9', name: 'Alfredo Pasta', category: 'Cocina · Vie–Dom', priceSingle: 120, prepTime: '15 min', available: true, status: 'Activo' },
-  { id: '10', name: 'Boneless', category: 'Cocina · Vie–Dom', priceSingle: 110, prepTime: '15 min', available: true, status: 'Activo' },
+  { id: '9', name: 'Alfredo Pasta', category: 'Cocina · Vie–Dom', priceSingle: 120, prepTime: '15 min', available: true, status: 'Activo', weekendOnly: true },
+  { id: '10', name: 'Boneless', category: 'Cocina · Vie–Dom', priceSingle: 110, prepTime: '15 min', available: true, status: 'Activo', weekendOnly: true },
   { id: '11', name: 'Horchata Latte', category: 'Té con leche', priceMed: 65, priceGde: 80, prepTime: '5 min', available: false, status: 'Archivado' },
 ];
 

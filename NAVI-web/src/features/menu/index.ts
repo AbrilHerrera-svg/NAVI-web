@@ -1,5 +1,7 @@
 export * from './types';
 export * from './data/menuMock';
+export * from './context/useMenu';
+export * from './context/MenuContext';
 export * from './components/MenuNavHeader';
 export * from './components/MenuTableView';
 export * from './components/MenuCardsView';

@@ -3,27 +3,28 @@ import type { ProductItem } from '../types';
 import Card from '../../../components/ui/Card';
 
 interface Props {
+  products: ProductItem[];
   onAddProduct: (product: ProductItem) => void;
   onOpenExtras: (product: ProductItem) => void;
+  isAvailable: (product: ProductItem) => boolean;
 }
 
-const mockProducts: ProductItem[] = [
-  { id: '1', name: 'Chai Milk Tea', category: 'Bebidas', categoryLabel: 'Té con leche', size: 'GDE', price: 85 },
-  { id: '2', name: 'Taro Smoothie', category: 'Bebidas', categoryLabel: 'Smoothies', size: 'MED', price: 65 },
-  { id: '3', name: 'Mango Fruit Tea', category: 'Bebidas', categoryLabel: 'Té de frutas', size: 'MED', price: 60 },
-  { id: '4', name: 'Chilaquiles rojos', category: 'Cocina', categoryLabel: 'Cocina', price: 95 },
-  { id: '5', name: 'Crepa de Nutella', category: 'Postres', categoryLabel: 'Postres', price: 75 },
-  { id: '6', name: 'Waffle Dulce', category: 'Postres', categoryLabel: 'Postres', price: 80 },
-];
-
-export const OrderCatalog = ({ onAddProduct, onOpenExtras }: Props) => {
+export const OrderCatalog = ({ products, onAddProduct, onOpenExtras, isAvailable }: Props) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
 
   const categories = ['Todos', 'Bebidas', 'Cocina', 'Postres'];
 
   const filtered = selectedCategory === 'Todos'
-    ? mockProducts
-    : mockProducts.filter((p) => p.category === selectedCategory);
+    ? products
+    : products.filter((p) => p.category === selectedCategory);
+
+  // Agrupa variantes de tamaño (MED/GDE) del mismo producto en una sola tarjeta.
+  const grouped: ProductItem[][] = [];
+  for (const prod of filtered) {
+    const group = grouped.find((g) => g[0].id === prod.id);
+    if (group) group.push(prod);
+    else grouped.push([prod]);
+  }
 
   return (
     <div className="flex-1 space-y-6">
@@ -51,35 +52,62 @@ export const OrderCatalog = ({ onAddProduct, onOpenExtras }: Props) => {
 
       {/* Grid de productos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map((prod) => (
-          <Card key={prod.id} className="shadow-xs flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-start">
-                <span className="text-[11px] text-slate-400 font-medium">{prod.categoryLabel}</span>
-                <button
-                  onClick={() => onAddProduct(prod)}
-                  className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition cursor-pointer text-sm font-bold"
-                  title="Agregar 1 directo"
-                >
-                  +
-                </button>
+        {grouped.map((variants) => {
+          const first = variants[0];
+          const allUnavailable = variants.every((v) => !isAvailable(v));
+          return (
+            <Card key={first.id} className={`shadow-xs flex flex-col justify-between ${allUnavailable ? 'opacity-60' : ''}`}>
+              <div>
+                <div className="flex justify-between items-start">
+                  <span className="text-[11px] text-slate-400 font-medium">{first.categoryLabel}</span>
+                  {allUnavailable && (
+                    <span className="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-full">
+                      Agotado
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-bold text-slate-800 text-sm mt-1">{first.name}</h3>
               </div>
-              <h3 className="font-bold text-slate-800 text-sm mt-1">{prod.name}</h3>
-              <p className="text-xs font-semibold text-slate-600 mt-1">
-                {prod.size ? `${prod.size} · ` : ''}${prod.price}
-              </p>
-            </div>
 
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => onOpenExtras(prod)}
-                className="text-xs font-medium text-slate-600 hover:text-[#5960A1] bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 transition cursor-pointer"
-              >
-                + Agregar extras
-              </button>
-            </div>
-          </Card>
-        ))}
+              {/* Una fila por variante: cada bebida debe elegir MED o GDE explícitamente */}
+              <div className="mt-2 space-y-2">
+                {variants.map((variant) => {
+                  const available = isAvailable(variant);
+                  return (
+                    <div
+                      key={variant.size ?? 'single'}
+                      className="flex items-center justify-between gap-2 border-t border-slate-50 pt-2 first:border-none first:pt-0"
+                    >
+                      <span className="text-xs font-semibold text-slate-600">
+                        {variant.size ? `${variant.size} · ` : ''}${variant.price}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => onOpenExtras(variant)}
+                          disabled={!available}
+                          className="text-xs font-medium text-slate-600 hover:text-[#5960A1] bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-50 disabled:hover:text-slate-600"
+                        >
+                          + Extras
+                        </button>
+                        {available ? (
+                          <button
+                            onClick={() => onAddProduct(variant)}
+                            className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition cursor-pointer text-sm font-bold"
+                            title="Agregar 1 directo"
+                          >
+                            +
+                          </button>
+                        ) : (
+                          <span className="text-[10px] font-bold text-rose-500">Agotado</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          );
+        })}
       </div>
 
       {/* Banner inferior de extras informativos */}

@@ -8,6 +8,7 @@ interface Props {
   orders: OrderItemRecord[];
   onOpenCancelModal: (orderId: string) => void;
   onAdvanceStatus: (orderId: string) => void;
+  onToggleItemPrepared: (orderId: string, itemIndex: number) => void;
 }
 
 const columns: { status: OrderItemRecord['status']; label: string; badgeColor: BadgeColor }[] = [
@@ -18,7 +19,7 @@ const columns: { status: OrderItemRecord['status']; label: string; badgeColor: B
   { status: 'Cancelado', label: 'Cancelado', badgeColor: 'danger' },
 ];
 
-export const OrdersKanbanView = ({ orders, onOpenCancelModal, onAdvanceStatus }: Props) => {
+export const OrdersKanbanView = ({ orders, onOpenCancelModal, onAdvanceStatus, onToggleItemPrepared }: Props) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
       {columns.map((col) => {
@@ -38,6 +39,10 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal, onAdvanceStatus }:
             <div className="space-y-3">
               {colOrders.map((order) => {
                 const action = getPrimaryAction(order.status);
+                // "Marcar listo" exige que todo el carrito esté preparado primero.
+                const needsPrepChecklist = order.status === 'En preparación' && !!order.cart?.length;
+                const allPrepared = order.cart?.every((item) => item.prepared) ?? true;
+                const actionDisabled = order.status === 'En preparación' && !allPrepared;
                 return (
                 <Card key={order.id} className="shadow-2xs space-y-3">
                   <div className="flex justify-between items-start">
@@ -55,6 +60,28 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal, onAdvanceStatus }:
                       {order.productsSummary}
                     </p>
                   </div>
+
+                  {needsPrepChecklist && (
+                    <div className="space-y-1 border-t border-slate-100 pt-2">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase">Preparación</p>
+                      {order.cart!.map((item, idx) => (
+                        <label
+                          key={idx}
+                          className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={!!item.prepared}
+                            onChange={() => onToggleItemPrepared(order.id, idx)}
+                            className="accent-[#5960A1]"
+                          />
+                          <span className={item.prepared ? 'line-through text-slate-400' : ''}>
+                            {item.quantity} × {item.product.name} {item.product.size || ''}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
 
                   {order.dueStatusLabel && (
                     <div className="space-y-1">
@@ -83,7 +110,9 @@ export const OrdersKanbanView = ({ orders, onOpenCancelModal, onAdvanceStatus }:
                       <Button
                         variant={action.color === 'success' ? 'success' : 'primary'}
                         onClick={() => onAdvanceStatus(order.id)}
-                        className="px-3 py-1.5 shadow-2xs"
+                        disabled={actionDisabled}
+                        title={actionDisabled ? 'Marca todos los productos como preparados primero' : undefined}
+                        className="px-3 py-1.5 shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         {action.label}
                       </Button>

@@ -1,43 +1,53 @@
 import { useState } from 'react';
-import type { ProductItem, CartItem, SelectedItemExtra } from '../features/orders/types';
+import type { ProductItem, CartItem, SelectedItemExtra, OrderPaymentMethod } from '../features/orders/types';
 import { OrderCatalog } from '../features/orders/components/OrderCatalog';
 import { OrderExtrasView } from '../features/orders/components/OrderExtrasView';
 import { OrderSummarySidebar } from '../features/orders/components/OrderSummarySidebar';
 import { OrderConfirmModal } from '../features/orders/components/OrderConfirmModal';
-import { buildStockLines } from '../features/orders/utils/buildStockLines';
+import { buildStockLines, canAddProductToCart } from '../features/orders/utils/buildStockLines';
+import { menuItemToProductVariants } from '../features/orders/utils/menuToCatalog';
+import { estimateOrderTime } from '../features/orders/utils/estimateOrderTime';
 import { useOrders } from '../features/orders';
 import { useInventory } from '../features/inventory';
+import { useMenu, isMenuItemOrderableToday } from '../features/menu';
 
 export default function NewOrderPage() {
   const { ingredients, registerSale, recipesByProductId } = useInventory();
-  const { addOrder } = useOrders();
+  const { orders, addOrder } = useOrders();
+  const { items: menuItems } = useMenu();
 
-  // Estado inicial simulado con los 2 productos de la captura
-  const [cart, setCart] = useState<CartItem[]>([
-    {
-      product: { id: '1', name: 'Chai Milk Tea', category: 'Bebidas', categoryLabel: 'Té con leche', size: 'GDE', price: 85 },
-      quantity: 1,
-      extras: [{ extraId: 'top-1', name: 'Topping Oreo', price: 15, quantity: 1 }],
-    },
-    {
-      product: { id: '2', name: 'Taro Smoothie', category: 'Bebidas', categoryLabel: 'Smoothies', size: 'MED', price: 65 },
-      quantity: 1,
-      extras: [],
-    },
-  ]);
+  // Catálogo del mostrador = productos del Menú disponibles hoy (inactivos/archivados
+  // desde Menú no se pueden vender aquí, igual que los de fin de semana en día de semana).
+  const products = menuItems
+    .filter((item) => isMenuItemOrderableToday(item))
+    .flatMap(menuItemToProductVariants);
+
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   const [activeExtraProduct, setActiveExtraProduct] = useState<ProductItem | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingPaymentMethod, setPendingPaymentMethod] = useState<OrderPaymentMethod>('Efectivo');
+
+  // Tiempo que se le comunica al cliente antes de confirmar: el de su propio pedido más
+  // lo que suma la fila de pedidos que ya están en curso.
+  const pendingOrdersAhead = orders.filter((o) => o.status === 'Nuevo' || o.status === 'En preparación').length;
+  const estimate = estimateOrderTime(cart, pendingOrdersAhead);
+
+  // Regla de negocio: si ya no hay existencia suficiente de algún ingrediente de la receta,
+  // el producto no se puede agregar al pedido (ni directo ni con extras).
+  const isProductAvailable = (product: ProductItem) =>
+    canAddProductToCart(product, cart, ingredients, recipesByProductId);
 
   // Agregar producto directo
   const handleAddDirect = (product: ProductItem) => {
+    if (!isProductAvailable(product)) return;
     setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id && item.extras.length === 0);
+      const existing = prev.find(
+        (item) => item.product.id === product.id && item.product.size === product.size && item.extras.length === 0
+      );
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id && item.extras.length === 0
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+          item === existing ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
       return [...prev, { product, quantity: 1, extras: [] }];
@@ -46,7 +56,7 @@ export default function NewOrderPage() {
 
   // Guardar producto con extras seleccionados
   const handleAddWithExtras = (extras: SelectedItemExtra[]) => {
-    if (!activeExtraProduct) return;
+    if (!activeExtraProduct || !isProductAvailable(activeExtraProduct)) return;
     setCart((prev) => [...prev, { product: activeExtraProduct, quantity: 1, extras }]);
     setActiveExtraProduct(null);
   };
@@ -83,7 +93,13 @@ export default function NewOrderPage() {
       return acc + itemExtras * item.quantity;
     }, 0);
 
-    addOrder({ origin: 'Mostrador', cart, total: productsTotal + extrasTotal, alreadyCharged: true });
+    addOrder({
+      origin: 'Mostrador',
+      cart,
+      total: productsTotal + extrasTotal,
+      alreadyCharged: true,
+      paymentMethod: pendingPaymentMethod,
+    });
 
     alert('¡Pedido confirmado y enviado a preparación!');
     setCart([]);
@@ -100,8 +116,10 @@ export default function NewOrderPage() {
         />
       ) : (
         <OrderCatalog
+          products={products}
           onAddProduct={handleAddDirect}
           onOpenExtras={(prod) => setActiveExtraProduct(prod)}
+          isAvailable={isProductAvailable}
         />
       )}
 
@@ -109,12 +127,16 @@ export default function NewOrderPage() {
       <OrderSummarySidebar
         cart={cart}
         onRemoveItem={handleRemoveItem}
-        onRequestConfirm={() => setIsConfirmOpen(true)}
+        onRequestConfirm={(method) => {
+          setPendingPaymentMethod(method);
+          setIsConfirmOpen(true);
+        }}
       />
 
       {/* Modal Confirmación */}
       <OrderConfirmModal
         isOpen={isConfirmOpen}
+        estimate={estimate}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleFinalizeOrder}
       />

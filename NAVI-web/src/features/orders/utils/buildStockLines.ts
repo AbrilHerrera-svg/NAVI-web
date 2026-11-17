@@ -1,4 +1,4 @@
-import type { CartItem } from '../types';
+import type { CartItem, ProductItem } from '../types';
 import {
   amountToBoxes,
   mockRecipesByExtraId,
@@ -51,4 +51,31 @@ export const buildStockLines = (
   }
 
   return Array.from(boxesByIngredient, ([ingredientId, boxes]) => ({ ingredientId, boxes }));
+};
+
+// Regla de negocio: no se puede agregar un producto al carrito si, sumado a lo que ya está
+// reservado por el resto del carrito, no alcanza el inventario de alguno de sus ingredientes.
+// Productos sin receta registrada siempre se consideran disponibles (no descuentan inventario).
+export const canAddProductToCart = (
+  product: ProductItem,
+  cart: CartItem[],
+  ingredients: InventoryIngredient[],
+  recipesByProductId: Record<string, RecipeLine[]>
+): boolean => {
+  const recipe = recipesByProductId[product.id];
+  if (!recipe || recipe.length === 0) return true;
+
+  const reserved = buildStockLines(cart, ingredients, recipesByProductId);
+  const reservedByIngredient = new Map(reserved.map((line) => [line.ingredientId, line.boxes]));
+
+  for (const line of recipe) {
+    const ingredient = ingredients.find((i) => i.id === line.ingredientId);
+    const amount = amountForSize(line, product.size);
+    if (!ingredient || !amount) continue;
+
+    const needed = (reservedByIngredient.get(ingredient.id) ?? 0) + amountToBoxes(ingredient, amount);
+    if (ingredient.stock < needed) return false;
+  }
+
+  return true;
 };

@@ -9,10 +9,13 @@ interface Props {
   inputs: ClosingInputs;
   initialReason: string;
   dateLabel: string;
-  onCloseDay?: () => void;
+  onCloseDay?: (countedFunds: number) => void;
+  // Si viene, el cierre queda bloqueado aunque la caja cuadre (ej. tareas de
+  // apertura/cierre pendientes) y se muestra el motivo en vez del botón.
+  blockedReason?: string;
 }
 
-export const ClosingCard = ({ summary, inputs, initialReason, dateLabel, onCloseDay }: Props) => {
+export const ClosingCard = ({ summary, inputs, initialReason, dateLabel, onCloseDay, blockedReason }: Props) => {
   const [cashCounted, setCashCounted] = useState(inputs.cashCounted.toFixed(2));
   const [terminalCounted, setTerminalCounted] = useState(inputs.terminalCounted.toFixed(2));
   const [transferCounted, setTransferCounted] = useState(inputs.transferCounted.toFixed(2));
@@ -25,7 +28,7 @@ export const ClosingCard = ({ summary, inputs, initialReason, dateLabel, onClose
   const expectedFunds = summary.systemSalesTotal + summary.initialFund;
   const difference = countedFunds - expectedFunds;
   const hasDifference = Math.abs(difference) > 0.001;
-  const canClose = !hasDifference || reason.trim().length > 0;
+  const canClose = !blockedReason && (!hasDifference || reason.trim().length > 0);
 
   return (
     <Card className="shadow-xs space-y-5">
@@ -110,9 +113,17 @@ export const ClosingCard = ({ summary, inputs, initialReason, dateLabel, onClose
         </div>
       )}
 
+      {blockedReason && (
+        <p className="text-[11px] text-rose-500 font-medium">{blockedReason}</p>
+      )}
+
       <div className="flex items-center justify-between pt-2">
         <span className="text-xs text-slate-400">{dateLabel}</span>
-        <Button onClick={onCloseDay} disabled={!canClose} className="disabled:opacity-40 disabled:cursor-not-allowed">
+        <Button
+          onClick={() => onCloseDay?.(countedFunds)}
+          disabled={!canClose}
+          className="disabled:opacity-40 disabled:cursor-not-allowed"
+        >
           Cerrar día
         </Button>
       </div>

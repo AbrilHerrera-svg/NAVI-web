@@ -14,7 +14,9 @@ import MainLayout from "./components/layout/MainLayout";
 import TasksPage from "./pages/TasksPage";
 import { type PageId } from "./components/layout/Sidebar";
 import { InventoryProvider } from "./features/inventory";
+import { MenuProvider } from "./features/menu";
 import { OrdersProvider } from "./features/orders";
+import { CashRegisterProvider } from "./features/cash-register";
 import { SessionProvider } from "./features/profile";
 import { UsersProvider } from "./features/users";
 import { TasksProvider } from "./features/tasks";
@@ -79,15 +81,19 @@ function App() {
       <UsersProvider>
         <TasksProvider>
           <InventoryProvider>
-            <OrdersProvider>
-              <MainLayout
-                currentPage={currentPage}
-                onNavigate={setCurrentPage}
-                onLogout={() => setIsAuthenticated(false)}
-              >
-                {renderCurrentPage()}
-              </MainLayout>
-            </OrdersProvider>
+            <MenuProvider>
+              <OrdersProvider>
+                <CashRegisterProvider>
+                  <MainLayout
+                    currentPage={currentPage}
+                    onNavigate={setCurrentPage}
+                    onLogout={() => setIsAuthenticated(false)}
+                  >
+                    {renderCurrentPage()}
+                  </MainLayout>
+                </CashRegisterProvider>
+              </OrdersProvider>
+            </MenuProvider>
           </InventoryProvider>
         </TasksProvider>
       </UsersProvider>

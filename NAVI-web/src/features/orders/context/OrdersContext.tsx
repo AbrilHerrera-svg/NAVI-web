@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import { useInventory } from '../../inventory';
 import { mockOrdersData, mockOrderExceptions } from '../data/ordersMock';
-import type { OrderItemRecord } from '../types';
+import type { OrderItemRecord, OrderPaymentMethod } from '../types';
 import { buildStockLines } from '../utils/buildStockLines';
-import { OrdersReactContext, type NewOrderInput } from './useOrders';
+import { OrdersReactContext, type AdvanceStatusResult, type NewOrderInput } from './useOrders';
 
 // Flujo de estados: a qué estado pasa un pedido al presionar su acción principal
 const nextStatus: Partial<Record<OrderItemRecord['status'], OrderItemRecord['status']>> = {
@@ -44,6 +44,7 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
         productsSummary,
         total: input.total,
         status: input.alreadyCharged ? 'En preparación' : 'Nuevo',
+        paymentMethod: input.alreadyCharged ? input.paymentMethod : undefined,
         cart: input.cart,
       },
       ...prev,
@@ -54,30 +55,57 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const advanceStatus = (id: string) => {
+  const advanceStatus = (id: string, paymentMethod?: OrderPaymentMethod): AdvanceStatusResult => {
     const order = orders.find((o) => o.id === id);
-    if (!order) return;
+    if (!order) return { ok: false, reason: 'El pedido ya no existe.' };
     const next = nextStatus[order.status];
-    if (!next) return;
+    if (!next) return { ok: false, reason: 'Este pedido no tiene un siguiente estado.' };
 
-    // "Cobrar" es la transición Nuevo → En preparación: ahí se descuenta inventario real.
-    if (order.status === 'Nuevo' && order.cart) {
-      const result = registerSale(
-        `Pedido ${order.orderNumber}`,
-        buildStockLines(order.cart, ingredients, recipesByProductId)
-      );
-      if (!result.ok) {
-        alert(
-          `No se puede cobrar ${order.orderNumber}: no alcanza el inventario de ${result.missing
-            .map((m) => m.ingredientName)
-            .join(', ')}.`
+    // "Cobrar" es la transición Nuevo → En preparación: no se puede cobrar sin método de
+    // pago, y ahí se descuenta inventario real.
+    if (order.status === 'Nuevo') {
+      if (!paymentMethod) {
+        return { ok: false, reason: 'Elige un método de pago para cobrar el pedido.' };
+      }
+      if (order.cart) {
+        const result = registerSale(
+          `Pedido ${order.orderNumber}`,
+          buildStockLines(order.cart, ingredients, recipesByProductId)
         );
-        return;
+        if (!result.ok) {
+          return {
+            ok: false,
+            reason: `No se puede cobrar ${order.orderNumber}: no alcanza el inventario de ${result.missing
+              .map((m) => m.ingredientName)
+              .join(', ')}.`,
+          };
+        }
       }
       setChargedOrderIds((prev) => new Set(prev).add(order.id));
     }
 
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: next } : o)));
+    // "Marcar listo" es En preparación → Listo: todos los renglones deben estar preparados.
+    if (order.status === 'En preparación' && order.cart && order.cart.some((item) => !item.prepared)) {
+      return { ok: false, reason: 'Marca todos los productos del pedido como preparados antes de pasarlo a Listo.' };
+    }
+
+    setOrders((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, status: next, paymentMethod: paymentMethod ?? o.paymentMethod } : o))
+    );
+    return { ok: true };
+  };
+
+  const toggleItemPrepared = (orderId: string, itemIndex: number) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === orderId && o.cart
+          ? {
+              ...o,
+              cart: o.cart.map((item, i) => (i === itemIndex ? { ...item, prepared: !item.prepared } : item)),
+            }
+          : o
+      )
+    );
   };
 
   const cancelOrder = (id: string) => {
@@ -106,7 +134,7 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <OrdersReactContext.Provider
-      value={{ orders, exceptions, addOrder, advanceStatus, cancelOrder, resolveException }}
+      value={{ orders, exceptions, addOrder, advanceStatus, toggleItemPrepared, cancelOrder, resolveException }}
     >
       {children}
     </OrdersReactContext.Provider>

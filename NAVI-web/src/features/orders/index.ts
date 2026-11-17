@@ -1,6 +1,7 @@
 export * from './types';
 export * from './data/ordersMock';
 export * from './utils/buildStockLines';
+export * from './utils/estimateOrderTime';
 export * from './context/useOrders';
 export * from './context/OrdersContext';
 export * from './components/OrdersNavHeader';
@@ -8,6 +9,7 @@ export * from './components/OrdersKanbanView';
 export * from './components/OrdersTableView';
 export * from './components/OrdersExceptionsView';
 export * from './components/OrderCancelModal';
+export * from './components/OrderChargeModal';
 export * from './components/OrderCatalog';
 export * from './components/OrderExtrasView';
 export * from './components/OrderSummarySidebar';

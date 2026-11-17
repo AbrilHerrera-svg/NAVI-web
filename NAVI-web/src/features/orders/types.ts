@@ -24,10 +24,14 @@ export interface CartItem {
   product: ProductItem;
   quantity: number;
   extras: SelectedItemExtra[];
+  // Marcado por cocina/barra cuando ese renglón ya está preparado. El pedido solo puede
+  // pasar a "Listo" cuando todos sus renglones están preparados.
+  prepared?: boolean;
 }
 
 export type OrderStatus = 'Nuevo' | 'En preparación' | 'Listo' | 'Recogido' | 'Cancelado';
 export type OrderOrigin = 'App' | 'Mostrador';
+export type OrderPaymentMethod = 'Efectivo' | 'Terminal de tarjeta' | 'Transferencia';
 
 export interface OrderItemRecord {
   id: string;
@@ -43,6 +47,9 @@ export interface OrderItemRecord {
   status: OrderStatus;
   primaryActionLabel?: string;
   primaryActionColor?: 'default' | 'success';
+  // Método con el que se cobró. Obligatorio para marcar el pedido como cobrado
+  // (transición Nuevo → En preparación); sin método no se puede cobrar.
+  paymentMethod?: OrderPaymentMethod;
   // Carrito estructurado del pedido, usado para descontar/restituir inventario al cobrar
   // o cancelar. Los pedidos sin receta registrada (ej. platillos de cocina) quedan sin
   // efecto en inventario aunque tengan línea aquí.

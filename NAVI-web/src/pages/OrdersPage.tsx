@@ -5,7 +5,9 @@ import {
   OrdersTableView,
   OrdersExceptionsView,
   OrderCancelModal,
+  OrderChargeModal,
   useOrders,
+  type OrderPaymentMethod,
 } from '../features/orders';
 
 interface Props {
@@ -13,13 +15,14 @@ interface Props {
 }
 
 export default function OrdersPage({ onNavigateToNewOrder }: Props) {
-  const { orders, exceptions, advanceStatus, cancelOrder, resolveException } = useOrders();
+  const { orders, exceptions, advanceStatus, toggleItemPrepared, cancelOrder, resolveException } = useOrders();
   const [viewMode, setViewMode] = useState<'tarjetas' | 'lista' | 'excepciones'>('tarjetas');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [originFilter, setOriginFilter] = useState('');
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [chargeOrderId, setChargeOrderId] = useState<string | null>(null);
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
@@ -42,6 +45,31 @@ export default function OrdersPage({ onNavigateToNewOrder }: Props) {
     setSelectedOrderId(null);
   };
 
+  // "Cobrar" (Nuevo → En preparación) exige elegir método de pago primero; las demás
+  // transiciones se intentan directo y, si el contexto las rechaza, se explica por qué.
+  const handleAdvanceStatus = (orderId: string) => {
+    const order = orders.find((o) => o.id === orderId);
+    if (!order) return;
+    if (order.status === 'Nuevo') {
+      setChargeOrderId(orderId);
+      return;
+    }
+    const result = advanceStatus(orderId);
+    if (!result.ok && result.reason) alert(result.reason);
+  };
+
+  const handleConfirmCharge = (method: OrderPaymentMethod) => {
+    if (!chargeOrderId) return;
+    const result = advanceStatus(chargeOrderId, method);
+    if (!result.ok && result.reason) {
+      alert(result.reason);
+      return;
+    }
+    setChargeOrderId(null);
+  };
+
+  const chargeOrder = orders.find((o) => o.id === chargeOrderId);
+
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6">
       <OrdersNavHeader
@@ -61,14 +89,15 @@ export default function OrdersPage({ onNavigateToNewOrder }: Props) {
         <OrdersKanbanView
           orders={filteredOrders}
           onOpenCancelModal={handleOpenCancel}
-          onAdvanceStatus={advanceStatus}
+          onAdvanceStatus={handleAdvanceStatus}
+          onToggleItemPrepared={toggleItemPrepared}
         />
       )}
 
       {viewMode === 'lista' && (
         <OrdersTableView
           orders={filteredOrders}
-          onAdvanceStatus={advanceStatus}
+          onAdvanceStatus={handleAdvanceStatus}
           onOpenCancelModal={handleOpenCancel}
         />
       )}
@@ -81,6 +110,14 @@ export default function OrdersPage({ onNavigateToNewOrder }: Props) {
         isOpen={cancelModalOpen}
         onClose={() => setCancelModalOpen(false)}
         onConfirm={handleConfirmCancel}
+      />
+
+      <OrderChargeModal
+        isOpen={!!chargeOrder}
+        orderNumber={chargeOrder?.orderNumber}
+        total={chargeOrder?.total ?? 0}
+        onClose={() => setChargeOrderId(null)}
+        onConfirm={handleConfirmCharge}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { CartItem } from '../types';
+import type { CartItem, OrderPaymentMethod } from '../types';
 import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
 import * as Icons from 'lucide-react';
@@ -7,15 +7,17 @@ import * as Icons from 'lucide-react';
 interface Props {
   cart: CartItem[];
   onRemoveItem: (index: number) => void;
-  onRequestConfirm: () => void;
+  // Solo se llama con el método de pago ya elegido; en efectivo, el monto recibido
+  // ya alcanzó el total (el botón se deshabilita si no).
+  onRequestConfirm: (paymentMethod: OrderPaymentMethod) => void;
 }
 
 export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Props) => {
-  const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Terminal de tarjeta' | 'Transferencia'>('Efectivo');
+  const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>('Efectivo');
   const [receivedAmount, setReceivedAmount] = useState<string>('200.00');
 
   const productsTotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  
+
   const extrasTotal = cart.reduce((acc, item) => {
     const itemExtras = item.extras.reduce((eAcc, e) => eAcc + e.price * e.quantity, 0);
     return acc + itemExtras * item.quantity;
@@ -24,6 +26,7 @@ export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Pr
   const grandTotal = productsTotal + extrasTotal;
   const receivedNum = parseFloat(receivedAmount) || 0;
   const change = Math.max(0, receivedNum - grandTotal);
+  const insufficientCash = paymentMethod === 'Efectivo' && receivedNum < grandTotal;
 
   return (
     <aside className="w-full lg:w-96 bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between shrink-0 h-fit space-y-6">
@@ -87,7 +90,7 @@ export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Pr
         <div className="mt-6">
           <label className="block text-xs font-bold text-slate-700 mb-2">Método de pago</label>
           <div className="grid grid-cols-3 gap-1.5 bg-slate-50 p-1 rounded-lg border border-slate-200">
-            {(['Efectivo', 'Terminal de tarjeta', 'Transferencia'] as const).map((method) => (
+            {(['Efectivo', 'Terminal de tarjeta', 'Transferencia'] satisfies OrderPaymentMethod[]).map((method) => (
               <button
                 key={method}
                 type="button"
@@ -112,19 +115,25 @@ export const OrderSummarySidebar = ({ cart, onRemoveItem, onRequestConfirm }: Pr
               type="text"
               value={receivedAmount}
               onChange={(e) => setReceivedAmount(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-[#5960A1]"
+              className={`w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm text-slate-800 font-semibold focus:outline-none focus:ring-2 ${
+                insufficientCash ? 'border-rose-300 focus:ring-rose-400' : 'border-slate-200 focus:ring-[#5960A1]'
+              }`}
             />
-            <div className="flex justify-between text-xs pt-1">
-              <span className="text-slate-500 font-medium">Cambiar</span>
-              <span className="font-bold text-slate-900">${change.toFixed(2)}</span>
-            </div>
+            {insufficientCash ? (
+              <p className="text-[11px] text-rose-500">El monto recibido no puede ser menor al total.</p>
+            ) : (
+              <div className="flex justify-between text-xs pt-1">
+                <span className="text-slate-500 font-medium">Cambiar</span>
+                <span className="font-bold text-slate-900">${change.toFixed(2)}</span>
+              </div>
+            )}
           </div>
         )}
       </div>
 
       <Button
-        onClick={onRequestConfirm}
-        disabled={cart.length === 0}
+        onClick={() => onRequestConfirm(paymentMethod)}
+        disabled={cart.length === 0 || insufficientCash}
         className="w-full py-3 text-sm disabled:bg-slate-300 disabled:cursor-not-allowed mt-4"
       >
         Confirmar pedido
