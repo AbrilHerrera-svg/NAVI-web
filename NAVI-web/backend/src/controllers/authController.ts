@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { buscarUsuarioPorUid } from "../models/userModel";
 
-// roles de firestore -> roles que usa la app
+// rol de firestore -> rol que usa el front
 const roles: Record<string, string> = {
   admin: "Dueño",
   encargado: "Encargado",
@@ -52,7 +52,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // 3. revisar que esté activo
-    if (usuario.activo === false) {
+    if (usuario.status === "Inactivo") {
       res.status(403).json({ mensaje: "Tu cuenta está desactivada" });
       return;
     }
@@ -61,10 +61,10 @@ export const login = async (req: Request, res: Response) => {
     res.json({
       token: datos.idToken,
       perfil: {
-        name: usuario.nombre,
+        name: usuario.name,
         email: usuario.email,
-        phone: usuario.telefono,
-        role: roles[usuario.rol] ?? usuario.rol,
+        phone: usuario.phone,
+        role: roles[usuario.role] ?? usuario.role,
       },
     });
   } catch (error) {
