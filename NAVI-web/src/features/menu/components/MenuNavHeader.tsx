@@ -5,7 +5,6 @@ interface Props {
   currentTab: MenuTab;
   onChangeTab: (tab: MenuTab) => void;
   onOpenNewProduct: () => void;
-  onOpenNewPromotion: () => void;
   title?: string;
   subtitle?: string;
 }
@@ -14,7 +13,6 @@ export const MenuNavHeader = ({
   currentTab,
   onChangeTab,
   onOpenNewProduct,
-  onOpenNewPromotion,
   title = 'Menú',
   subtitle = 'Precios, tamaños y disponibilidad',
 }: Props) => {
@@ -43,23 +41,9 @@ export const MenuNavHeader = ({
           >
             Tarjetas
           </button>
-          <button
-            onClick={() => onChangeTab('promociones')}
-            className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-              currentTab === 'promociones' ? 'bg-[#5960A1] text-white shadow-xs' : 'hover:text-slate-900'
-            }`}
-          >
-            Promociones
-          </button>
         </div>
 
-        {currentTab === 'promociones' ? (
-          <Button onClick={onOpenNewPromotion}>
-            Nueva promoción
-          </Button>
-        ) : (
-          <Button onClick={onOpenNewProduct}>Agregar producto</Button>
-        )}
+        <Button onClick={onOpenNewProduct}>Agregar producto</Button>
       </div>
     </div>
   );

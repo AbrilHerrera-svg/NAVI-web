@@ -1,4 +1,22 @@
-export type MenuTab = 'lista' | 'tarjetas' | 'promociones';
+export type MenuTab = 'lista' | 'tarjetas';
+
+export const MENU_CATEGORIES = [
+  'Té con leche',
+  'Té de frutas',
+  'Smoothies',
+  'Cocina',
+  'Postres',
+] as const;
+
+export const WEEK_DAYS = [
+  { label: 'Lun', value: 1 },
+  { label: 'Mar', value: 2 },
+  { label: 'Mié', value: 3 },
+  { label: 'Jue', value: 4 },
+  { label: 'Vie', value: 5 },
+  { label: 'Sáb', value: 6 },
+  { label: 'Dom', value: 0 },
+] as const;
 
 export interface MenuItem {
   id: string;
@@ -24,15 +42,3 @@ export const isMenuItemOrderableToday = (item: MenuItem, today: Date = new Date(
   if (item.weekendOnly && !WEEKEND_DAYS.includes(today.getDay())) return false;
   return true;
 };
-
-export interface PromotionItem {
-  id: string;
-  name: string;
-  appliesTo: string;
-  discount: string;
-  price?: number;
-  schedule: string;
-  period?: string;
-  status: 'Activo' | 'Programado' | 'Terminado';
-  active: boolean;
-}

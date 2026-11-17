@@ -3,20 +3,14 @@ import {
   MenuNavHeader,
   MenuTableView,
   MenuCardsView,
-  PromotionsTableView,
   ProductRecipeView,
   NewProductForm,
   ArchiveProductModal,
-  RemovePromoModal,
   SaveRecipeModal,
   CreateProductModal,
-  NewPromotionModal,
-  EditPromotionModal,
-  mockPromotions,
   useMenu,
   type MenuTab,
   type MenuItem,
-  type PromotionItem,
 } from '../features/menu';
 import { useInventory, type RecipeLine } from '../features/inventory';
 
@@ -24,7 +18,6 @@ export default function MenuPage() {
   const { updateRecipe } = useInventory();
   const { items, toggleAvailable, archiveProduct, unarchiveProduct } = useMenu();
   const [currentTab, setCurrentTab] = useState<MenuTab>('lista');
-  const [promotions, setPromotions] = useState<PromotionItem[]>(mockPromotions);
 
   // Sub-vistas (Receta y Nuevo Producto)
   const [selectedRecipeProduct, setSelectedRecipeProduct] = useState<MenuItem | null>(null);
@@ -32,11 +25,8 @@ export default function MenuPage() {
 
   // Estados de los Modales
   const [archiveTarget, setArchiveTarget] = useState<MenuItem | null>(null);
-  const [removePromoTarget, setRemovePromoTarget] = useState<PromotionItem | null>(null);
   const [pendingRecipeLines, setPendingRecipeLines] = useState<RecipeLine[] | null>(null);
   const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
-  const [isNewPromoOpen, setIsNewPromoOpen] = useState(false);
-  const [editPromoTarget, setEditPromoTarget] = useState<PromotionItem | null>(null);
 
   // Confirmar archivar
   const handleConfirmArchive = () => {
@@ -48,13 +38,6 @@ export default function MenuPage() {
   // Desarchivar: regresa el producto a Activo y disponible
   const handleUnarchive = (item: MenuItem) => {
     unarchiveProduct(item.id);
-  };
-
-  // Confirmar quitar promoción
-  const handleConfirmRemovePromo = () => {
-    if (!removePromoTarget) return;
-    setPromotions((prev) => prev.filter((p) => p.id !== removePromoTarget.id));
-    setRemovePromoTarget(null);
   };
 
   return (
@@ -73,19 +56,12 @@ export default function MenuPage() {
           onSubmit={() => setIsCreateProductOpen(true)}
         />
       ) : (
-        /* 3. Vistas Principales (Lista, Tarjetas o Promociones) */
+        /* 3. Vistas Principales (Lista o Tarjetas) */
         <>
           <MenuNavHeader
             currentTab={currentTab}
             onChangeTab={setCurrentTab}
             onOpenNewProduct={() => setIsCreatingProduct(true)}
-            onOpenNewPromotion={() => setIsNewPromoOpen(true)}
-            title={currentTab === 'promociones' ? 'Promociones' : 'Menú'}
-            subtitle={
-              currentTab === 'promociones'
-                ? 'Descuentos y ofertas para artículos del menú'
-                : 'Precios, tamaños y disponibilidad'
-            }
           />
 
           {currentTab === 'lista' && (
@@ -104,19 +80,6 @@ export default function MenuPage() {
               onOpenRecipe={setSelectedRecipeProduct}
             />
           )}
-
-          {currentTab === 'promociones' && (
-            <PromotionsTableView
-              promotions={promotions}
-              onRequestRemove={setRemovePromoTarget}
-              onToggleActive={(promo) =>
-                setPromotions((prev) =>
-                  prev.map((p) => (p.id === promo.id ? { ...p, active: !p.active } : p))
-                )
-              }
-              onEdit={setEditPromoTarget}
-            />
-          )}
         </>
       )}
 
@@ -126,12 +89,6 @@ export default function MenuPage() {
         productName={archiveTarget?.name || ''}
         onClose={() => setArchiveTarget(null)}
         onConfirm={handleConfirmArchive}
-      />
-
-      <RemovePromoModal
-        isOpen={!!removePromoTarget}
-        onClose={() => setRemovePromoTarget(null)}
-        onConfirm={handleConfirmRemovePromo}
       />
 
       <SaveRecipeModal
@@ -153,20 +110,6 @@ export default function MenuPage() {
           setIsCreateProductOpen(false);
           setIsCreatingProduct(false);
         }}
-      />
-
-      <NewPromotionModal
-        isOpen={isNewPromoOpen}
-        onClose={() => setIsNewPromoOpen(false)}
-        onCreate={(promo) => setPromotions((prev) => [...prev, promo])}
-      />
-
-      <EditPromotionModal
-        promo={editPromoTarget}
-        onClose={() => setEditPromoTarget(null)}
-        onSave={(updated) =>
-          setPromotions((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
-        }
       />
     </div>
   );

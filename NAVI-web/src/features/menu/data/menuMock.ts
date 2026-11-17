@@ -1,4 +1,4 @@
-import type { MenuItem, PromotionItem } from '../types';
+import type { MenuItem } from '../types';
 
 export const mockMenuItems: MenuItem[] = [
   { id: '1', name: 'Chai Milk Tea', category: 'Té con leche', priceMed: 70, priceGde: 85, prepTime: '5 min', available: true, status: 'Activo' },
@@ -12,11 +12,4 @@ export const mockMenuItems: MenuItem[] = [
   { id: '9', name: 'Alfredo Pasta', category: 'Cocina · Vie–Dom', priceSingle: 120, prepTime: '15 min', available: true, status: 'Activo', weekendOnly: true },
   { id: '10', name: 'Boneless', category: 'Cocina · Vie–Dom', priceSingle: 110, prepTime: '15 min', available: true, status: 'Activo', weekendOnly: true },
   { id: '11', name: 'Horchata Latte', category: 'Té con leche', priceMed: 65, priceGde: 80, prepTime: '5 min', available: false, status: 'Archivado' },
-];
-
-export const mockPromotions: PromotionItem[] = [
-  { id: 'p1', name: 'Happy hour · 2×1', appliesTo: 'Té con leche MED', discount: '2×1', schedule: 'Lun–Vie 3–5 p. m.', status: 'Activo', active: true },
-  { id: 'p2', name: 'Student 10% off', appliesTo: 'Todas las bebidas', discount: '10%', schedule: 'Siempre', status: 'Activo', active: true },
-  { id: 'p3', name: 'Combo chilaquiles rojos', appliesTo: 'Chilaquiles rojos + Chai Milk', discount: '—', price: 150, schedule: 'Fines de semana', status: 'Programado', active: true },
-  { id: 'p4', name: 'Summer mango', appliesTo: 'Mango Fruit Tea', discount: '$10 de desc.', schedule: '1–30 sep', status: 'Terminado', active: true },
 ];

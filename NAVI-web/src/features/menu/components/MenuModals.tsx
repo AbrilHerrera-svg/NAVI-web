@@ -33,37 +33,6 @@ export const ArchiveProductModal = ({
   );
 };
 
-// 2. Modal Quitar Promoción
-export const RemovePromoModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-}) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
-      <div className="w-full max-w-sm bg-white rounded-2xl p-6 shadow-2xl border border-slate-100 text-center space-y-4">
-        <h3 className="text-base font-bold text-slate-800">¿Quitar esta promoción?</h3>
-        <p className="text-xs text-slate-500">
-          Deja de aplicarse de inmediato. Queda en el historial como terminada.
-        </p>
-        <div className="flex gap-3 pt-2">
-          <Button variant="secondary" onClick={onClose} className="flex-1 py-2 px-3">
-            Mantener promoción
-          </Button>
-          <Button variant="danger" onClick={onConfirm} className="flex-1 py-2 px-3">
-            Sí, quitar
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // 3. Modal Guardar Receta
 export const SaveRecipeModal = ({
   isOpen,
