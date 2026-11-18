@@ -150,7 +150,7 @@ export const UserFormModal = ({ isOpen, user, onClose, onCreate, onUpdate }: Pro
           </div>
 
           <div className="bg-[#EEF0FB] text-[#454B80] rounded-lg px-3 py-2.5 text-[11px] leading-relaxed">
-            Dueño ve todo, incluida esta pantalla. Encargado y Cajero administran tareas y caja. Barista y Cocina
+            Dueño ve todo, incluida esta pantalla. Cajero administra tareas y caja. Barista y Cocina
             ven pedidos y sus tareas asignadas.
           </div>
 
