@@ -1,8 +1,8 @@
-export type UserRole = 'Dueño' | 'Encargado' | 'Cajero' | 'Barista' | 'Cocina';
+export type UserRole = 'Dueño' | 'Cajero' | 'Barista' | 'Cocina';
 export type UserStatus = 'Activo' | 'Inactivo';
 export type UserShift = 'Matutino' | 'Vespertino';
 
-export const USER_ROLES: UserRole[] = ['Dueño', 'Encargado', 'Cajero', 'Barista', 'Cocina'];
+export const USER_ROLES: UserRole[] = ['Dueño', 'Cajero', 'Barista', 'Cocina'];
 export const USER_SHIFTS: UserShift[] = ['Matutino', 'Vespertino'];
 
 export interface TeamUser {

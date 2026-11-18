@@ -23,8 +23,8 @@ export interface Task {
 
 export type TaskInput = Omit<Task, 'id' | 'date' | 'done'>;
 
-// Solo dueño, encargado y cajero crean, editan y eliminan tareas; el resto solo las marca.
-export const canManageTasks = (role: string) => ['Dueño', 'Encargado', 'Cajero'].includes(role);
+// Solo dueño y cajero crean, editan y eliminan tareas; el resto solo las marca.
+export const canManageTasks = (role: string) => ['Dueño', 'Cajero'].includes(role);
 
 // "21:30" → "9:30 p. m."
 export const formatTime12 = (time: string) => {
