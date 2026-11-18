@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import DashboardPage from "./pages/DashboardPage";
 import SalesPage from "./pages/SalesPage";
 import NewOrderPage from "./pages/NewOrderPage";
@@ -13,25 +13,56 @@ import UsersPage from "./pages/UsersPage";
 import MainLayout from "./components/layout/MainLayout";
 import TasksPage from "./pages/TasksPage";
 import { type PageId } from "./components/layout/Sidebar";
+import { type SearchEntry } from "./components/layout/searchIndex";
+import { useScrollToSection } from "./lib/useScrollToSection";
 import { InventoryProvider } from "./features/inventory";
 import { MenuProvider } from "./features/menu";
 import { OrdersProvider } from "./features/orders";
 import { CashRegisterProvider } from "./features/cash-register";
-import { SessionProvider } from "./features/profile";
+import { iniciarSesion, cerrarSesion, obtenerSesion } from "./features/auth";
+import { SessionProvider, type ProfileInfo } from "./features/profile";
 import { UsersProvider } from "./features/users";
 import { TasksProvider } from "./features/tasks";
 
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // si ya había una sesión guardada, entra directo sin pedir login
+  const [profile, setProfile] = useState<ProfileInfo | null>(
+    () => obtenerSesion()?.perfil ?? null
+  );
   const [currentPage, setCurrentPage] = useState<PageId>("dashboard");
+
+  // sección a la que hay que hacer scroll después de que el buscador cambie de página
+  const [sectionToScroll, setSectionToScroll] = useState<string | null>(null);
+  const clearSectionToScroll = useCallback(() => setSectionToScroll(null), []);
+  useScrollToSection(sectionToScroll, clearSectionToScroll);
+
+  const handleSearchSelect = (entry: SearchEntry) => {
+    setCurrentPage(entry.page);
+    if (entry.sectionId) {
+      setSectionToScroll(entry.sectionId);
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleLogin = async (email: string, password: string) => {
+    const perfil = await iniciarSesion(email, password);
+    setProfile(perfil);
+  };
+
+  const handleLogout = () => {
+    cerrarSesion();
+    setProfile(null);
+    setCurrentPage("dashboard");
+  };
 
   // Renderizado dinámico según la opción seleccionada
   const renderCurrentPage = () => {
     switch (currentPage) {
       case "dashboard":
-        return <DashboardPage />;
+        return <DashboardPage onNavigate={setCurrentPage} />;
       case "sales":
         return <SalesPage />;
       case "new-order":
@@ -72,12 +103,12 @@ function App() {
     }
   };
 
-  if (!isAuthenticated) {
-    return <LoginPage onLogin={() => setIsAuthenticated(true)} />;
+  if (!profile) {
+    return <LoginPage onLogin={handleLogin} />;
   }
 
   return (
-    <SessionProvider>
+    <SessionProvider initialProfile={profile}>
       <UsersProvider>
         <TasksProvider>
           <InventoryProvider>
@@ -87,7 +118,8 @@ function App() {
                   <MainLayout
                     currentPage={currentPage}
                     onNavigate={setCurrentPage}
-                    onLogout={() => setIsAuthenticated(false)}
+                    onLogout={handleLogout}
+                    onSearchSelect={handleSearchSelect}
                   >
                     {renderCurrentPage()}
                   </MainLayout>

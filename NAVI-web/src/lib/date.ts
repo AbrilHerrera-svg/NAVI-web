@@ -18,3 +18,18 @@ export const formatLongDateEs = (date: Date) => {
   const label = date.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
   return label.charAt(0).toUpperCase() + label.slice(1);
 };
+
+// Últimos `count` días en ISO, del más antiguo al más reciente (el último es hoy).
+export const lastDaysISO = (count: number) => {
+  const base = new Date(`${todayISO()}T00:00:00Z`);
+  return Array.from({ length: count }, (_, i) => {
+    const day = new Date(base);
+    day.setUTCDate(base.getUTCDate() - (count - 1 - i));
+    return day.toISOString().slice(0, 10);
+  });
+};
+
+const weekdayAbbrev = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+// "2026-10-17" → "Sáb"
+export const weekdayShortEs = (iso: string) => weekdayAbbrev[new Date(`${iso}T00:00:00Z`).getUTCDay()];

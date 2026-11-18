@@ -13,3 +13,5 @@ export * from './components/AdjustStockForm';
 export * from './components/RegisterPurchaseForm';
 export * from './components/IngredientFormModal';
 export * from './components/DeleteIngredientModal';
+
+export * from './services/inventoryService';

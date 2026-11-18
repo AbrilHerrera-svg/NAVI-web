@@ -6,4 +6,6 @@ export * from './components/LiveOperations';
 export * from './components/InventoryHighlights';
 export * from './components/TeamAndTasks';
 export * from './components/SalesAndFinance';
-export * from './data/dashboardMock';
+export * from './services/dashboardService';
+export * from './utils/buildDashboard';
+export * from './hooks/useDashboard';

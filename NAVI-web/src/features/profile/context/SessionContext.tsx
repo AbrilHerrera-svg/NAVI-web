@@ -1,10 +1,14 @@
 import { useState, type ReactNode } from 'react';
-import { mockProfile } from '../data/profileMock';
 import type { ProfileInfo } from '../types';
 import { SessionReactContext } from './useSession';
 
-export const SessionProvider = ({ children }: { children: ReactNode }) => {
-  const [profile, setProfile] = useState<ProfileInfo>(mockProfile);
+interface Props {
+  initialProfile: ProfileInfo;
+  children: ReactNode;
+}
+
+export const SessionProvider = ({ initialProfile, children }: Props) => {
+  const [profile, setProfile] = useState<ProfileInfo>(initialProfile);
 
   return (
     <SessionReactContext.Provider value={{ profile, updateProfile: setProfile }}>

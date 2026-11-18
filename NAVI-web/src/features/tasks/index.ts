@@ -10,3 +10,4 @@ export * from './components/CloseDayBanner';
 export * from './components/CleaningCard';
 export * from './components/TaskFormModal';
 export * from './components/DeleteTaskModal';
+export * from './services/tasksService';

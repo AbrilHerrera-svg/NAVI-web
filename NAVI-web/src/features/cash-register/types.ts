@@ -40,3 +40,23 @@ export interface ClosingInputs {
   terminalCounted: number;
   transferCounted: number;
 }
+
+
+// Sesión de caja de un día, tal como la devuelve el backend (GET /api/cash-register?date=).
+export interface CashSessionRecord {
+  id: string;
+  date: string; // ISO yyyy-mm-dd
+  status: 'Abierto' | 'Cerrado';
+  openedBy: string;
+  initialFund: number;
+  salesByMethod: SalesByMethodItem[];
+  dailyExpenses: DailyExpenseItem[];
+  refunds: RefundItem[];
+  closing?: {
+    cashCounted: number;
+    terminalCounted: number;
+    transferCounted: number;
+    difference: number;
+    reason?: string;
+  };
+}

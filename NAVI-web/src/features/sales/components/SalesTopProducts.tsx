@@ -1,6 +1,6 @@
 import Card from "../../../components/ui/Card";
 import Badge from "../../../components/ui/Badge";
-import { mockTopProducts } from "../../dashboard";
+import { mockTopProducts } from "../data/salesMock";
 
 export const SalesTopProducts = () => {
   return (

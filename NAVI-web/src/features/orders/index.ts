@@ -14,3 +14,4 @@ export * from './components/OrderCatalog';
 export * from './components/OrderExtrasView';
 export * from './components/OrderSummarySidebar';
 export * from './components/OrderConfirmModal';
+export * from './services/ordersService';
