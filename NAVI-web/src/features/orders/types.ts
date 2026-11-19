@@ -85,3 +85,23 @@ export interface OrderExceptionItem {
   primaryAction: string;
   secondaryAction?: string;
 }
+
+// Lo que se manda en POST /api/orders (el backend asigna orderNumber y status "Nuevo").
+export interface CreateOrderPayload {
+  origin: OrderOrigin;
+  receivedTime: string;
+  dueTime: string;
+  customerName?: string;
+  productsSummary: string;
+  total: number;
+  paymentMethod?: OrderPaymentMethod;
+  cart?: CartItem[];
+}
+
+// Lo que se manda en PUT /api/orders/:id (actualización parcial, al menos un campo).
+export interface UpdateOrderPayload {
+  status?: OrderStatus;
+  paymentMethod?: OrderPaymentMethod;
+  customerName?: string;
+  cart?: CartItem[];
+}
