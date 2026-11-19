@@ -7,7 +7,7 @@ export const crearProductoSchema = z
     priceSingle: z.number().nonnegative(),
     prepTime: z.string().trim().max(30),
     available: z.boolean(),
-    status: z.enum(["Activo", "Inactivo"]),
+    status: z.enum(["Activo", "Inactivo", "Archivado"]),
   })
   .strict();
 
