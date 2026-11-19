@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   OrdersNavHeader,
   OrdersKanbanView,
@@ -15,7 +15,8 @@ interface Props {
 }
 
 export default function OrdersPage({ onNavigateToNewOrder }: Props) {
-  const { orders, exceptions, advanceStatus, toggleItemPrepared, cancelOrder, resolveException } = useOrders();
+  const { orders, exceptions, loading, error, reload, advanceStatus, toggleItemPrepared, cancelOrder, resolveException } =
+    useOrders();
   const [viewMode, setViewMode] = useState<'tarjetas' | 'lista' | 'excepciones'>('tarjetas');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -23,6 +24,11 @@ export default function OrdersPage({ onNavigateToNewOrder }: Props) {
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [chargeOrderId, setChargeOrderId] = useState<string | null>(null);
+
+  // Cada vez que se entra a Pedidos se vuelven a pedir, para ver los que llegaron desde la app.
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
@@ -39,28 +45,37 @@ export default function OrdersPage({ onNavigateToNewOrder }: Props) {
     setCancelModalOpen(true);
   };
 
-  const handleConfirmCancel = () => {
-    if (selectedOrderId) cancelOrder(selectedOrderId);
+  const handleConfirmCancel = async () => {
+    const id = selectedOrderId;
     setCancelModalOpen(false);
     setSelectedOrderId(null);
+    if (!id) return;
+    const result = await cancelOrder(id);
+    if (!result.ok && result.reason) alert(result.reason);
+  };
+
+  // Marcar/desmarcar un producto como preparado; si el servidor falla, se avisa.
+  const handleTogglePrepared = async (orderId: string, itemIndex: number) => {
+    const result = await toggleItemPrepared(orderId, itemIndex);
+    if (!result.ok && result.reason) alert(result.reason);
   };
 
   // "Cobrar" (Nuevo → En preparación) exige elegir método de pago primero; las demás
   // transiciones se intentan directo y, si el contexto las rechaza, se explica por qué.
-  const handleAdvanceStatus = (orderId: string) => {
+  const handleAdvanceStatus = async (orderId: string) => {
     const order = orders.find((o) => o.id === orderId);
     if (!order) return;
     if (order.status === 'Nuevo') {
       setChargeOrderId(orderId);
       return;
     }
-    const result = advanceStatus(orderId);
+    const result = await advanceStatus(orderId);
     if (!result.ok && result.reason) alert(result.reason);
   };
 
-  const handleConfirmCharge = (method: OrderPaymentMethod) => {
+  const handleConfirmCharge = async (method: OrderPaymentMethod) => {
     if (!chargeOrderId) return;
-    const result = advanceStatus(chargeOrderId, method);
+    const result = await advanceStatus(chargeOrderId, method);
     if (!result.ok && result.reason) {
       alert(result.reason);
       return;
@@ -85,12 +100,23 @@ export default function OrdersPage({ onNavigateToNewOrder }: Props) {
         onOriginFilterChange={setOriginFilter}
       />
 
+      {error && (
+        <div role="alert" className="flex items-center justify-between gap-4 text-sm text-rose-700 bg-rose-50 border border-rose-100 rounded-xl px-4 py-3">
+          <span>{error}</span>
+          <button onClick={reload} className="font-semibold underline cursor-pointer">
+            Reintentar
+          </button>
+        </div>
+      )}
+
+      {loading && orders.length === 0 && <p className="text-sm text-slate-400">Cargando pedidos...</p>}
+
       {viewMode === 'tarjetas' && (
         <OrdersKanbanView
           orders={filteredOrders}
           onOpenCancelModal={handleOpenCancel}
           onAdvanceStatus={handleAdvanceStatus}
-          onToggleItemPrepared={toggleItemPrepared}
+          onToggleItemPrepared={handleTogglePrepared}
         />
       )}
 

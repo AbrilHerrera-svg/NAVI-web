@@ -12,7 +12,7 @@ import { useInventory } from '../features/inventory';
 import { useMenu, isMenuItemOrderableToday } from '../features/menu';
 
 export default function NewOrderPage() {
-  const { ingredients, registerSale, recipesByProductId } = useInventory();
+  const { ingredients, registerSale, registerCancellation, recipesByProductId } = useInventory();
   const { orders, addOrder } = useOrders();
   const { items: menuItems } = useMenu();
 
@@ -29,6 +29,7 @@ export default function NewOrderPage() {
   const [editingCartIndex, setEditingCartIndex] = useState<number | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingPaymentMethod, setPendingPaymentMethod] = useState<OrderPaymentMethod>('Efectivo');
+  const [saving, setSaving] = useState(false); // evita guardar el mismo pedido dos veces
 
   // Tiempo que se le comunica al cliente antes de confirmar: el de su propio pedido más
   // lo que suma la fila de pedidos que ya están en curso.
@@ -87,10 +88,11 @@ export default function NewOrderPage() {
     );
   };
 
-  // Confirmar: descuenta inventario según receta y, solo si alcanza, limpia el carrito
-  // y manda el pedido a la cola compartida de Pedidos (ya cobrado).
-  const handleFinalizeOrder = () => {
+  // Confirmar: descuenta inventario según receta y, solo si alcanza, guarda el pedido en el
+  // backend (ya cobrado) y limpia el carrito. Si el servidor falla, se regresa el inventario.
+  const handleFinalizeOrder = async () => {
     setIsConfirmOpen(false);
+    if (saving) return;
 
     const lines = buildStockLines(cart, ingredients, recipesByProductId);
     const result = registerSale(`Pedido mostrador · ${new Date().toLocaleTimeString('es-MX')}`, lines);
@@ -110,16 +112,27 @@ export default function NewOrderPage() {
       return acc + itemExtras * item.quantity;
     }, 0);
 
-    addOrder({
-      origin: 'Mostrador',
-      cart,
-      total: productsTotal + extrasTotal,
-      alreadyCharged: true,
-      paymentMethod: pendingPaymentMethod,
-    });
+    setSaving(true);
+    try {
+      const saved = await addOrder({
+        origin: 'Mostrador',
+        cart,
+        total: productsTotal + extrasTotal,
+        alreadyCharged: true,
+        paymentMethod: pendingPaymentMethod,
+      });
 
-    alert('¡Pedido confirmado y enviado a preparación!');
-    setCart([]);
+      if (!saved.ok) {
+        registerCancellation('Reversa: pedido de mostrador no guardado', lines);
+        alert(saved.reason ?? 'No se pudo guardar el pedido. Intenta de nuevo.');
+        return;
+      }
+
+      alert(saved.reason ?? '¡Pedido confirmado y enviado a preparación!');
+      setCart([]);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -151,6 +164,7 @@ export default function NewOrderPage() {
         onRemoveItem={handleRemoveItem}
         onEditExtras={handleEditExtras}
         onRequestConfirm={(method) => {
+          if (saving) return;
           setPendingPaymentMethod(method);
           setIsConfirmOpen(true);
         }}

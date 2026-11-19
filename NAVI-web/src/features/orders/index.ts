@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/ordersMock';
 export * from './utils/buildStockLines';
 export * from './utils/estimateOrderTime';
 export * from './context/useOrders';
