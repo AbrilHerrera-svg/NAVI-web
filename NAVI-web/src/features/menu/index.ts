@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/menuMock';
 export * from './context/useMenu';
 export * from './context/MenuContext';
 export * from './components/MenuNavHeader';
