@@ -58,3 +58,25 @@ export const getInitials = (name: string) =>
     .join('');
 
 export const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+// Usuario tal como lo devuelve el backend: el rol viene en minúsculas (admin, cajero...)
+// y el turno puede faltar en cuentas recién creadas.
+export interface UserRecord {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: UserStatus;
+  shift?: UserShift;
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'Dueño',
+  encargado: 'Encargado',
+  cajero: 'Cajero',
+  barista: 'Barista',
+  cocina: 'Cocina',
+};
+
+// "admin" → "Dueño" (mismo mapa que authController del backend)
+export const roleLabel = (role: string) => ROLE_LABELS[role] ?? role;

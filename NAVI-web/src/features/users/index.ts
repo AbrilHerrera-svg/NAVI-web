@@ -8,3 +8,4 @@ export * from './components/UserFormModal';
 export * from './components/DeactivateUserModal';
 export * from './components/TodayShiftCard';
 export * from './components/AssignedTasksCard';
+export * from './services/usersService';

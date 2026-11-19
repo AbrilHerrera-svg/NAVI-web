@@ -42,3 +42,9 @@ export const isMenuItemOrderableToday = (item: MenuItem, today: Date = new Date(
   if (item.weekendOnly && !WEEKEND_DAYS.includes(today.getDay())) return false;
   return true;
 };
+
+// Lo que se manda en PUT /api/menu/:id (actualización parcial, al menos un campo).
+export interface UpdateMenuItemPayload {
+  available?: boolean;
+  status?: MenuItem['status'];
+}

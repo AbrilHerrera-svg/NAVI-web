@@ -1,7 +1,7 @@
 import { LoginForm } from "../features/auth";
 
 interface Props {
-  onLogin: (email: string, password: string) => void;
+  onLogin: (email: string, password: string) => Promise<void>;
 }
 
 export default function LoginPage({ onLogin }: Props) {

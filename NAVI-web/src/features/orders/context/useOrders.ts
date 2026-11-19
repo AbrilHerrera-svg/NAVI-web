@@ -13,6 +13,8 @@ export interface NewOrderInput {
   paymentMethod?: OrderPaymentMethod;
 }
 
+// Resultado de cualquier acción sobre un pedido. Regresa { ok: false, reason } cuando no
+// se pudo hacer (regla de negocio o error del servidor), sin tronar en silencio.
 export interface AdvanceStatusResult {
   ok: boolean;
   reason?: string;
@@ -21,19 +23,23 @@ export interface AdvanceStatusResult {
 export interface OrdersContextValue {
   orders: OrderItemRecord[];
   exceptions: OrderExceptionItem[];
-  // Agrega un pedido nuevo a la cola compartida (ej. desde Nuevo pedido).
-  addOrder: (input: NewOrderInput) => void;
+  loading: boolean;
+  error: string;
+  // Vuelve a pedir los pedidos al backend.
+  reload: () => void;
+  // Guarda un pedido nuevo en el backend (ej. desde Nuevo pedido).
+  // Si ok es true y trae reason, es un aviso (el pedido sí se guardó).
+  addOrder: (input: NewOrderInput) => Promise<AdvanceStatusResult>;
   // Avanza el pedido a su siguiente estado.
   // - Nuevo → En preparación ("Cobrar"): requiere paymentMethod, descuenta inventario
   //   real y no avanza si no alcanza.
   // - En preparación → Listo: requiere que todos los renglones del carrito estén
   //   marcados como preparados.
-  // Regresa { ok: false, reason } cuando no se puede avanzar, sin tronar en silencio.
-  advanceStatus: (id: string, paymentMethod?: OrderPaymentMethod) => AdvanceStatusResult;
+  advanceStatus: (id: string, paymentMethod?: OrderPaymentMethod) => Promise<AdvanceStatusResult>;
   // Marca/desmarca un renglón del carrito como preparado.
-  toggleItemPrepared: (orderId: string, itemIndex: number) => void;
+  toggleItemPrepared: (orderId: string, itemIndex: number) => Promise<AdvanceStatusResult>;
   // Cancela el pedido; restituye inventario solo si esta sesión ya lo había cobrado.
-  cancelOrder: (id: string) => void;
+  cancelOrder: (id: string) => Promise<AdvanceStatusResult>;
   resolveException: (id: string) => void;
 }
 

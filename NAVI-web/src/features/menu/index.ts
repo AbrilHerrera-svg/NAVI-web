@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/menuMock';
 export * from './context/useMenu';
 export * from './context/MenuContext';
 export * from './components/MenuNavHeader';
@@ -9,3 +8,4 @@ export * from './components/ProductRecipeView';
 export * from './components/NewProductForm';
 export * from './components/MenuModals';
 export * from './components/AddIngredientModal';
+export * from './services/menuService';
