@@ -14,47 +14,47 @@ import MainLayout from "./components/layout/MainLayout";
 import TasksPage from "./pages/TasksPage";
 import { type PageId } from "./components/layout/Sidebar";
 import { type SearchEntry } from "./components/layout/searchIndex";
-import { useScrollToSection } from "./lib/useScrollToSection";
 import { InventoryProvider } from "./features/inventory";
 import { MenuProvider } from "./features/menu";
 import { OrdersProvider } from "./features/orders";
 import { CashRegisterProvider } from "./features/cash-register";
-import { iniciarSesion, cerrarSesion, obtenerSesion } from "./features/auth";
 import { SessionProvider, type ProfileInfo } from "./features/profile";
+import { login, logout } from "./features/auth";
+import { errorMessage } from "./lib/api";
+import { useScrollToSection } from "./lib/useScrollToSection";
 import { UsersProvider } from "./features/users";
 import { TasksProvider } from "./features/tasks";
 
 // Puedes importar aquí tus otras páginas a medida que las crees
 
 function App() {
-  // si ya había una sesión guardada, entra directo sin pedir login
-  const [profile, setProfile] = useState<ProfileInfo | null>(
-    () => obtenerSesion()?.perfil ?? null
-  );
+  // Perfil de quien inició sesión; null = no hay sesión
+  const [sessionProfile, setSessionProfile] = useState<ProfileInfo | null>(null);
   const [currentPage, setCurrentPage] = useState<PageId>("dashboard");
+  // Sección a la que debe hacer scroll el buscador del Topbar (null = ninguna)
+  const [pendingSection, setPendingSection] = useState<string | null>(null);
 
-  // sección a la que hay que hacer scroll después de que el buscador cambie de página
-  const [sectionToScroll, setSectionToScroll] = useState<string | null>(null);
-  const clearSectionToScroll = useCallback(() => setSectionToScroll(null), []);
-  useScrollToSection(sectionToScroll, clearSectionToScroll);
+  const clearPendingSection = useCallback(() => setPendingSection(null), []);
+  useScrollToSection(pendingSection, clearPendingSection);
 
+  // El buscador lleva a la página elegida y, si la entrada tiene sección, hace scroll hasta ella
   const handleSearchSelect = (entry: SearchEntry) => {
     setCurrentPage(entry.page);
-    if (entry.sectionId) {
-      setSectionToScroll(entry.sectionId);
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    setPendingSection(entry.sectionId ?? null);
+  };
+
+  const handleLogin = async (email: string, password: string): Promise<string | null> => {
+    try {
+      setSessionProfile(await login(email, password));
+      return null;
+    } catch (error) {
+      return errorMessage(error);
     }
   };
 
-  const handleLogin = async (email: string, password: string) => {
-    const perfil = await iniciarSesion(email, password);
-    setProfile(perfil);
-  };
-
   const handleLogout = () => {
-    cerrarSesion();
-    setProfile(null);
+    logout();
+    setSessionProfile(null);
     setCurrentPage("dashboard");
   };
 
@@ -103,12 +103,12 @@ function App() {
     }
   };
 
-  if (!profile) {
+  if (!sessionProfile) {
     return <LoginPage onLogin={handleLogin} />;
   }
 
   return (
-    <SessionProvider initialProfile={profile}>
+    <SessionProvider initialProfile={sessionProfile}>
       <UsersProvider>
         <TasksProvider>
           <InventoryProvider>

@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { CashOpeningInfo } from '../types';
+import type { CashOpeningInfo, CashSession, CloseDayInput } from '../types';
 
 export interface OpenDayResult {
   ok: boolean;
@@ -8,10 +8,12 @@ export interface OpenDayResult {
 
 export interface CashRegisterContextValue {
   opening: CashOpeningInfo;
+  // Sesión de hoy (ventas por método, gastos, reembolsos); null si la caja no se ha abierto
+  session: CashSession | null;
   // Monto final del cierre anterior; la apertura de hoy debe coincidir con este monto.
   previousCloseAmount: number;
   openDay: (initialFund: number, openedBy: string) => OpenDayResult;
-  closeDay: (countedFunds: number) => void;
+  closeDay: (input: CloseDayInput) => void;
 }
 
 export const CashRegisterReactContext = createContext<CashRegisterContextValue | null>(null);

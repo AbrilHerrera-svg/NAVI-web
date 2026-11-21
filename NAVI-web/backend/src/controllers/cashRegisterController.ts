@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { buscarSesion, abrirSesion, cerrarSesion } from "../models/cashRegisterModel";
+import { buscarSesion, abrirSesion, cerrarSesion, ultimoCierre } from "../models/cashRegisterModel";
 
 // GET /api/cash-register?date=yyyy-mm-dd — una sesión por día.
 export const getSesion = async (req: Request, res: Response) => {
@@ -32,6 +32,16 @@ export const postCerrar = async (req: Request, res: Response) => {
   try {
     await cerrarSesion(req.params.id, req.body);
     res.json({ ok: true });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};
+
+// GET /api/cash-register/last-close
+export const getUltimoCierre = async (_req: Request, res: Response) => {
+  try {
+    res.json(await ultimoCierre());
   } catch (error) {
     console.log(error);
     res.status(500).json({ mensaje: "Error en el servidor" });

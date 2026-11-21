@@ -3,26 +3,25 @@ import naviLogo from "../../../assets/navi-cohete.svg";
 import Button from "../../../components/ui/Button";
 
 interface Props {
-  onLogin: (email: string, password: string) => Promise<void>;
+  // Devuelve el mensaje de error si el inicio de sesión falla, o null si salió bien
+  onLogin: (email: string, password: string) => Promise<string | null>;
 }
 
 export const LoginForm = ({ onLogin }: Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setCargando(true);
-
-    try {
-      await onLogin(email, password);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo iniciar sesión");
-    } finally {
-      setCargando(false);
+    setLoading(true);
+    setError(null);
+    const message = await onLogin(email, password);
+    // si salió bien, esta pantalla se desmonta; solo se actualiza cuando hubo error
+    if (message) {
+      setError(message);
+      setLoading(false);
     }
   };
 
@@ -74,14 +73,10 @@ export const LoginForm = ({ onLogin }: Props) => {
           />
         </div>
 
-        {error && (
-          <p className="text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-100 rounded-lg px-3 py-2">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}
 
-        <Button type="submit" disabled={cargando} className="w-full py-2.5 text-sm disabled:opacity-60">
-          {cargando ? "Entrando..." : "Iniciar sesión"}
+        <Button type="submit" disabled={loading} className="w-full py-2.5 text-sm disabled:opacity-60">
+          {loading ? "Entrando..." : "Iniciar sesión"}
         </Button>
       </form>
 

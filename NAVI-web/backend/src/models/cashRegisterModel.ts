@@ -1,14 +1,18 @@
 import { db } from "../config/firebase";
 import { fromISO, toISO } from "../lib/dates";
-import type { Timestamp } from "firebase-admin/firestore";
+import { Timestamp } from "firebase-admin/firestore";
 
 const cashSessions = db.collection("cashSessions");
 
-const sessionOut = (id: string, data: Record<string, unknown>) => ({
-  id,
-  ...data,
-  date: toISO(data.date as Timestamp),
-});
+const sessionOut = (id: string, data: Record<string, unknown>) => {
+  const { openedAt, ...resto } = data;
+  return {
+    id,
+    ...resto,
+    date: toISO(data.date as Timestamp),
+    openedAt: openedAt ? (openedAt as Timestamp).toDate().toISOString() : null,
+  };
+};
 
 export const buscarSesion = async (fechaISO: string) => {
   const snap = await cashSessions.where("date", "==", fromISO(fechaISO)).limit(1).get();
@@ -23,6 +27,7 @@ export const abrirSesion = async (
   const ref = await cashSessions.add({
     ...datos,
     date: fromISO(fechaISO),
+    openedAt: Timestamp.now(),
     status: "Abierto",
     salesByMethod: [],
     dailyExpenses: [],
@@ -36,4 +41,18 @@ export const cerrarSesion = async (
   closing: { cashCounted: number; terminalCounted: number; transferCounted: number; difference: number; reason?: string }
 ) => {
   await cashSessions.doc(id).update({ status: "Cerrado", closing });
+};
+
+// Monto con el que cerró la última caja (efectivo + terminal + transferencias contados).
+// La apertura siguiente debe coincidir con este monto. null si nunca se ha cerrado una.
+export const ultimoCierre = async () => {
+  const snap = await cashSessions.orderBy("date", "desc").limit(30).get();
+  const cerrada = snap.docs.find((d) => d.data().status === "Cerrado" && d.data().closing);
+  if (!cerrada) return null;
+
+  const { closing, date } = cerrada.data();
+  return {
+    date: toISO(date as Timestamp),
+    amount: Math.round((closing.cashCounted + closing.terminalCounted + closing.transferCounted) * 100) / 100,
+  };
 };

@@ -1,10 +1,10 @@
 import { lastDaysISO } from "../../../lib/date";
-import { obtenerCaja } from "../../cash-register";
-import { obtenerIngredientes } from "../../inventory";
+import { getSessionApi } from "../../cash-register";
+import { listIngredientsApi } from "../../inventory";
 import { obtenerMenu } from "../../menu";
 import { obtenerPedidos } from "../../orders";
-import { obtenerTareas } from "../../tasks";
-import { obtenerUsuarios } from "../../users";
+import { listTasksApi } from "../../tasks";
+import { listUsersApi } from "../../users";
 import type { DashboardSource } from "../types";
 
 // Pide al backend todo lo que necesita el inicio, en paralelo.
@@ -16,11 +16,11 @@ export const obtenerDatosDashboard = async (incluirFinanzas: boolean): Promise<D
 
   const [orders, ingredients, menu, tasks, users, cajas] = await Promise.all([
     obtenerPedidos(),
-    obtenerIngredientes(),
+    listIngredientsApi(),
     obtenerMenu(),
-    obtenerTareas(hoy),
-    obtenerUsuarios(),
-    Promise.all(dias.map((dia) => obtenerCaja(dia))),
+    listTasksApi(hoy),
+    listUsersApi(),
+    Promise.all(dias.map((dia) => getSessionApi(dia))),
   ]);
 
   return {

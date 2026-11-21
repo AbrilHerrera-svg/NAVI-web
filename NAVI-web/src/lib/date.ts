@@ -2,8 +2,15 @@
 // para que ningún texto o filtro quede desincronizado del resto (ej. el encabezado del
 // Dashboard mostrando una fecha fija mientras Inventario usa la fecha real del sistema).
 
-// Fecha ISO (yyyy-mm-dd) del momento real actual.
-export const todayISO = () => new Date().toISOString().slice(0, 10);
+// Fecha ISO (yyyy-mm-dd) de HOY según la hora local del equipo (no en UTC),
+// para que coincida con la fecha que se muestra en pantalla.
+export const todayISO = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 const monthAbbrev = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 

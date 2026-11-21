@@ -14,7 +14,7 @@ import {
 
 interface Props {
   isOpen: boolean;
-  // Si viene una tarea, el modal edita; si no, crea una nueva.
+  // Si viene una tarea, el modal edita, si no, crea una nueva.
   task: Task | null;
   // Personas a las que se puede asignar (solo usuarios activos).
   assignees: TeamUser[];
