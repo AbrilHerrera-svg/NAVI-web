@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ProductItem, SelectedItemExtra } from '../types';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
+import { useExtras } from '../../extras';
 
 interface Props {
   product: ProductItem;
@@ -11,13 +12,11 @@ interface Props {
   onConfirm: (extras: SelectedItemExtra[]) => void;
 }
 
-const availableToppings = [
-  { id: 'top-1', name: 'Topping Oreo', price: 15 },
-  { id: 'top-2', name: 'Perlas de tapioca', price: 15 },
-  { id: 'top-3', name: 'Gelatina de coco', price: 15 },
-];
-
 export const OrderExtrasView = ({ product, initialExtras = [], isEditing = false, onBack, onConfirm }: Props) => {
+  const { items: catalogo, loading } = useExtras();
+  // Solo los que el staff dejó disponibles aparecen al armar un pedido.
+  const availableToppings = catalogo.filter((extra) => extra.available);
+
   const [counts, setCounts] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     for (const ex of initialExtras) initial[ex.extraId] = ex.quantity;
@@ -60,9 +59,14 @@ export const OrderExtrasView = ({ product, initialExtras = [], isEditing = false
 
       <Card className="shadow-xs space-y-6">
         <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-          <span className="font-bold text-sm text-slate-800">Toppings extra · $15 c/u</span>
+          <span className="font-bold text-sm text-slate-800">Toppings extra</span>
           <span className="text-xs text-slate-400">Opcional</span>
         </div>
+
+        {loading && <p className="text-sm text-slate-400">Cargando extras...</p>}
+        {!loading && availableToppings.length === 0 && (
+          <p className="text-sm text-slate-400">Todavía no hay extras disponibles.</p>
+        )}
 
         <div className="space-y-4">
           {availableToppings.map((top) => {

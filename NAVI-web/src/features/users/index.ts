@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/usersMock';
 export * from './context/useUsers';
 export * from './context/UsersContext';
 export * from './components/UsersHeader';
@@ -8,3 +7,4 @@ export * from './components/UserFormModal';
 export * from './components/DeactivateUserModal';
 export * from './components/TodayShiftCard';
 export * from './components/AssignedTasksCard';
+export * from './services/usersService';

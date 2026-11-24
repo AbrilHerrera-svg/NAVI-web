@@ -41,9 +41,17 @@ export const MenuNavHeader = ({
           >
             Tarjetas
           </button>
+          <button
+            onClick={() => onChangeTab('extras')}
+            className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+              currentTab === 'extras' ? 'bg-[#5960A1] text-white shadow-xs' : 'hover:text-slate-900'
+            }`}
+          >
+            Extras
+          </button>
         </div>
 
-        <Button onClick={onOpenNewProduct}>Agregar producto</Button>
+        {currentTab !== 'extras' && <Button onClick={onOpenNewProduct}>Agregar producto</Button>}
       </div>
     </div>
   );

@@ -47,3 +47,23 @@ export const registrarCompraSchema = z
     paymentMethod: z.string().trim().min(1).max(60),
   })
   .strict();
+
+// Descuenta (Venta) o restituye (Cancelación) existencias de varios ingredientes a la vez.
+export const registrarConsumoSchema = z
+  .object({
+    type: z.enum(["Venta", "Cancelación"]),
+    reference: z.string().trim().min(1).max(200),
+    date: isoDate,
+    lines: z
+      .array(
+        z
+          .object({
+            ingredientId: z.string().trim().min(1).max(200),
+            boxes: z.number().positive(),
+          })
+          .strict()
+      )
+      .min(1)
+      .max(100),
+  })
+  .strict();

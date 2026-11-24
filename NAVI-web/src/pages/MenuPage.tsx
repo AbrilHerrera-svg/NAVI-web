@@ -13,10 +13,11 @@ import {
   type MenuItem,
 } from '../features/menu';
 import { useInventory, type RecipeLine } from '../features/inventory';
+import { ExtrasView } from '../features/extras';
 
 export default function MenuPage() {
   const { updateRecipe } = useInventory();
-  const { items, toggleAvailable, archiveProduct, unarchiveProduct } = useMenu();
+  const { items, loading, error, reload, toggleAvailable, archiveProduct, unarchiveProduct } = useMenu();
   const [currentTab, setCurrentTab] = useState<MenuTab>('lista');
 
   // Sub-vistas (Receta y Nuevo Producto)
@@ -28,16 +29,27 @@ export default function MenuPage() {
   const [pendingRecipeLines, setPendingRecipeLines] = useState<RecipeLine[] | null>(null);
   const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
 
+  // Si el servidor no pudo guardar el cambio, se avisa.
+  const alertIfFailed = (result: { ok: boolean; reason?: string }) => {
+    if (!result.ok && result.reason) alert(result.reason);
+  };
+
+  // Prender/apagar disponibilidad
+  const handleToggleAvailable = async (id: string) => {
+    alertIfFailed(await toggleAvailable(id));
+  };
+
   // Confirmar archivar
-  const handleConfirmArchive = () => {
+  const handleConfirmArchive = async () => {
     if (!archiveTarget) return;
-    archiveProduct(archiveTarget.id);
+    const id = archiveTarget.id;
     setArchiveTarget(null);
+    alertIfFailed(await archiveProduct(id));
   };
 
   // Desarchivar: regresa el producto a Activo y disponible
-  const handleUnarchive = (item: MenuItem) => {
-    unarchiveProduct(item.id);
+  const handleUnarchive = async (item: MenuItem) => {
+    alertIfFailed(await unarchiveProduct(item.id));
   };
 
   return (
@@ -64,10 +76,21 @@ export default function MenuPage() {
             onOpenNewProduct={() => setIsCreatingProduct(true)}
           />
 
+          {error && (
+            <div role="alert" className="flex items-center justify-between gap-4 text-sm text-rose-700 bg-rose-50 border border-rose-100 rounded-xl px-4 py-3">
+              <span>{error}</span>
+              <button onClick={reload} className="font-semibold underline cursor-pointer">
+                Reintentar
+              </button>
+            </div>
+          )}
+
+          {loading && items.length === 0 && <p className="text-sm text-slate-400">Cargando menú...</p>}
+
           {currentTab === 'lista' && (
             <MenuTableView
               items={items}
-              onToggleAvailable={toggleAvailable}
+              onToggleAvailable={handleToggleAvailable}
               onRequestArchive={setArchiveTarget}
               onUnarchive={handleUnarchive}
               onOpenRecipe={setSelectedRecipeProduct}
@@ -80,6 +103,8 @@ export default function MenuPage() {
               onOpenRecipe={setSelectedRecipeProduct}
             />
           )}
+
+          {currentTab === 'extras' && <ExtrasView />}
         </>
       )}
 

@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/cashRegisterMock';
 export * from './context/useCashRegister';
 export * from './context/CashRegisterContext';
 export * from './components/CashRegisterHeader';
@@ -9,3 +8,5 @@ export * from './components/SalesByMethodCard';
 export * from './components/DailyExpensesCard';
 export * from './components/RefundsCard';
 export * from './components/ClosingCard';
+
+export * from './services/cashRegisterService';

@@ -1,7 +1,7 @@
-import { useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useInventory } from '../../inventory';
-import { mockOrdersData, mockOrderExceptions } from '../data/ordersMock';
-import type { OrderItemRecord, OrderPaymentMethod } from '../types';
+import { actualizarPedido, crearPedido, obtenerPedidos } from '../services/ordersService';
+import type { OrderExceptionItem, OrderItemRecord, OrderPaymentMethod } from '../types';
 import { buildStockLines } from '../utils/buildStockLines';
 import { OrdersReactContext, type AdvanceStatusResult, type NewOrderInput } from './useOrders';
 
@@ -12,120 +12,200 @@ const nextStatus: Partial<Record<OrderItemRecord['status'], OrderItemRecord['sta
   Listo: 'Recogido',
 };
 
+// El backend los devuelve sin orden: los más nuevos (folio más alto) van primero.
+const folio = (order: OrderItemRecord) => parseInt(order.orderNumber.replace(/\D/g, ''), 10) || 0;
+const newestFirst = (list: OrderItemRecord[]) => [...list].sort((a, b) => folio(b) - folio(a));
+
+const messageOf = (err: unknown, fallback: string) => (err instanceof Error ? err.message : fallback);
+
 export const OrdersProvider = ({ children }: { children: ReactNode }) => {
   const { ingredients, registerSale, registerCancellation, recipesByProductId } = useInventory();
-  const [orders, setOrders] = useState<OrderItemRecord[]>(mockOrdersData);
-  const [exceptions, setExceptions] = useState(mockOrderExceptions);
-  const [nextOrderNumber, setNextOrderNumber] = useState(99);
+  const [orders, setOrders] = useState<OrderItemRecord[]>([]);
+  // Las excepciones aún no existen en el backend, así que empiezan vacías.
+  const [exceptions, setExceptions] = useState<OrderExceptionItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
   // Pedidos a los que SÍ se les descontó inventario en esta sesión (al cobrar o al
-  // crearse ya pagados), para saber si cancelarlos debe restituir existencias. Los
-  // pedidos precargados del mock nunca pasaron por este descuento, así que cancelarlos
-  // no toca inventario (evita inflar existencias que nunca se restaron).
+  // crearse ya pagados), para saber si cancelarlos debe restituir existencias.
   const [chargedOrderIds, setChargedOrderIds] = useState<Set<string>>(new Set());
+  // Pedidos con una acción en curso: evita doble clic (ej. cobrar dos veces).
+  const busy = useRef(new Set<string>());
 
-  const addOrder = (input: NewOrderInput) => {
-    const id = `ord-${Date.now()}`;
-    const orderNumber = `#${nextOrderNumber}`;
-    setNextOrderNumber((n) => n + 1);
+  useEffect(() => {
+    let cancelled = false; // evita actualizar el estado si el componente ya se cerró
 
+    obtenerPedidos()
+      .then((datos) => {
+        if (cancelled) return;
+        setOrders(newestFirst(datos));
+        setError('');
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(messageOf(err, 'No se pudieron cargar los pedidos'));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
+
+  const reload = useCallback(() => {
+    setLoading(true);
+    setReloadKey((key) => key + 1);
+  }, []);
+
+  const patchOrder = (id: string, changes: Partial<OrderItemRecord>) =>
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, ...changes } : o)));
+
+  const markCharged = (id: string) => setChargedOrderIds((prev) => new Set(prev).add(id));
+
+  const addOrder = async (input: NewOrderInput): Promise<AdvanceStatusResult> => {
     const time = new Date().toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit' });
     const productsSummary = input.cart
       .map((item) => `${item.product.name}${item.product.size ? ` ${item.product.size}` : ''}`)
-      .join(', ');
+      .join(', ')
+      .slice(0, 500); // el backend acepta máximo 500 caracteres
 
-    setOrders((prev) => [
-      {
-        id,
-        orderNumber,
+    let created: OrderItemRecord;
+    try {
+      created = await crearPedido({
         origin: input.origin,
         receivedTime: time,
         dueTime: 'Por definir',
         customerName: input.customerName,
         productsSummary,
         total: input.total,
-        status: input.alreadyCharged ? 'En preparación' : 'Nuevo',
         paymentMethod: input.alreadyCharged ? input.paymentMethod : undefined,
         cart: input.cart,
-      },
-      ...prev,
-    ]);
+      });
+    } catch (err) {
+      return { ok: false, reason: messageOf(err, 'No se pudo guardar el pedido') };
+    }
 
-    if (input.alreadyCharged) {
-      setChargedOrderIds((prev) => new Set(prev).add(id));
+    // El backend siempre crea el pedido como "Nuevo"; si ya se cobró, se pasa a preparación.
+    if (!input.alreadyCharged) {
+      setOrders((prev) => [created, ...prev]);
+      return { ok: true };
+    }
+
+    try {
+      await actualizarPedido(created.id, { status: 'En preparación' });
+      setOrders((prev) => [{ ...created, status: 'En preparación' }, ...prev]);
+      markCharged(created.id);
+      return { ok: true };
+    } catch {
+      // El pedido sí quedó guardado (como "Nuevo"); no se reintenta para no duplicarlo.
+      setOrders((prev) => [created, ...prev]);
+      return {
+        ok: true,
+        reason: `El pedido ${created.orderNumber} se guardó, pero no se pudo pasar a preparación. Cóbralo desde Pedidos.`,
+      };
     }
   };
 
-  const advanceStatus = (id: string, paymentMethod?: OrderPaymentMethod): AdvanceStatusResult => {
+  const advanceStatus = async (id: string, paymentMethod?: OrderPaymentMethod): Promise<AdvanceStatusResult> => {
     const order = orders.find((o) => o.id === id);
     if (!order) return { ok: false, reason: 'El pedido ya no existe.' };
     const next = nextStatus[order.status];
     if (!next) return { ok: false, reason: 'Este pedido no tiene un siguiente estado.' };
+    if (busy.current.has(id)) return { ok: false, reason: 'Espera un momento, el pedido se está actualizando.' };
 
-    // "Cobrar" es la transición Nuevo → En preparación: no se puede cobrar sin método de
-    // pago, y ahí se descuenta inventario real.
-    if (order.status === 'Nuevo') {
-      if (!paymentMethod) {
-        return { ok: false, reason: 'Elige un método de pago para cobrar el pedido.' };
-      }
-      if (order.cart) {
-        const result = registerSale(
-          `Pedido ${order.orderNumber}`,
-          buildStockLines(order.cart, ingredients, recipesByProductId)
-        );
-        if (!result.ok) {
-          return {
-            ok: false,
-            reason: `No se puede cobrar ${order.orderNumber}: no alcanza el inventario de ${result.missing
-              .map((m) => m.ingredientName)
-              .join(', ')}.`,
-          };
+    busy.current.add(id);
+    let soldLines: ReturnType<typeof buildStockLines> | null = null;
+
+    try {
+      // "Cobrar" es la transición Nuevo → En preparación: no se puede cobrar sin método de
+      // pago, y ahí se descuenta inventario real.
+      if (order.status === 'Nuevo') {
+        if (!paymentMethod) {
+          return { ok: false, reason: 'Elige un método de pago para cobrar el pedido.' };
+        }
+        if (order.cart) {
+          const lines = buildStockLines(order.cart, ingredients, recipesByProductId);
+          const result = registerSale(`Pedido ${order.orderNumber}`, lines);
+          if (!result.ok) {
+            return {
+              ok: false,
+              reason: `No se puede cobrar ${order.orderNumber}: no alcanza el inventario de ${result.missing
+                .map((m) => m.ingredientName)
+                .join(', ')}.`,
+            };
+          }
+          soldLines = lines;
         }
       }
-      setChargedOrderIds((prev) => new Set(prev).add(order.id));
-    }
 
-    // "Marcar listo" es En preparación → Listo: todos los renglones deben estar preparados.
-    if (order.status === 'En preparación' && order.cart && order.cart.some((item) => !item.prepared)) {
-      return { ok: false, reason: 'Marca todos los productos del pedido como preparados antes de pasarlo a Listo.' };
-    }
+      // "Marcar listo" es En preparación → Listo: todos los renglones deben estar preparados.
+      if (order.status === 'En preparación' && order.cart && order.cart.some((item) => !item.prepared)) {
+        return { ok: false, reason: 'Marca todos los productos del pedido como preparados antes de pasarlo a Listo.' };
+      }
 
-    setOrders((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, status: next, paymentMethod: paymentMethod ?? o.paymentMethod } : o))
-    );
-    return { ok: true };
+      await actualizarPedido(id, { status: next, ...(paymentMethod ? { paymentMethod } : {}) });
+      patchOrder(id, { status: next, paymentMethod: paymentMethod ?? order.paymentMethod });
+      if (order.status === 'Nuevo') markCharged(id);
+      return { ok: true };
+    } catch (err) {
+      // No se guardó el cobro: se regresa el inventario que ya se había descontado.
+      if (soldLines) registerCancellation(`Reversa por error al cobrar ${order.orderNumber}`, soldLines);
+      return { ok: false, reason: messageOf(err, 'No se pudo actualizar el pedido') };
+    } finally {
+      busy.current.delete(id);
+    }
   };
 
-  const toggleItemPrepared = (orderId: string, itemIndex: number) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === orderId && o.cart
-          ? {
-              ...o,
-              cart: o.cart.map((item, i) => (i === itemIndex ? { ...item, prepared: !item.prepared } : item)),
-            }
-          : o
-      )
-    );
+  const toggleItemPrepared = async (orderId: string, itemIndex: number): Promise<AdvanceStatusResult> => {
+    const order = orders.find((o) => o.id === orderId);
+    if (!order?.cart) return { ok: false };
+    if (busy.current.has(orderId)) return { ok: false }; // ya hay un cambio en curso
+
+    const cart = order.cart.map((item, i) => (i === itemIndex ? { ...item, prepared: !item.prepared } : item));
+
+    busy.current.add(orderId);
+    try {
+      await actualizarPedido(orderId, { cart });
+      patchOrder(orderId, { cart });
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, reason: messageOf(err, 'No se pudo marcar el producto') };
+    } finally {
+      busy.current.delete(orderId);
+    }
   };
 
-  const cancelOrder = (id: string) => {
+  const cancelOrder = async (id: string): Promise<AdvanceStatusResult> => {
     const order = orders.find((o) => o.id === id);
-    if (!order) return;
+    if (!order) return { ok: false, reason: 'El pedido ya no existe.' };
+    if (busy.current.has(id)) return { ok: false, reason: 'Espera un momento, el pedido se está actualizando.' };
 
-    // Solo restituye inventario si esta sesión lo había descontado al cobrar.
-    if (chargedOrderIds.has(order.id) && order.cart) {
-      registerCancellation(
-        `Cancelación ${order.orderNumber}`,
-        buildStockLines(order.cart, ingredients, recipesByProductId)
-      );
-      setChargedOrderIds((prev) => {
-        const next = new Set(prev);
-        next.delete(order.id);
-        return next;
-      });
+    busy.current.add(id);
+    try {
+      await actualizarPedido(id, { status: 'Cancelado' });
+
+      // Solo restituye inventario si esta sesión lo había descontado al cobrar.
+      if (chargedOrderIds.has(id) && order.cart) {
+        registerCancellation(
+          `Cancelación ${order.orderNumber}`,
+          buildStockLines(order.cart, ingredients, recipesByProductId)
+        );
+        setChargedOrderIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
+
+      patchOrder(id, { status: 'Cancelado' });
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, reason: messageOf(err, 'No se pudo cancelar el pedido') };
+    } finally {
+      busy.current.delete(id);
     }
-
-    setOrders((prev) => prev.map((o) => (o.id === order.id ? { ...o, status: 'Cancelado' } : o)));
   };
 
   const resolveException = (id: string) => {
@@ -134,7 +214,18 @@ export const OrdersProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <OrdersReactContext.Provider
-      value={{ orders, exceptions, addOrder, advanceStatus, toggleItemPrepared, cancelOrder, resolveException }}
+      value={{
+        orders,
+        exceptions,
+        loading,
+        error,
+        reload,
+        addOrder,
+        advanceStatus,
+        toggleItemPrepared,
+        cancelOrder,
+        resolveException,
+      }}
     >
       {children}
     </OrdersReactContext.Provider>

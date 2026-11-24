@@ -2,14 +2,14 @@ import { useState } from 'react';
 import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
-import type { ClosingSummary, ClosingInputs } from '../types';
+import type { ClosingSummary, ClosingInputs, CloseDayInput } from '../types';
 
 interface Props {
   summary: ClosingSummary;
   inputs: ClosingInputs;
   initialReason: string;
   dateLabel: string;
-  onCloseDay?: (countedFunds: number) => void;
+  onCloseDay?: (input: CloseDayInput) => void;
   // Si viene, el cierre queda bloqueado aunque la caja cuadre (ej. tareas de
   // apertura/cierre pendientes) y se muestra el motivo en vez del botón.
   blockedReason?: string;
@@ -120,7 +120,15 @@ export const ClosingCard = ({ summary, inputs, initialReason, dateLabel, onClose
       <div className="flex items-center justify-between pt-2">
         <span className="text-xs text-slate-400">{dateLabel}</span>
         <Button
-          onClick={() => onCloseDay?.(countedFunds)}
+          onClick={() =>
+            onCloseDay?.({
+              cashCounted: parseFloat(cashCounted) || 0,
+              terminalCounted: parseFloat(terminalCounted) || 0,
+              transferCounted: parseFloat(transferCounted) || 0,
+              difference: Math.round(difference * 100) / 100,
+              reason: hasDifference ? reason.trim() : undefined,
+            })
+          }
           disabled={!canClose}
           className="disabled:opacity-40 disabled:cursor-not-allowed"
         >

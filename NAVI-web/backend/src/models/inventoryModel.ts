@@ -1,16 +1,21 @@
 import { db } from "../config/firebase";
 import { fromISO, toISO } from "../lib/dates";
 import { siguienteFolio } from "./counterModel";
-import type { Timestamp } from "firebase-admin/firestore";
+import { FieldValue, type Timestamp } from "firebase-admin/firestore";
 
 const ingredients = db.collection("ingredients");
 const movements = db.collection("inventoryMovements");
 
-const movementOut = (id: string, data: Record<string, unknown>) => ({
-  id,
-  ...data,
-  date: toISO(data.date as Timestamp),
-});
+const movementOut = (id: string, data: Record<string, unknown>) => {
+  const { createdAt, ...resto } = data;
+  return {
+    id,
+    ...resto,
+    date: toISO(data.date as Timestamp),
+    // hora exacta en que se registró (el front la muestra en su zona horaria)
+    createdAt: createdAt ? (createdAt as Timestamp).toDate().toISOString() : null,
+  };
+};
 
 export const listarIngredientes = async () => {
   const snap = await ingredients.get();
@@ -27,6 +32,21 @@ export const crearIngrediente = async (datos: {
 }) => {
   const { initialStock, ...resto } = datos;
   const ref = await ingredients.add({ ...resto, stock: initialStock });
+
+  // la existencia inicial queda en el historial para que el stock siempre se explique
+  if (initialStock > 0) {
+    await movements.add({
+      ingredientId: ref.id,
+      ingredientName: resto.name,
+      type: "Ajuste",
+      quantity: initialStock,
+      date: fromISO(new Date().toISOString().slice(0, 10)),
+      reference: "Alta de ingrediente · existencia inicial",
+      notes: null,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  }
+
   return { id: ref.id, ...resto, stock: initialStock };
 };
 
@@ -77,6 +97,7 @@ const aplicarMovimiento = async (input: {
       date: fromISO(input.date),
       reference: input.reference,
       notes: input.notes ?? null,
+      createdAt: FieldValue.serverTimestamp(),
     });
   });
 
@@ -126,5 +147,54 @@ export const registrarCompra = async (input: {
     date: input.date,
     reference: `${folio} · ${input.supplier} · $${input.totalCost}`,
     notes: input.notes,
+  });
+};
+
+export class ExistenciasInsuficientes extends Error {
+  constructor(public faltantes: { ingredientId: string; ingredientName: string }[]) {
+    super("Existencias insuficientes");
+  }
+}
+
+// Venta (descuenta) o cancelación (restituye) de varios ingredientes en UNA sola
+// transacción: o se aplica todo o no se aplica nada, y una venta nunca deja
+// el stock en negativo aunque dos cajeros cobren al mismo tiempo.
+export const registrarConsumo = async (input: {
+  type: "Venta" | "Cancelación";
+  reference: string;
+  date: string;
+  lines: { ingredientId: string; boxes: number }[];
+}) => {
+  // si el mismo ingrediente viene dos veces, se suma
+  const porIngrediente = new Map<string, number>();
+  input.lines.forEach((l) => porIngrediente.set(l.ingredientId, (porIngrediente.get(l.ingredientId) ?? 0) + l.boxes));
+
+  await db.runTransaction(async (tx) => {
+    const lecturas = await Promise.all(
+      [...porIngrediente.entries()].map(async ([id, boxes]) => ({ id, boxes, snap: await tx.get(ingredients.doc(id)) }))
+    );
+
+    const signo = input.type === "Venta" ? -1 : 1;
+    const faltantes = lecturas
+      .filter(({ snap, boxes }) => !snap.exists || (input.type === "Venta" && snap.data()!.stock < boxes))
+      .map(({ id, snap }) => ({ ingredientId: id, ingredientName: snap.exists ? (snap.data()!.name as string) : id }));
+
+    if (faltantes.length > 0) throw new ExistenciasInsuficientes(faltantes);
+
+    for (const { id, boxes, snap } of lecturas) {
+      const ingrediente = snap.data()!;
+      const cantidad = signo * boxes;
+      tx.update(ingredients.doc(id), { stock: Math.round((ingrediente.stock + cantidad) * 1000) / 1000 });
+      tx.set(movements.doc(), {
+        ingredientId: id,
+        ingredientName: ingrediente.name,
+        type: input.type,
+        quantity: cantidad,
+        date: fromISO(input.date),
+        reference: input.reference,
+        notes: null,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
   });
 };

@@ -57,7 +57,7 @@ export interface OrderItemRecord {
 }
 
 // Deriva la acción principal del pedido a partir de su estado actual,
-// para que el botón siempre coincida con el estado real (no con un valor fijo del mock).
+// para que el botón siempre coincida con el estado real del servidor.
 export const getPrimaryAction = (
   status: OrderStatus
 ): { label: string; color: 'default' | 'success' } | null => {
@@ -84,4 +84,24 @@ export interface OrderExceptionItem {
   metaValue: string;
   primaryAction: string;
   secondaryAction?: string;
+}
+
+// Lo que se manda en POST /api/orders (el backend asigna orderNumber y status "Nuevo").
+export interface CreateOrderPayload {
+  origin: OrderOrigin;
+  receivedTime: string;
+  dueTime: string;
+  customerName?: string;
+  productsSummary: string;
+  total: number;
+  paymentMethod?: OrderPaymentMethod;
+  cart?: CartItem[];
+}
+
+// Lo que se manda en PUT /api/orders/:id (actualización parcial, al menos un campo).
+export interface UpdateOrderPayload {
+  status?: OrderStatus;
+  paymentMethod?: OrderPaymentMethod;
+  customerName?: string;
+  cart?: CartItem[];
 }

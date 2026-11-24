@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/tasksMock';
 export * from './context/useTasks';
 export * from './context/TasksContext';
 export * from './components/TasksHeader';
@@ -10,3 +9,4 @@ export * from './components/CloseDayBanner';
 export * from './components/CleaningCard';
 export * from './components/TaskFormModal';
 export * from './components/DeleteTaskModal';
+export * from './services/tasksService';

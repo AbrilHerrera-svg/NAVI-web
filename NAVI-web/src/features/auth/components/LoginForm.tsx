@@ -3,16 +3,26 @@ import naviLogo from "../../../assets/navi-cohete.svg";
 import Button from "../../../components/ui/Button";
 
 interface Props {
-  onLogin: (email: string, password: string) => void;
+  // Devuelve el mensaje de error si el inicio de sesión falla, o null si salió bien
+  onLogin: (email: string, password: string) => Promise<string | null>;
 }
 
 export const LoginForm = ({ onLogin }: Props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin(email, password);
+    setLoading(true);
+    setError(null);
+    const message = await onLogin(email, password);
+    // si salió bien, esta pantalla se desmonta; solo se actualiza cuando hubo error
+    if (message) {
+      setError(message);
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,8 +73,10 @@ export const LoginForm = ({ onLogin }: Props) => {
           />
         </div>
 
-        <Button type="submit" className="w-full py-2.5 text-sm">
-          Iniciar sesión
+        {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}
+
+        <Button type="submit" disabled={loading} className="w-full py-2.5 text-sm disabled:opacity-60">
+          {loading ? "Entrando..." : "Iniciar sesión"}
         </Button>
       </form>
 

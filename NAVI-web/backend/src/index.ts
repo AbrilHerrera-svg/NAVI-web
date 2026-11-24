@@ -11,6 +11,8 @@ import orderRoutes from "./routes/orderRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import cashRegisterRoutes from "./routes/cashRegisterRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
+import extraRoutes from "./routes/extraRoutes";
+import ventasRoutes from "./routes/ventasRoutes";
 import { verificarToken } from "./middleware/auth";
 
 const app = express();
@@ -56,6 +58,8 @@ app.use("/api/orders", verificarToken, orderRoutes);
 app.use("/api/tasks", verificarToken, taskRoutes);
 app.use("/api/cash-register", verificarToken, cashRegisterRoutes);
 app.use("/api/settings", verificarToken, settingsRoutes);
+app.use("/api/extras", verificarToken, extraRoutes);
+app.use("/api/ventas", ventasRoutes); // ya trae su propio verificarToken
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);

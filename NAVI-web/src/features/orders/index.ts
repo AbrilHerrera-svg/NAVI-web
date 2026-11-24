@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/ordersMock';
 export * from './utils/buildStockLines';
 export * from './utils/estimateOrderTime';
 export * from './context/useOrders';
@@ -14,3 +13,4 @@ export * from './components/OrderCatalog';
 export * from './components/OrderExtrasView';
 export * from './components/OrderSummarySidebar';
 export * from './components/OrderConfirmModal';
+export * from './services/ordersService';

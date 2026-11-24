@@ -40,3 +40,29 @@ export interface ClosingInputs {
   terminalCounted: number;
   transferCounted: number;
 }
+
+// Datos que se envían al cerrar la caja (POST /api/cash-register/:id/close).
+export interface CloseDayInput {
+  cashCounted: number;
+  terminalCounted: number;
+  transferCounted: number;
+  difference: number;
+  reason?: string;
+}
+
+// Sesión de caja de un día, tal como la devuelve el backend (GET /api/cash-register?date=).
+export interface CashSessionRecord {
+  id: string;
+  date: string; // ISO yyyy-mm-dd
+  status: 'Abierto' | 'Cerrado';
+  openedBy: string;
+  initialFund: number;
+  openedAt?: string | null; // ISO con hora; null si el backend no la tiene
+  salesByMethod: SalesByMethodItem[];
+  dailyExpenses: DailyExpenseItem[];
+  refunds: RefundItem[];
+  closing?: CloseDayInput;
+}
+
+// Alias que usan el contexto, el servicio y la página de Caja.
+export type CashSession = CashSessionRecord;

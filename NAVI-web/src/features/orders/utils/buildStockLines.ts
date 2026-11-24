@@ -1,11 +1,5 @@
 import type { CartItem, ProductItem } from '../types';
-import {
-  amountToBoxes,
-  mockRecipesByExtraId,
-  type InventoryIngredient,
-  type RecipeLine,
-  type StockLine,
-} from '../../inventory';
+import { amountToBoxes, type InventoryIngredient, type RecipeLine, type StockLine } from '../../inventory';
 
 // Cuántas unidades (en la unidad nativa del ingrediente) consume una línea de receta
 // según el tamaño del producto vendido.
@@ -41,12 +35,16 @@ export const buildStockLines = (
     }
 
     for (const extra of item.extras) {
-      // Los extras (toppings) son independientes del tamaño del producto: siempre usan amountSingle.
-      const extraLine = mockRecipesByExtraId[extra.extraId];
-      const ingredient = extraLine && ingredients.find((i) => i.id === extraLine.ingredientId);
-      const amount = extraLine?.amountSingle;
-      if (!ingredient || !amount) continue;
-      addBoxes(ingredient.id, amountToBoxes(ingredient, amount) * extra.quantity * item.quantity);
+      // Los extras (toppings) son independientes del tamaño del producto: siempre usan
+      // amountSingle. Su receta vive en la misma colección que la de productos (el id
+      // del doc es el extraId), así que se busca en el mismo mapa.
+      const extraRecipe = recipesByProductId[extra.extraId] ?? [];
+      for (const line of extraRecipe) {
+        const ingredient = ingredients.find((i) => i.id === line.ingredientId);
+        const amount = line.amountSingle;
+        if (!ingredient || !amount) continue;
+        addBoxes(ingredient.id, amountToBoxes(ingredient, amount) * extra.quantity * item.quantity);
+      }
     }
   }
 

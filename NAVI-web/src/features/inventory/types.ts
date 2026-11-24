@@ -94,8 +94,12 @@ export const formatMoney = (value: number) =>
   `$${value.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 // Deriva el estado a partir de la existencia, para que siempre coincida con el stock real.
-export const getStockStatus = (ingredient: InventoryIngredient): StockStatus => {
+export const getStockStatus = (ingredient: Pick<InventoryIngredient, 'stock' | 'minStock'>): StockStatus => {
   if (ingredient.stock <= 0) return 'Agotado';
   if (ingredient.stock <= ingredient.minStock) return 'Bajo';
   return 'Disponible';
 };
+
+
+// Ingrediente tal como lo devuelve el backend (dependentProducts se calcula en el front).
+export type IngredientRecord = Omit<InventoryIngredient, 'dependentProducts'>;
