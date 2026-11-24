@@ -1,13 +1,14 @@
 import type { Request, Response } from "express";
-import { buscarUsuarioPorUid } from "../models/userModel";
+import { getAuth } from "firebase-admin/auth";
+import { buscarUsuarioPorUid, crearUsuarioConUid } from "../models/userModel";
 
 // rol de firestore -> rol que usa el front
 const roles: Record<string, string> = {
   admin: "Dueño",
-  encargado: "Encargado",
   cajero: "Cajero",
   barista: "Barista",
   cocina: "Cocina",
+  cliente: "Cliente",
 };
 
 export const login = async (req: Request, res: Response) => {
@@ -101,6 +102,77 @@ export const refresh = async (req: Request, res: Response) => {
       token: datos.id_token,
       refreshToken: datos.refresh_token,
       expiresIn: Number(datos.expires_in),
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};
+
+// Crea el perfil en Firestore para una cuenta de cliente que la app móvil ya
+// registró directamente en Firebase Auth. Requiere un idToken válido (verificarToken).
+export const registerCliente = async (req: Request, res: Response) => {
+  const uid = req.uid as string;
+  const { name, phone } = req.body;
+
+  try {
+    const existente = await buscarUsuarioPorUid(uid);
+    if (existente) {
+      res.status(409).json({ mensaje: "Ya tienes un perfil registrado" });
+      return;
+    }
+
+    const cuenta = await getAuth().getUser(uid);
+
+    const datos = {
+      name,
+      email: cuenta.email ?? "",
+      phone: phone ?? "",
+      role: "cliente",
+      status: "Activo",
+    };
+
+    await crearUsuarioConUid(uid, datos);
+
+    res.status(201).json({
+      perfil: {
+        name: datos.name,
+        email: datos.email,
+        phone: datos.phone,
+        role: roles[datos.role] ?? datos.role,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};
+
+// Perfil del usuario autenticado; la app móvil lo pide tras iniciar sesión
+// directamente con Firebase Auth, para saber su nombre/rol/estado.
+export const me = async (req: Request, res: Response) => {
+  const uid = req.uid as string;
+
+  try {
+    const usuario = await buscarUsuarioPorUid(uid);
+
+    if (!usuario) {
+      res.status(404).json({ mensaje: "Tu cuenta no tiene perfil en el sistema" });
+      return;
+    }
+
+    if (usuario.status === "Inactivo") {
+      res.status(403).json({ mensaje: "Tu cuenta está desactivada" });
+      return;
+    }
+
+    res.json({
+      perfil: {
+        name: usuario.name,
+        email: usuario.email,
+        phone: usuario.phone,
+        role: roles[usuario.role] ?? usuario.role,
+      },
     });
   } catch (error) {
     console.log(error);

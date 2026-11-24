@@ -24,6 +24,13 @@ export const crearUsuario = async (datos: object) => {
   return { id: ref.id, ...datos };
 };
 
+// La cuenta de Firebase Auth ya existe (la crea el cliente); el perfil se
+// guarda con ese mismo uid como id del documento.
+export const crearUsuarioConUid = async (uid: string, datos: object) => {
+  await users.doc(uid).set(datos);
+  return { id: uid, ...datos };
+};
+
 export const actualizarUsuario = async (uid: string, datos: object) => {
   await users.doc(uid).update(datos);
 };
