@@ -208,3 +208,17 @@ export const actualizarMiPerfil = async (req: Request, res: Response) => {
     res.status(500).json({ mensaje: "Error en el servidor" });
   }
 };
+
+// Guarda el token de notificaciones push del dispositivo; solo sobre la
+// propia cuenta. Se vuelve a llamar cada vez que Firebase lo renueva.
+export const actualizarFcmToken = async (req: Request, res: Response) => {
+  const uid = req.uid as string;
+
+  try {
+    await actualizarUsuario(uid, { fcmToken: req.body.token });
+    res.json({ ok: true });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};

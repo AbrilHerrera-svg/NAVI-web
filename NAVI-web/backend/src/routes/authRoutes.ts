@@ -1,9 +1,9 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
-import { login, refresh, registerCliente, me, actualizarMiPerfil } from "../controllers/authController";
+import { login, refresh, registerCliente, me, actualizarMiPerfil, actualizarFcmToken } from "../controllers/authController";
 import { verificarToken } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
-import { loginSchema, refreshSchema, registerSchema, actualizarPerfilSchema } from "../schemas/authSchemas";
+import { loginSchema, refreshSchema, registerSchema, actualizarPerfilSchema, fcmTokenSchema } from "../schemas/authSchemas";
 
 const router = Router();
 
@@ -29,5 +29,8 @@ router.get("/me", verificarToken, me);
 
 // PUT /api/auth/me — edita el propio nombre/teléfono (pantalla de Perfil)
 router.put("/me", verificarToken, validateBody(actualizarPerfilSchema), actualizarMiPerfil);
+
+// PUT /api/auth/fcm-token — registra/renueva el token de push del dispositivo
+router.put("/fcm-token", verificarToken, validateBody(fcmTokenSchema), actualizarFcmToken);
 
 export default router;

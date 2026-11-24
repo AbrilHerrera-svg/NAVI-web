@@ -20,6 +20,12 @@ export const registerSchema = z
   })
   .strict();
 
+export const fcmTokenSchema = z
+  .object({
+    token: z.string().trim().min(10).max(4096),
+  })
+  .strict();
+
 export const actualizarPerfilSchema = z
   .object({
     name: z.string().trim().min(1).max(100),
