@@ -9,6 +9,7 @@ import {
   postCompra,
 } from "../controllers/inventoryController";
 import { getReceta, putReceta } from "../controllers/recipeController";
+import { ROLES_STAFF, requireRole } from "../middleware/auth";
 import { validateBody, validateIdParam } from "../middleware/validate";
 import {
   crearIngredienteSchema,
@@ -19,6 +20,9 @@ import {
 import { guardarRecetaSchema } from "../schemas/recipeSchemas";
 
 const router = Router();
+
+// Todo el inventario es de staff; un cliente no tiene por qué tocar esto.
+router.use(requireRole(...ROLES_STAFF));
 
 router.get("/ingredients", getIngredientes);
 router.post("/ingredients", validateBody(crearIngredienteSchema), postIngrediente);
