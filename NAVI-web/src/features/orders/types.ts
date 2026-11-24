@@ -57,7 +57,7 @@ export interface OrderItemRecord {
 }
 
 // Deriva la acción principal del pedido a partir de su estado actual,
-// para que el botón siempre coincida con el estado real (no con un valor fijo del mock).
+// para que el botón siempre coincida con el estado real del servidor.
 export const getPrimaryAction = (
   status: OrderStatus
 ): { label: string; color: 'default' | 'success' } | null => {

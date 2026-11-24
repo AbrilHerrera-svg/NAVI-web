@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { errorMessage } from '../../../lib/api';
 import { todayISO, formatIsoDateEs } from '../../../lib/date';
-import { mockRecipesByExtraId } from '../data/recipesMock';
 import {
   adjustStockApi,
   createIngredientApi,
@@ -13,10 +12,10 @@ import {
   registerPurchaseApi,
   saveRecipeApi,
   updateIngredientApi,
-  type IngredientRecord,
 } from '../services/inventoryService';
 import {
   roundBoxes,
+  type IngredientRecord,
   type InventoryIngredient,
   type InventoryMovement,
   type NewIngredientInput,
@@ -28,13 +27,9 @@ import {
 import { InventoryReactContext, type DeleteResult, type SaleResult, type StockLine } from './useInventory';
 
 // Verdadero si algún producto o extra del catálogo usa este ingrediente en su receta.
-const isUsedInRecipe = (ingredientId: string, recipesByProductId: Record<string, RecipeLine[]>) => {
-  const inProducts = Object.values(recipesByProductId).some((lines) =>
-    lines.some((line) => line.ingredientId === ingredientId)
-  );
-  const inExtras = Object.values(mockRecipesByExtraId).some((line) => line.ingredientId === ingredientId);
-  return inProducts || inExtras;
-};
+// recipesByProductId ya trae ambos (el id del doc es el del producto o el del extra).
+const isUsedInRecipe = (ingredientId: string, recipesByProductId: Record<string, RecipeLine[]>) =>
+  Object.values(recipesByProductId).some((lines) => lines.some((line) => line.ingredientId === ingredientId));
 
 // Etiqueta de fecha para movimientos nuevos: la fecha (capturada o de hoy) + hora actual.
 const buildDateLabel = (isoDate: string) => {

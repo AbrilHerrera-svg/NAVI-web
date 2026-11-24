@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/tasksMock';
 export * from './context/useTasks';
 export * from './context/TasksContext';
 export * from './components/TasksHeader';

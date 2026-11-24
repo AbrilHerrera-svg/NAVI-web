@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/cashRegisterMock';
 export * from './context/useCashRegister';
 export * from './context/CashRegisterContext';
 export * from './components/CashRegisterHeader';

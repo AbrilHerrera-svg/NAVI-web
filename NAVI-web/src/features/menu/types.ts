@@ -1,4 +1,4 @@
-export type MenuTab = 'lista' | 'tarjetas';
+export type MenuTab = 'lista' | 'tarjetas' | 'extras';
 
 export const MENU_CATEGORIES = [
   'Té con leche',

@@ -1,6 +1,4 @@
 export * from './types';
-export * from './data/inventoryMock';
-export * from './data/recipesMock';
 export * from './context/useInventory';
 export * from './context/InventoryContext';
 export * from './components/InventoryHeader';

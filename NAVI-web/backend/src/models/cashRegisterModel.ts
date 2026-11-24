@@ -24,7 +24,7 @@ export const abrirSesion = async (
   fechaISO: string,
   datos: { openedBy: string; initialFund: number }
 ) => {
-  const ref = await cashSessions.add({
+  await cashSessions.add({
     ...datos,
     date: fromISO(fechaISO),
     openedAt: Timestamp.now(),

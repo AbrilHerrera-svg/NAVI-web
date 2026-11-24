@@ -13,6 +13,7 @@ import {
   type MenuItem,
 } from '../features/menu';
 import { useInventory, type RecipeLine } from '../features/inventory';
+import { ExtrasView } from '../features/extras';
 
 export default function MenuPage() {
   const { updateRecipe } = useInventory();
@@ -102,6 +103,8 @@ export default function MenuPage() {
               onOpenRecipe={setSelectedRecipeProduct}
             />
           )}
+
+          {currentTab === 'extras' && <ExtrasView />}
         </>
       )}
 

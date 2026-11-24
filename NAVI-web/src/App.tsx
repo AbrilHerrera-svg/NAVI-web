@@ -18,6 +18,7 @@ import { InventoryProvider } from "./features/inventory";
 import { MenuProvider } from "./features/menu";
 import { OrdersProvider } from "./features/orders";
 import { CashRegisterProvider } from "./features/cash-register";
+import { ExtrasProvider } from "./features/extras";
 import { SessionProvider, type ProfileInfo } from "./features/profile";
 import { login, logout } from "./features/auth";
 import { errorMessage } from "./lib/api";
@@ -113,18 +114,20 @@ function App() {
         <TasksProvider>
           <InventoryProvider>
             <MenuProvider>
-              <OrdersProvider>
-                <CashRegisterProvider>
-                  <MainLayout
-                    currentPage={currentPage}
-                    onNavigate={setCurrentPage}
-                    onLogout={handleLogout}
-                    onSearchSelect={handleSearchSelect}
-                  >
-                    {renderCurrentPage()}
-                  </MainLayout>
-                </CashRegisterProvider>
-              </OrdersProvider>
+              <ExtrasProvider>
+                <OrdersProvider>
+                  <CashRegisterProvider>
+                    <MainLayout
+                      currentPage={currentPage}
+                      onNavigate={setCurrentPage}
+                      onLogout={handleLogout}
+                      onSearchSelect={handleSearchSelect}
+                    >
+                      {renderCurrentPage()}
+                    </MainLayout>
+                  </CashRegisterProvider>
+                </OrdersProvider>
+              </ExtrasProvider>
             </MenuProvider>
           </InventoryProvider>
         </TasksProvider>

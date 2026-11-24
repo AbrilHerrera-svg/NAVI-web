@@ -1,5 +1,4 @@
 export * from './types';
-export * from './data/usersMock';
 export * from './context/useUsers';
 export * from './context/UsersContext';
 export * from './components/UsersHeader';

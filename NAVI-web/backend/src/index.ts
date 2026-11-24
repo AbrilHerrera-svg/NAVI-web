@@ -11,6 +11,7 @@ import orderRoutes from "./routes/orderRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import cashRegisterRoutes from "./routes/cashRegisterRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
+import extraRoutes from "./routes/extraRoutes";
 import ventasRoutes from "./routes/ventasRoutes";
 import { verificarToken } from "./middleware/auth";
 
@@ -20,8 +21,24 @@ const PORT = process.env.PORT || 3000;
 // cabeceras de seguridad (CSP, no-sniff, etc.)
 app.use(helmet());
 
-// permitir que el front (vite) haga peticiones; origen configurable en prod
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || "http://localhost:5173" }));
+// permitir que el front (vite) y la app móvil en modo web hagan peticiones.
+// En prod se restringe a CLIENT_ORIGIN; en dev se acepta cualquier puerto de
+// localhost/127.0.0.1 (Flutter Web elige uno distinto cada vez que corres
+// `flutter run`). Apps nativas (Android/iOS) no mandan Origin, así que esto
+// no les afecta.
+const origenesPermitidos = /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/;
+
+app.use(
+  cors({
+    origin: (origen, callback) => {
+      if (process.env.CLIENT_ORIGIN) {
+        callback(null, origen === process.env.CLIENT_ORIGIN);
+        return;
+      }
+      callback(null, !origen || origenesPermitidos.test(origen));
+    },
+  })
+);
 
 // limita el tamaño del body para evitar payloads gigantes (DoS)
 app.use(express.json({ limit: "100kb" }));
@@ -41,6 +58,7 @@ app.use("/api/orders", verificarToken, orderRoutes);
 app.use("/api/tasks", verificarToken, taskRoutes);
 app.use("/api/cash-register", verificarToken, cashRegisterRoutes);
 app.use("/api/settings", verificarToken, settingsRoutes);
+app.use("/api/extras", verificarToken, extraRoutes);
 app.use("/api/ventas", ventasRoutes); // ya trae su propio verificarToken
 
 app.listen(PORT, () => {
