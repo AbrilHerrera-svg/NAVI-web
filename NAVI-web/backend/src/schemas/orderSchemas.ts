@@ -42,6 +42,15 @@ export const crearPedidoSchema = z
   })
   .strict();
 
+// Mensaje manual del staff a UN pedido (ej. "tu pedido se retrasó 10 min"),
+// no una promoción general a todos los clientes.
+export const notificarPedidoSchema = z
+  .object({
+    title: z.string().trim().min(1).max(120),
+    body: z.string().trim().min(1).max(300),
+  })
+  .strict();
+
 export const actualizarPedidoSchema = z
   .object({
     status: z.enum(["Nuevo", "En preparación", "Listo", "Recogido", "Cancelado"]).optional(),

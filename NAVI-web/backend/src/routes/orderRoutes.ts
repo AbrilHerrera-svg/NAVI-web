@@ -1,8 +1,15 @@
 import { Router } from "express";
-import { getPedidos, getPedido, getMisPedidos, postPedido, putPedido } from "../controllers/orderController";
+import {
+  getPedidos,
+  getPedido,
+  getMisPedidos,
+  postPedido,
+  putPedido,
+  postNotificarPedido,
+} from "../controllers/orderController";
 import { ROLES_STAFF, requireRole } from "../middleware/auth";
 import { validateBody, validateIdParam } from "../middleware/validate";
-import { crearPedidoSchema, actualizarPedidoSchema } from "../schemas/orderSchemas";
+import { crearPedidoSchema, actualizarPedidoSchema, notificarPedidoSchema } from "../schemas/orderSchemas";
 
 const router = Router();
 
@@ -15,5 +22,13 @@ router.get("/mine", getMisPedidos);
 router.get("/:id", requireRole(...ROLES_STAFF), validateIdParam("id"), getPedido);
 router.post("/", validateBody(crearPedidoSchema), postPedido);
 router.put("/:id", requireRole(...ROLES_STAFF), validateIdParam("id"), validateBody(actualizarPedidoSchema), putPedido);
+// Mensaje manual del staff a este pedido (no una promoción a todos los clientes).
+router.post(
+  "/:id/notify",
+  requireRole(...ROLES_STAFF),
+  validateIdParam("id"),
+  validateBody(notificarPedidoSchema),
+  postNotificarPedido
+);
 
 export default router;

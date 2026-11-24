@@ -6,6 +6,8 @@ import {
   actualizarPedido,
   listarPedidosPorCliente,
 } from "../models/orderModel";
+import { buscarUsuarioPorUid } from "../models/userModel";
+import { enviarNotificacion, mensajePorEstadoPedido } from "../services/notificaciones";
 
 export const getPedidos = async (_req: Request, res: Response) => {
   try {
@@ -55,10 +57,56 @@ export const postPedido = async (req: Request, res: Response) => {
 };
 
 // Cambia estado, método de pago, etc. — un solo endpoint de actualización
-// parcial, igual que users/menu.
+// parcial, igual que users/menu. Si cambia el estado y el pedido es de un
+// cliente de la app (tiene customerUid), le avisamos por push.
 export const putPedido = async (req: Request, res: Response) => {
   try {
+    const pedidoAntes = req.body.status
+      ? ((await buscarPedido(req.params.id)) as { customerUid?: string; orderNumber?: string } | null)
+      : null;
+
     await actualizarPedido(req.params.id, req.body);
+
+    if (req.body.status && pedidoAntes?.customerUid) {
+      const cliente = await buscarUsuarioPorUid(pedidoAntes.customerUid);
+      if (cliente?.fcmToken) {
+        await enviarNotificacion(
+          cliente.fcmToken,
+          `Pedido ${pedidoAntes.orderNumber ?? ""}`.trim(),
+          mensajePorEstadoPedido(req.body.status)
+        );
+      }
+    }
+
+    res.json({ ok: true });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};
+
+// Mensaje manual del staff a UN pedido (no una promoción a todos). Solo
+// sirve si el pedido es de un cliente de la app (tiene customerUid y token).
+export const postNotificarPedido = async (req: Request, res: Response) => {
+  try {
+    const pedido = (await buscarPedido(req.params.id)) as { customerUid?: string } | null;
+    if (!pedido) {
+      res.status(404).json({ mensaje: "Pedido no encontrado" });
+      return;
+    }
+
+    if (!pedido.customerUid) {
+      res.status(400).json({ mensaje: "Este pedido no es de un cliente de la app" });
+      return;
+    }
+
+    const cliente = await buscarUsuarioPorUid(pedido.customerUid);
+    if (!cliente?.fcmToken) {
+      res.status(400).json({ mensaje: "El cliente no tiene notificaciones activas" });
+      return;
+    }
+
+    await enviarNotificacion(cliente.fcmToken, req.body.title, req.body.body);
     res.json({ ok: true });
   } catch (error) {
     console.log(error);
