@@ -1,9 +1,9 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
-import { login, refresh, registerCliente, me } from "../controllers/authController";
+import { login, refresh, registerCliente, me, actualizarMiPerfil } from "../controllers/authController";
 import { verificarToken } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
-import { loginSchema, refreshSchema, registerSchema } from "../schemas/authSchemas";
+import { loginSchema, refreshSchema, registerSchema, actualizarPerfilSchema } from "../schemas/authSchemas";
 
 const router = Router();
 
@@ -26,5 +26,8 @@ router.post("/register", limiteRegistro, verificarToken, validateBody(registerSc
 
 // GET /api/auth/me — perfil del usuario autenticado (lo pide la app móvil tras login)
 router.get("/me", verificarToken, me);
+
+// PUT /api/auth/me — edita el propio nombre/teléfono (pantalla de Perfil)
+router.put("/me", verificarToken, validateBody(actualizarPerfilSchema), actualizarMiPerfil);
 
 export default router;

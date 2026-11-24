@@ -19,3 +19,12 @@ export const registerSchema = z
     phone: z.string().trim().min(1).max(30).optional(),
   })
   .strict();
+
+export const actualizarPerfilSchema = z
+  .object({
+    name: z.string().trim().min(1).max(100),
+    phone: z.string().trim().min(1).max(30),
+  })
+  .partial()
+  .strict()
+  .refine((datos) => Object.keys(datos).length > 0, { message: "No hay campos para actualizar" });

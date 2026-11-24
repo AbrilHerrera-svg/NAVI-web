@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { getAuth } from "firebase-admin/auth";
-import { buscarUsuarioPorUid, crearUsuarioConUid } from "../models/userModel";
+import { buscarUsuarioPorUid, crearUsuarioConUid, actualizarUsuario } from "../models/userModel";
 
 // rol de firestore -> rol que usa el front
 const roles: Record<string, string> = {
@@ -172,6 +172,35 @@ export const me = async (req: Request, res: Response) => {
         email: usuario.email,
         phone: usuario.phone,
         role: roles[usuario.role] ?? usuario.role,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};
+
+// Edita el propio perfil (nombre/teléfono); solo sobre el uid del token, no
+// sobre un id que mande el cliente, así nadie edita el perfil de alguien más.
+export const actualizarMiPerfil = async (req: Request, res: Response) => {
+  const uid = req.uid as string;
+
+  try {
+    const usuario = await buscarUsuarioPorUid(uid);
+    if (!usuario) {
+      res.status(404).json({ mensaje: "Tu cuenta no tiene perfil en el sistema" });
+      return;
+    }
+
+    await actualizarUsuario(uid, req.body);
+    const actualizado = { ...usuario, ...req.body };
+
+    res.json({
+      perfil: {
+        name: actualizado.name,
+        email: actualizado.email,
+        phone: actualizado.phone,
+        role: roles[actualizado.role] ?? actualizado.role,
       },
     });
   } catch (error) {
