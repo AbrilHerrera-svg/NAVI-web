@@ -76,6 +76,37 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+// Firebase manda el correo con el enlace. La respuesta es igual exista o no la
+// cuenta, para no revelar qué correos están registrados.
+export const recuperarContrasena = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  try {
+    const url = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.FIREBASE_API_KEY}`;
+
+    const respuesta = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Firebase-Locale": "es" },
+      body: JSON.stringify({ requestType: "PASSWORD_RESET", email }),
+    });
+
+    if (!respuesta.ok) {
+      const datos = await respuesta.json();
+      const motivo = String(datos.error?.message || "");
+      console.log("Error de firebase al recuperar contraseña:", motivo);
+      if (!motivo.includes("EMAIL_NOT_FOUND")) {
+        res.status(502).json({ mensaje: "No se pudo enviar el correo, intenta más tarde" });
+        return;
+      }
+    }
+
+    res.json({ mensaje: "Si el correo está registrado, recibirás un enlace para cambiar tu contraseña" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};
+
 // El idToken dura 1 hora; el front debe pedir uno nuevo con el refreshToken
 // (que no expira hasta que se revoque) en vez de forzar un login de nuevo.
 export const refresh = async (req: Request, res: Response) => {
