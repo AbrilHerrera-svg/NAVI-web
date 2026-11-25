@@ -19,6 +19,13 @@ export const login = async (email: string, password: string): Promise<ProfileInf
   return data.perfil;
 };
 
+export const recoverPassword = (email: string) =>
+  apiFetch<{ mensaje: string }>('/auth/recover', {
+    method: 'POST',
+    body: { email },
+    auth: false,
+  });
+
 export const logout = () => clearTokens();
 
 // Compatibilidad: menú, pedidos y ventas piden datos con peticionAuth(ruta, { method, body: string }).

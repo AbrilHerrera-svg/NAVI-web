@@ -1,6 +1,8 @@
 import { useState } from "react";
 import naviLogo from "../../../assets/navi-cohete.svg";
 import Button from "../../../components/ui/Button";
+import { ApiError, errorMessage } from "../../../lib/api";
+import { recoverPassword } from "../services/authService";
 
 interface Props {
   // Devuelve el mensaje de error si el inicio de sesión falla, o null si salió bien
@@ -12,17 +14,42 @@ export const LoginForm = ({ onLogin }: Props) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setNotice(null);
     const message = await onLogin(email, password);
     // si salió bien, esta pantalla se desmonta; solo se actualiza cuando hubo error
     if (message) {
       setError(message);
       setLoading(false);
     }
+  };
+
+  const handleRecover = async () => {
+    setError(null);
+    setNotice(null);
+    if (!email.trim()) {
+      setError("Escribe tu correo para recuperar la contraseña");
+      return;
+    }
+    setRecovering(true);
+    try {
+      const { mensaje } = await recoverPassword(email.trim());
+      setNotice(mensaje);
+    } catch (err) {
+      // el límite de intentos responde en texto plano, sin "mensaje"
+      setError(
+        err instanceof ApiError && err.status === 429
+          ? "Demasiados intentos, intenta más tarde"
+          : errorMessage(err)
+      );
+    }
+    setRecovering(false);
   };
 
   return (
@@ -74,6 +101,7 @@ export const LoginForm = ({ onLogin }: Props) => {
         </div>
 
         {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}
+        {notice && <p role="status" className="text-xs text-emerald-600 font-medium">{notice}</p>}
 
         <Button type="submit" disabled={loading} className="w-full py-2.5 text-sm disabled:opacity-60">
           {loading ? "Entrando..." : "Iniciar sesión"}
@@ -82,10 +110,11 @@ export const LoginForm = ({ onLogin }: Props) => {
 
       <button
         type="button"
-        onClick={() => alert("Funcionalidad de recuperación de contraseña próximamente")}
-        className="text-sm text-[#5960A1] hover:underline cursor-pointer"
+        onClick={handleRecover}
+        disabled={recovering}
+        className="text-sm text-[#5960A1] hover:underline cursor-pointer disabled:opacity-60"
       >
-        ¿Olvidaste tu contraseña?
+        {recovering ? "Enviando correo..." : "¿Olvidaste tu contraseña?"}
       </button>
     </div>
   );
