@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import { useExtras } from '../context/useExtras';
+import { notify, confirmDialog } from '../../../components/ui/notify';
 
 // Administra el catálogo de extras/toppings (nombre, precio, disponibilidad);
 // lo mismo que usa el flujo de "Agregar extras" al armar un pedido.
@@ -33,10 +34,16 @@ export const ExtrasView = () => {
   };
 
   const handleEliminar = async (id: string, name: string) => {
-    if (!confirm(`¿Eliminar "${name}"? Esto no borra lo ya vendido.`)) return;
-    const resultado = await deleteExtra(id);
-    if (!resultado.ok && resultado.reason) alert(resultado.reason);
-  };
+  const accepted = await confirmDialog({
+    title: `¿Eliminar "${name}"?`,
+    message: 'Esto no borra lo ya vendido.',
+    confirmLabel: 'Eliminar',
+    variant: 'danger',
+  });
+  if (!accepted) return;
+  const resultado = await deleteExtra(id);
+  if (!resultado.ok && resultado.reason) notify.error(resultado.reason);
+};
 
   return (
     <div className="space-y-6">

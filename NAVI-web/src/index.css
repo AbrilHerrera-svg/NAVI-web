@@ -1,3 +1,62 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Animaciones de las notificaciones (components/ui/NotificationHost) */
+@keyframes navi-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes navi-toast-bar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes navi-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes navi-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.navi-toast-in {
+  animation: navi-toast-in 0.25s ease-out;
+}
+
+.navi-toast-bar {
+  animation-name: navi-toast-bar;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.navi-fade-in {
+  animation: navi-fade-in 0.15s ease-out;
+}
+
+.navi-pop-in {
+  animation: navi-pop-in 0.2s ease-out;
+}

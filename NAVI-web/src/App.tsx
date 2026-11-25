@@ -25,8 +25,7 @@ import { errorMessage } from "./lib/api";
 import { useScrollToSection } from "./lib/useScrollToSection";
 import { UsersProvider } from "./features/users";
 import { TasksProvider } from "./features/tasks";
-
-// Puedes importar aquí tus otras páginas a medida que las crees
+import NotificationHost from "./components/ui/NotificationHost";
 
 function App() {
   // Perfil de quien inició sesión; null = no hay sesión
@@ -105,10 +104,16 @@ function App() {
   };
 
   if (!sessionProfile) {
-    return <LoginPage onLogin={handleLogin} />;
+    return (
+      <>
+        <LoginPage onLogin={handleLogin} />
+        <NotificationHost />
+      </>
+    );
   }
 
   return (
+    <>
     <SessionProvider initialProfile={sessionProfile}>
       <UsersProvider>
         <TasksProvider>
@@ -133,6 +138,8 @@ function App() {
         </TasksProvider>
       </UsersProvider>
     </SessionProvider>
+    <NotificationHost />
+    </>
   );
 }
 

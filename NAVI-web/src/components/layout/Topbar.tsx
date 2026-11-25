@@ -1,24 +1,23 @@
 import { useState } from "react";
 import * as Icons from "lucide-react";
-import { type PageId } from "./Sidebar"
+import { type PageId } from "./Sidebar";
 import SearchBox from "./SearchBox";
 import { type SearchEntry } from "./searchIndex";
+import { confirmDialog } from "../ui/notify";
 
-const pageTitles: Record<PageId, string> = 
-    {
-      dashboard: "Inicio",
-      sales: "Ventas",
-      orders: "Pedidos",
-      "new-order": "Nuevo pedido",
-      menu: "Menú",
-      inventory: "Inventario",
-      tasks: "Tareas",
-      users: "Usuarios",
-      "cash-register": "Caja",
-      profile: "Mi perfil",
-      settings: "Configuración",
-    }
-
+const pageTitles: Record<PageId, string> = {
+  dashboard: "Inicio",
+  sales: "Ventas",
+  orders: "Pedidos",
+  "new-order": "Nuevo pedido",
+  menu: "Menú",
+  inventory: "Inventario",
+  tasks: "Tareas",
+  users: "Usuarios",
+  "cash-register": "Caja",
+  profile: "Mi perfil",
+  settings: "Configuración",
+};
 
 interface TopbarProps {
   currentPage: PageId;
@@ -69,9 +68,15 @@ export default function Topbar({ currentPage, onNavigate, onLogout, onSearchSele
                 Configuración
               </button>
               <button
-                onClick={() => {
+                onClick={async () => {
                   setIsMenuOpen(false);
-                  if (confirm("¿Cerrar sesión?")) {
+                  const accepted = await confirmDialog({
+                    title: "¿Cerrar sesión?",
+                    message: "Tendrás que volver a iniciar sesión para entrar.",
+                    confirmLabel: "Cerrar sesión",
+                    variant: "danger",
+                  });
+                  if (accepted) {
                     onLogout();
                   }
                 }}
