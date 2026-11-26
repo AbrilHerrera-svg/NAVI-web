@@ -1,5 +1,4 @@
 import Card from "../../../components/ui/Card";
-import Button from "../../../components/ui/Button";
 import type { SalesBar, SalesPaymentMethod } from "../types";
 
 interface Props {
@@ -19,15 +18,8 @@ export const SalesCharts = ({ title, chart, paymentMethods, totalLabel }: Props)
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Ventas por hora / por día */}
       <Card className="shadow-xs lg:col-span-2 flex flex-col justify-between">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8">
           <h2 className="text-sm font-bold text-slate-800">{title}</h2>
-          <Button
-            variant="secondary"
-            onClick={() => alert('Exportar reporte — próximamente')}
-            className="px-3 py-1.5 shadow-2xs"
-          >
-            Exportar
-          </Button>
         </div>
 
         {sinVentas ? (
